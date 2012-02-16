@@ -17,6 +17,8 @@ QPndman::Manager* QPndman::Manager::getManager()
 
 QPndman::Manager::~Manager()
 {
+  removeAllDevices();
+  removeAllRepositories();
   pndman_quit();
 }
 
@@ -69,16 +71,13 @@ bool QPndman::Manager::addDevice(QString const& path)
   while(latestDevice->next != 0)
     latestDevice = latestDevice->next;
   
-  if(pndman_read_from_device(&_repositories, latestDevice))
-    return false;
-  
   emit devicesChanged(getDevices());
   return true;
 }
 
 bool QPndman::Manager::detectDevices()
 {
-  return false;
+  return pndman_device_detect(&_devices) == 0;
 }
 
 bool QPndman::Manager::removeDevice(QString const& path)
@@ -96,7 +95,7 @@ bool QPndman::Manager::removeDevice(QString const& path)
 
 bool QPndman::Manager::removeAllDevices()
 {
-  pndman_device_free_all(&_devices);
+  return pndman_device_free_all(&_devices) == 0;
 }
 
 QList<QPndman::Device*> QPndman::Manager::getDevices()
@@ -113,17 +112,23 @@ QList<QPndman::Device*> QPndman::Manager::getDevices()
 
 QPndman::Handle* QPndman::Manager::createHandle(QString const& name)
 {
-  return 0;
+  Handle* handle = new Handle;
+  if(pndman_handle_init(name.toLocal8Bit().data(), handle->getPndmanHandle()))
+    return 0;
+  handle->update();
+  return handle;
 }
 
 bool QPndman::Manager::performHandle(Handle* handle)
 {
-  return false;
+  return pndman_handle_perform(handle->getPndmanHandle()) == 0;
 }
 
 bool QPndman::Manager::removeHandle(Handle* handle)
 {
-  return false;
+  if(pndman_handle_free(handle->getPndmanHandle()))
+    return false;
+  delete handle;
 }
 
 

@@ -5,7 +5,7 @@
 int main()
 {
   QPndman::Manager* manager = QPndman::Manager::getManager();
-  if(!manager->addDevice("/tmp/qtlibpndman"))
+  if(!manager->addDevice("/tmp"))
   {
     qDebug() << "Error adding device!";
     return 1;
