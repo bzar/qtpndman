@@ -1,0 +1,2 @@
+ADD_SUBDIRECTORY(jansson)
+ADD_SUBDIRECTORY(libpndman)

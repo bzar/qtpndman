@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 2.6)
+
+find_package(CURL REQUIRED)
+find_package(OpenSSL REQUIRED)
+
+include_directories(${JANSSON_BINARY_DIR}/include/)
+
+file (GLOB_RECURSE PNDMAN_SRCS src/lib/*.c)
+add_library(pndman ${PNDMAN_SRCS})
+target_link_libraries(pndman curl ssl jansson)
