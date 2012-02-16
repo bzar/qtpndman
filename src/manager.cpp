@@ -1,5 +1,7 @@
 #include "manager.h"
 
+#include <QDebug>
+
 QScopedPointer<QPndman::Manager> QPndman::Manager::_manager(0);
 
 QPndman::Manager* QPndman::Manager::getManager()
@@ -22,33 +24,56 @@ QPndman::Manager::~Manager()
 bool QPndman::Manager::addRepository(QString const& url)
 {
   if(pndman_repository_add(url.toLocal8Bit().data(), &_repositories))
-  {
-    emit repositoriesChanged(getRepositories());
-    return true;
-  }
+    return false;
   
-  return false;
+  emit repositoriesChanged(getRepositories());
+  return true;
 }
 
 bool QPndman::Manager::removeRepository(QString const& url)
 {
+  for(pndman_repository* r = &_repositories; r != 0; r = r->next)
+  {
+    if(QString(r->url) == url)
+    {
+      pndman_repository_free(r);
+      return true;
+    }
+  }
   return false;
 }
 
 bool QPndman::Manager::removeAllRepositories()
 {
-  return false;
+  pndman_repository_free_all(&_repositories);
 }
 
 QList<QPndman::Repository*> QPndman::Manager::getRepositories()
 {
-  return QList<Repository*>();
+  QList<Repository*> repositories;
+  for(pndman_repository* r = &_repositories; r != 0; r = r->next)
+  {
+    repositories << new Repository(r->url, r->name, r->updates, QDateTime::fromTime_t(r->timestamp), r->version, QList<Package>(), r->exist);
+  }
+  
+  return repositories;
 }
 
 
 bool QPndman::Manager::addDevice(QString const& path)
 {
-  return false;
+  if(pndman_device_add(path.toLocal8Bit().data(), &_devices))
+    return false;
+  
+  pndman_device* latestDevice = &_devices;
+  while(latestDevice->next != 0)
+    latestDevice = latestDevice->next;
+  
+  if(pndman_read_from_device(&_repositories, latestDevice))
+    return false;
+  
+  emit devicesChanged(getDevices());
+  return true;
 }
 
 bool QPndman::Manager::detectDevices()
@@ -58,17 +83,31 @@ bool QPndman::Manager::detectDevices()
 
 bool QPndman::Manager::removeDevice(QString const& path)
 {
+  for(pndman_device* d = &_devices; d != 0; d = d->next)
+  {
+    if(QString(d->mount) == path || QString(d->device) == path)
+    {
+      pndman_device_free(d);
+      return true;
+    }
+  }
   return false;
 }
 
 bool QPndman::Manager::removeAllDevices()
 {
-  return false;
+  pndman_device_free_all(&_devices);
 }
 
 QList<QPndman::Device*> QPndman::Manager::getDevices()
 {
-  return QList<Device*>();
+  QList<Device*> devices;
+  for(pndman_device* d = &_devices; d != 0; d = d->next)
+  {
+    devices << new Device(d->mount, d->device, d->size, d->free, d->available);
+  }
+  
+  return devices;
 }
 
 
@@ -90,22 +129,46 @@ bool QPndman::Manager::removeHandle(Handle* handle)
 
 int QPndman::Manager::download()
 {
-  return 0;
+  return pndman_download();
 }
 
 bool QPndman::Manager::sync(Repository* repository)
 {
+  for(pndman_repository* r = &_repositories; r != 0; r = r->next)
+  {
+    if(QString(r->url) == repository->getUrl())
+    {
+      pndman_sync_request(r);
+      pndman_sync();
+      return true;
+    }
+  }
+  
   return false;
 }
 
 int QPndman::Manager::sync(QList<Repository*> const& repositories)
 {
-  return 0;
+  int result = 0;
+  foreach(Repository* r, repositories)
+  {
+    if(sync(r))
+    {
+      result += 1;
+    }
+  }
+  return result;
 }
 
 int QPndman::Manager::syncAll()
 {
-  return 0;
+  int result = 0;
+  for(pndman_repository* r = &_repositories; r != 0; r = r->next)
+  {
+    pndman_sync_request(r);
+    result += pndman_sync();
+  }
+  return result;
 }
 
 

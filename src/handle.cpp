@@ -1,56 +1,103 @@
 #include "handle.h"
 
-QPndman::Handle::Handle(QString const& main, QString const& error, QString const& url, unsigned int const& flags, bool const& done, QObject* parent) : QObject(parent), 
-  _main(main), _error(error), _url(url), _flags(flags), _done(done)
+QPndman::Handle::Handle() : QObject(0), 
+  _handle(), _name(""), _error(""), _force(false), _operation(Handle::Install), _installLocation(Handle::Desktop), _done(false)
 {
 }
 
-QPndman::Handle::Handle(Handle const& other) : QObject(0), 
-  _main(other._main), _error(other._error), _url(other._url), _flags(other._flags), _done(other._done)
+pndman_handle* QPndman::Handle::getPndmanHandle()
 {
+  return &_handle;
 }
 
-QPndman::Handle& QPndman::Handle::operator=(Handle const& other)
+void QPndman::Handle::update()
 {
-  if(&other == this)
-    return *this;
+  setName(_handle.name);
+  setError(_handle.error);
+  setForce(_handle.flags & PNDMAN_HANDLE_FORCE);
   
-  _main = other._main;
-  _error = other._error;
-  _url = other._url;
-  _flags = other._flags;
-  _done = other._done;
+  if(_handle.flags & PNDMAN_HANDLE_INSTALL) setOperation(Handle::Install);
+  else if(_handle.flags & PNDMAN_HANDLE_REMOVE) setOperation(Handle::Remove);
   
-  return *this;
+  if(_handle.flags & PNDMAN_HANDLE_INSTALL_DESKTOP) setInstallLocation(Handle::Desktop);
+  else if(_handle.flags & PNDMAN_HANDLE_INSTALL_MENU) setInstallLocation(Handle::Menu);
+  else if(_handle.flags & PNDMAN_HANDLE_INSTALL_APPS) setInstallLocation(Handle::DesktopAndMenu);
+  
+  setDone(_handle.done);
 }
 
-QString QPndman::Handle::getMain() const
+QString QPndman::Handle::getName() const
 {
-  return _main;
+  return _name;
 }
 QString QPndman::Handle::getError() const
 {
   return _error;
 }
-QString QPndman::Handle::getUrl() const
+bool QPndman::Handle::getForce() const
 {
-  return _url;
+  return _force;
 }
-unsigned int QPndman::Handle::getFlags() const
+QPndman::Handle::Operation QPndman::Handle::getOperation() const
 {
-  return _flags;
+  return _operation;
+}
+QPndman::Handle::InstallLocation QPndman::Handle::getInstallLocation() const
+{
+  return _installLocation;
 }
 bool QPndman::Handle::getDone() const
 {
   return _done;
 }
 
-void QPndman::Handle::setMain(QString const& main)
+void QPndman::Handle::setForce(bool const& force)
 {
-  if(main != _main) 
+  if(force != _force) 
   {
-    _main = main; 
-    emit mainChanged(_main);
+    _force = force;
+    updateHandleFlags();
+    emit forceChanged(_force);
+  }
+}
+void QPndman::Handle::setOperation(Operation const operation)
+{
+  if(operation != _operation) 
+  {
+    _operation = operation; 
+    updateHandleFlags();
+    emit operationChanged(_operation);
+  }
+}
+void QPndman::Handle::setInstallLocation(InstallLocation const installLocation)
+{
+  if(installLocation != _installLocation) 
+  {
+    _installLocation = installLocation; 
+    updateHandleFlags();
+    emit installLocationChanged(_installLocation);
+  }
+}
+
+void QPndman::Handle::updateHandleFlags()
+{
+  _handle.flags = 0;
+  if(_force) _handle.flags |= PNDMAN_HANDLE_FORCE;
+  
+  if(_operation == Handle::Install) _handle.flags |= PNDMAN_HANDLE_INSTALL;
+  else if(_operation == Handle::Remove) _handle.flags |= PNDMAN_HANDLE_REMOVE;
+
+  if(_installLocation == Handle::Desktop) _handle.flags |= PNDMAN_HANDLE_INSTALL_DESKTOP;
+  else if(_installLocation == Handle::Menu) _handle.flags |= PNDMAN_HANDLE_INSTALL_MENU;
+  else if(_installLocation == Handle::DesktopAndMenu) _handle.flags |= PNDMAN_HANDLE_INSTALL_APPS;
+}
+
+void QPndman::Handle::setName(QString const& name)
+{
+  if(name != _name) 
+  {
+    _name = name;
+    emit nameChanged(_name);
   }
 }
 void QPndman::Handle::setError(QString const& error)
@@ -61,27 +108,16 @@ void QPndman::Handle::setError(QString const& error)
     emit errorChanged(_error);
   }
 }
-void QPndman::Handle::setUrl(QString const& url)
-{
-  if(url != _url) 
-  {
-    _url = url; 
-    emit urlChanged(_url);
-  }
-}
-void QPndman::Handle::setFlags(unsigned int const& flags)
-{
-  if(flags != _flags) 
-  {
-    _flags = flags; 
-    emit flagsChanged(_flags);
-  }
-}
 void QPndman::Handle::setDone(bool const& done)
 {
   if(done != _done) 
   {
     _done = done; 
     emit doneChanged(_done);
+    if(done)
+    {
+      emit Handle::done();
+    }
   }
 }
+

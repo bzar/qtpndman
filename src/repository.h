@@ -20,7 +20,7 @@ namespace QPndman
     Q_PROPERTY(QList<Package> packages READ getPackages WRITE setPackages NOTIFY packagesChanged);
 
   public:
-    Repository(QString const& url, QString const& name, QString const& updates, QDateTime const& timestamp, QString const& version, QList<Package> const& packages, QObject* parent = 0);
+    Repository(QString const& url, QString const& name, QString const& updates, QDateTime const& timestamp, QString const& version, QList<Package> const& packages, bool exists, QObject* parent = 0);
     Repository(Repository const& other);
     Repository& operator=(Repository const& other);
 
@@ -31,6 +31,7 @@ namespace QPndman
     QDateTime getTimestamp() const;
     QString getVersion() const;
     QList<Package> getPackages() const;
+    bool getExists() const;
 
     void setUrl(QString const& url);
     void setName(QString const& name);
@@ -38,7 +39,8 @@ namespace QPndman
     void setTimestamp(QDateTime const& timestamp);
     void setVersion(QString const& version);
     void setPackages(QList<Package> const& packages);
-
+    void setExists(bool const exists);
+    
   signals:
     void urlChanged(QString newUrl);
     void nameChanged(QString newName);
@@ -46,7 +48,8 @@ namespace QPndman
     void timestampChanged(QDateTime newTimestamp);
     void versionChanged(QString newVersion);
     void packagesChanged(QList<Package> newPackages);
-
+    void existsChanged(bool newExists);
+    
   private:
     QString _url;
     QString _name;
@@ -54,6 +57,7 @@ namespace QPndman
     QDateTime _timestamp;
     QString _version;
     QList<Package> _packages;
+    bool _exists;
 
   };
 }

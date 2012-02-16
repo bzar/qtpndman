@@ -7,9 +7,8 @@
 #include "device.h"
 #include "handle.h"
 
-extern "C" {
-  #include "pndman.h"
-}
+
+#include "pndman.h"
 
 namespace QPndman
 {

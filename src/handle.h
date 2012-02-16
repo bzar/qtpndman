@@ -2,49 +2,68 @@
 #define HANDLE_H
 
 #include <QObject>
+#include "pndman.h"
 
 namespace QPndman
 {
   class Handle : public QObject
   {
   Q_OBJECT
+  Q_ENUMS(Operation InstallLocation)
+  
+    Q_PROPERTY(QString name READ getName NOTIFY nameChanged);
+    Q_PROPERTY(QString error READ getError NOTIFY errorChanged);
+    Q_PROPERTY(bool force READ getForce WRITE setForce NOTIFY forceChanged);
+    Q_PROPERTY(Operation operation READ getOperation WRITE setOperation NOTIFY operationChanged);
+    Q_PROPERTY(InstallLocation installLocation READ getInstallLocation WRITE setInstallLocation NOTIFY installLocationChanged);
+    Q_PROPERTY(bool done READ getDone NOTIFY doneChanged);
 
-    Q_PROPERTY(QString main READ getMain WRITE setMain NOTIFY mainChanged);
-    Q_PROPERTY(QString error READ getError WRITE setError NOTIFY errorChanged);
-    Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged);
-    Q_PROPERTY(unsigned int flags READ getFlags WRITE setFlags NOTIFY flagsChanged);
-    Q_PROPERTY(bool done READ getDone WRITE setDone NOTIFY doneChanged);
-
+  
+  
   public:
-    Handle(QString const& main, QString const& error, QString const& url, unsigned int const& flags, bool const& done, QObject* parent = 0);
-    Handle(Handle const& other);
-    Handle& operator=(Handle const& other);
+    enum Operation { Install, Remove };
+    enum InstallLocation { Desktop, Menu, DesktopAndMenu };
+    
+    Handle();
 
+    pndman_handle* getPndmanHandle();
+    void update();
+    
   public slots:
-    QString getMain() const;
+    QString getName() const;
     QString getError() const;
-    QString getUrl() const;
-    unsigned int getFlags() const;
+    bool getForce() const;
+    Operation getOperation() const;
+    InstallLocation getInstallLocation() const;
     bool getDone() const;
 
-    void setMain(QString const& main);
-    void setError(QString const& error);
-    void setUrl(QString const& url);
-    void setFlags(unsigned int const& flags);
-    void setDone(bool const& done);
+    void setForce(bool const& force);
+    void setOperation(Operation const operation);
+    void setInstallLocation(InstallLocation const installLocation);
 
   signals:
-    void mainChanged(QString newMain);
+    void nameChanged(QString newName);
     void errorChanged(QString newError);
-    void urlChanged(QString newUrl);
-    void flagsChanged(unsigned int newFlags);
+    void forceChanged(bool newForce);
+    void operationChanged(Operation newOperation);
+    void installLocationChanged(InstallLocation newInstallLocation);
+    
     void doneChanged(bool newDone);
-
+    void done();
+    
   private:
-    QString _main;
+    void updateHandleFlags();
+
+    void setName(QString const& name);
+    void setError(QString const& error);
+    void setDone(bool const& done);
+
+    pndman_handle _handle;
+    QString _name;
     QString _error;
-    QString _url;
-    unsigned int _flags;
+    bool _force;
+    Operation _operation;
+    InstallLocation _installLocation;
     bool _done;
 
   };
