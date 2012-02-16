@@ -1,0 +1,6 @@
+[submodule "lib/jansson/src"]
+	path = lib/jansson/src
+	url = git://github.com/akheron/jansson.git
+[submodule "lib/libpndman/src"]
+	path = lib/libpndman/src
+	url = git://github.com/Cloudef/libpndman.git
