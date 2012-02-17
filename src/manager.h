@@ -40,8 +40,8 @@ namespace QPndman
     
     int download();
     bool sync(Repository* repository);
-    int sync(QList<Repository*> const& repositories);
-    int syncAll();
+    bool sync(QList<Repository*> const& repositories);
+    bool syncAll();
   
   signals:
     void repositoriesChanged(QList< QSharedPointer<Repository> >);

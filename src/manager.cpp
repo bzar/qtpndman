@@ -133,35 +133,42 @@ bool QPndman::Manager::sync(Repository* repository)
     if(QString(r->url) == repository->getUrl())
     {
       pndman_sync_request(r);
-      return pndman_sync() > 0;
     }
   }
-  
-  return false;
+
+  int result = 0;
+  while(result = pndman_sync() > 0);
+  return result != -1;
 }
 
-int QPndman::Manager::sync(QList<Repository*> const& repositories)
+bool QPndman::Manager::sync(QList<Repository*> const& repositories)
 {
-  int result = 0;
-  foreach(Repository* r, repositories)
+  foreach(Repository* repository, repositories)
   {
-    if(sync(r))
+    for(pndman_repository* r = &_repositories; r != 0; r = r->next)
     {
-      result += 1;
+      if(QString(r->url) == repository->getUrl())
+      {
+        pndman_sync_request(r);
+      }
     }
   }
-  return result;
+
+  int result = 0;
+  while(result = pndman_sync() > 0);
+  return result != -1;
 }
 
-int QPndman::Manager::syncAll()
+bool QPndman::Manager::syncAll()
 {
-  int result = 0;
   for(pndman_repository* r = &_repositories; r != 0; r = r->next)
   {
     pndman_sync_request(r);
-    result += pndman_sync();
   }
-  return result;
+
+  int result = 0;
+  while(result = pndman_sync() > 0);
+  return result != -1;
 }
 
 

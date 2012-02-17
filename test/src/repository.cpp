@@ -1,6 +1,15 @@
 #include "qtpndman.h"
 
 #include <QDebug>
+#include <QDateTime>
+
+qint64 time()
+{
+  static qint64 t = QDateTime::currentMSecsSinceEpoch();
+  qint64 d = QDateTime::currentMSecsSinceEpoch() - t;
+  t = QDateTime::currentMSecsSinceEpoch();
+  return d;
+}
 
 int main()
 {
@@ -23,11 +32,18 @@ int main()
     return 1;
   }
   
-  int syncNum = manager->syncAll();
-  qDebug() << "Number of repositories:   " << syncNum;
-  qDebug() << "";
+  time();
+  if(!manager->syncAll())
+  {
+    qDebug() << "Error syncing repositories!";
+    return 1;    
+  }
+  qDebug() << "Synced in" << time() << "msec";
   
-  foreach(const QSharedPointer<QPndman::Repository> r, manager->getRepositories())
+  QList< QSharedPointer<QPndman::Repository> > repositories = manager->getRepositories();
+  qDebug() << "Generated repository list in" << time() << "msec";
+  
+  foreach(const QSharedPointer<QPndman::Repository> r, repositories)
   {
     qDebug() << "url:       " << r->getUrl();
     qDebug() << "name:      " << r->getName();
@@ -38,6 +54,7 @@ int main()
     qDebug() << "packages:  " << r->getPackages().size();
     qDebug() << "";
   }
+  qDebug() << "Listed repo information in" << time() << "msec";
   
   return 0;
 }
