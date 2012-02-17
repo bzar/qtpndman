@@ -5,6 +5,11 @@ QPndman::License::License(QString const& name, QString const& url, QString const
 {
 }
 
+QPndman::License::License(pndman_license const* p) : QObject(0), 
+  _name(p->name), _url(p->url), _sourceCodeUrl(p->sourcecodeurl)
+{
+}
+
 QPndman::License::License(License const& other) : QObject(0), 
   _name(other._name), _url(other._url), _sourceCodeUrl(other._sourceCodeUrl)
 {

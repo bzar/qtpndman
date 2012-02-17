@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+#include "pndman.h"
+
 namespace QPndman
 {
   class PreviewPicture : public QObject
@@ -13,6 +15,7 @@ namespace QPndman
 
   public:
     PreviewPicture(QString const& src, QObject* parent = 0);
+    PreviewPicture(pndman_previewpic const* p);
     PreviewPicture(PreviewPicture const& other);
     PreviewPicture& operator=(PreviewPicture const& other);
 

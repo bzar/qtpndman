@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+#include "pndman.h"
+
 namespace QPndman
 {
   class DocumentationInfo : public QObject
@@ -15,6 +17,7 @@ namespace QPndman
 
   public:
     DocumentationInfo(QString const& name, QString const& type, QString const& src, QObject* parent = 0);
+    DocumentationInfo(pndman_info const* p);
     DocumentationInfo(DocumentationInfo const& other);
     DocumentationInfo& operator=(DocumentationInfo const& other);
 

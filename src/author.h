@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+#include "pndman.h"
+
 namespace QPndman
 {
   class Author : public QObject
@@ -14,6 +16,7 @@ namespace QPndman
 
   public:
     Author(QString const& name, QString const& website, QObject* parent = 0);
+    Author(pndman_author const* p);
     Author(Author const& other);
     Author& operator=(Author const& other);
 

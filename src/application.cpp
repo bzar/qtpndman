@@ -1,7 +1,20 @@
 #include "application.h"
+#include "util.h"
 
-QPndman::Application::Application(QString const& id, QString const& appdata, QString const& icon, int const& clockFrequency, Author const& author, Version const& osVersion, Version const& version, ExecutionInfo const& executionInfo, DocumentationInfo const& documentationInfo, QList<TranslatedString> const& titles, QList<TranslatedString> const& descriptions, QList<License> const& licenses, QList<PreviewPicture> const& previewPictures, QList<Category> const& categories, QList<Association> const& associations, QObject* parent) : QObject(parent), 
+QPndman::Application::Application(QString const& id, QString const& appdata, QString const& icon, int const& clockFrequency, Author const& author, Version const& osVersion, Version const& version, ExecutionInfo const& executionInfo, DocumentationInfo const& documentationInfo, QList< QSharedPointer<TranslatedString> > const& titles, QList< QSharedPointer<TranslatedString> > const& descriptions, QList< QSharedPointer<License> > const& licenses, QList< QSharedPointer<PreviewPicture> > const& previewPictures, QList< QSharedPointer<Category> > const& categories, QList< QSharedPointer<Association> > const& associations, QObject* parent) : QObject(parent), 
   _id(id), _appdata(appdata), _icon(icon), _clockFrequency(clockFrequency), _author(author), _osVersion(osVersion), _version(version), _executionInfo(executionInfo), _documentationInfo(documentationInfo), _titles(titles), _descriptions(descriptions), _licenses(licenses), _previewPictures(previewPictures), _categories(categories), _associations(associations)
+{
+}
+
+QPndman::Application::Application(pndman_application const* p) : QObject(0), 
+  _id(p->id), _appdata(p->appdata), _icon(p->icon), _clockFrequency(p->frequency), _author(&(p->author)), _osVersion(&(p->osversion)), _version(&(p->version)), 
+  _executionInfo(&(p->exec)), _documentationInfo(&(p->info)), 
+  _titles(makeQList<pndman_translated, TranslatedString>(p->title)),
+  _descriptions(makeQList<pndman_translated, TranslatedString>(p->description)), 
+  _licenses(makeQList<pndman_license, License>(p->license)), 
+  _previewPictures(makeQList<pndman_previewpic, PreviewPicture>(p->previewpic)), 
+  _categories(makeQList<pndman_category, Category>(p->category)), 
+  _associations(makeQList<pndman_association, Association>(p->association))
 {
 }
 
@@ -70,27 +83,27 @@ QPndman::DocumentationInfo QPndman::Application::getDocumentationinfo() const
 {
   return _documentationInfo;
 }
-QList<QPndman::TranslatedString> QPndman::Application::getTitles() const
+QList< QSharedPointer<QPndman::TranslatedString> > QPndman::Application::getTitles() const
 {
   return _titles;
 }
-QList<QPndman::TranslatedString> QPndman::Application::getDescriptions() const
+QList< QSharedPointer<QPndman::TranslatedString> > QPndman::Application::getDescriptions() const
 {
   return _descriptions;
 }
-QList<QPndman::License> QPndman::Application::getLicenses() const
+QList< QSharedPointer<QPndman::License> > QPndman::Application::getLicenses() const
 {
   return _licenses;
 }
-QList<QPndman::PreviewPicture> QPndman::Application::getPreviewpictures() const
+QList< QSharedPointer<QPndman::PreviewPicture> > QPndman::Application::getPreviewpictures() const
 {
   return _previewPictures;
 }
-QList<QPndman::Category> QPndman::Application::getCategories() const
+QList< QSharedPointer<QPndman::Category> > QPndman::Application::getCategories() const
 {
   return _categories;
 }
-QList<QPndman::Association> QPndman::Application::getAssociations() const
+QList< QSharedPointer<QPndman::Association> > QPndman::Application::getAssociations() const
 {
   return _associations;
 }
@@ -152,32 +165,32 @@ void QPndman::Application::setDocumentationinfo(DocumentationInfo const& documen
   _documentationInfo = documentationInfo; 
   emit documentationInfoChanged(_documentationInfo);
 }
-void QPndman::Application::setTitles(QList<TranslatedString> const& titles)
+void QPndman::Application::setTitles(QList< QSharedPointer<TranslatedString> > const& titles)
 {
   _titles = titles; 
   emit titlesChanged(_titles);
 }
-void QPndman::Application::setDescriptions(QList<TranslatedString> const& descriptions)
+void QPndman::Application::setDescriptions(QList< QSharedPointer<TranslatedString> > const& descriptions)
 {
   _descriptions = descriptions; 
   emit descriptionsChanged(_descriptions);
 }
-void QPndman::Application::setLicenses(QList<License> const& licenses)
+void QPndman::Application::setLicenses(QList< QSharedPointer<License> > const& licenses)
 {
   _licenses = licenses; 
   emit licensesChanged(_licenses);
 }
-void QPndman::Application::setPreviewpictures(QList<PreviewPicture> const& previewPictures)
+void QPndman::Application::setPreviewpictures(QList< QSharedPointer<PreviewPicture> > const& previewPictures)
 {
   _previewPictures = previewPictures; 
   emit previewPicturesChanged(_previewPictures);
 }
-void QPndman::Application::setCategories(QList<Category> const& categories)
+void QPndman::Application::setCategories(QList< QSharedPointer<Category> > const& categories)
 {
   _categories = categories; 
   emit categoriesChanged(_categories);
 }
-void QPndman::Application::setAssociations(QList<Association> const& associations)
+void QPndman::Application::setAssociations(QList< QSharedPointer<Association> > const& associations)
 {
   _associations = associations; 
   emit associationsChanged(_associations);

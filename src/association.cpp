@@ -5,6 +5,11 @@ QPndman::Association::Association(QString const& name, QString const& fileType, 
 {
 }
 
+QPndman::Association::Association(pndman_association const* p) : QObject(0), 
+  _name(p->name), _fileType(p->filetype), _exec(p->exec)
+{
+}
+
 QPndman::Association::Association(Association const& other) : QObject(0), 
   _name(other._name), _fileType(other._fileType), _exec(other._exec)
 {

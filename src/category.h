@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+#include "pndman.h"
+
 namespace QPndman
 {
   class Category : public QObject
@@ -15,6 +17,7 @@ namespace QPndman
   public:
     Category(QString const& main, QString const& sub, QObject* parent = 0);
     Category(Category const& other);
+    Category(pndman_category const* p);
     Category& operator=(Category const& other);
 
   public slots:

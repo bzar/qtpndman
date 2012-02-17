@@ -10,6 +10,11 @@ QPndman::Category::Category(Category const& other) : QObject(0),
 {
 }
 
+QPndman::Category::Category(pndman_category const* p) : QObject(0), 
+  _main(p->main), _sub(p->sub)
+{
+}
+
 QPndman::Category& QPndman::Category::operator=(Category const& other)
 {
   if(&other == this)

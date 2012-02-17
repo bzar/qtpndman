@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+#include "pndman.h"
+
 namespace QPndman
 {
   class ExecutionInfo : public QObject
@@ -20,6 +22,7 @@ namespace QPndman
     enum ExecX11 { ExecReq, ExecStop, ExecIgnore};
 
     ExecutionInfo(bool const& background, QString const& startDir, bool const& standalone, QString const& command, QString const& arguments, ExecX11 const& x11, QObject* parent = 0);
+    ExecutionInfo(pndman_exec const* p);
     ExecutionInfo(ExecutionInfo const& other);
     ExecutionInfo& operator=(ExecutionInfo const& other);
 

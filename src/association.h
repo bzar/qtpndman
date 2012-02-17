@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+#include "pndman.h"
+
 namespace QPndman
 {
   class Association : public QObject
@@ -15,6 +17,7 @@ namespace QPndman
 
   public:
     Association(QString const& name, QString const& fileType, QString const& exec, QObject* parent = 0);
+    Association(pndman_association const* p);
     Association(Association const& other);
     Association& operator=(Association const& other);
 

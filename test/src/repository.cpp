@@ -27,7 +27,7 @@ int main()
   qDebug() << "Number of repositories:   " << syncNum;
   qDebug() << "";
   
-  foreach(const QPndman::Repository* r, manager->getRepositories())
+  foreach(const QSharedPointer<QPndman::Repository> r, manager->getRepositories())
   {
     qDebug() << "url:       " << r->getUrl();
     qDebug() << "name:      " << r->getName();
@@ -35,6 +35,7 @@ int main()
     qDebug() << "timestamp: " << r->getTimestamp();
     qDebug() << "version:   " << r->getVersion();
     qDebug() << "exists:    " << r->getExists();
+    qDebug() << "packages:  " << r->getPackages().size();
     qDebug() << "";
   }
   

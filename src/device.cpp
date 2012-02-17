@@ -5,6 +5,11 @@ QPndman::Device::Device(QString const& mount, QString const& device, qint64 cons
 {
 }
 
+QPndman::Device::Device(pndman_device const* p) : QObject(0), 
+  _mount(p->mount), _device(p->device), _size(p->size), _free(p->free), _available(p->available), _appdata(p->appdata)
+{
+}
+
 QPndman::Device::Device(Device const& other) : QObject(0), 
   _mount(other._mount), _device(other._device), _size(other._size), _free(other._free), _available(other._available), _appdata(other._appdata)
 {

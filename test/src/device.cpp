@@ -24,7 +24,7 @@ int main()
     return 1;
   }
   
-  foreach(const QPndman::Device* d, manager->getDevices())
+  foreach(const QSharedPointer<QPndman::Device> d, manager->getDevices())
   {
     qDebug() << "mount:    " << d->getMount();
     qDebug() << "device:   " << d->getDevice();

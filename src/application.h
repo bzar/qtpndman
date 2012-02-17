@@ -2,6 +2,7 @@
 #define APPLICATION_H
 
 #include <QObject>
+#include <QSharedPointer>
 
 #include "executioninfo.h"
 #include "documentationinfo.h"
@@ -12,6 +13,8 @@
 #include "previewpicture.h"
 #include "category.h"
 #include "association.h"
+
+#include "pndman.h"
 
 namespace QPndman
 {
@@ -28,15 +31,16 @@ namespace QPndman
     Q_PROPERTY(Version version READ getVersion WRITE setVersion NOTIFY versionChanged);
     Q_PROPERTY(ExecutionInfo executionInfo READ getExecutioninfo WRITE setExecutioninfo NOTIFY executionInfoChanged);
     Q_PROPERTY(DocumentationInfo documentationInfo READ getDocumentationinfo WRITE setDocumentationinfo NOTIFY documentationInfoChanged);
-    Q_PROPERTY(QList<TranslatedString> titles READ getTitles WRITE setTitles NOTIFY titlesChanged);
-    Q_PROPERTY(QList<TranslatedString> descriptions READ getDescriptions WRITE setDescriptions NOTIFY descriptionsChanged);
-    Q_PROPERTY(QList<License> licenses READ getLicenses WRITE setLicenses NOTIFY licensesChanged);
-    Q_PROPERTY(QList<PreviewPicture> previewPictures READ getPreviewpictures WRITE setPreviewpictures NOTIFY previewPicturesChanged);
-    Q_PROPERTY(QList<Category> categories READ getCategories WRITE setCategories NOTIFY categoriesChanged);
-    Q_PROPERTY(QList<Association> associations READ getAssociations WRITE setAssociations NOTIFY associationsChanged);
+    Q_PROPERTY(QList< QSharedPointer<TranslatedString> > titles READ getTitles WRITE setTitles NOTIFY titlesChanged);
+    Q_PROPERTY(QList< QSharedPointer<TranslatedString> > descriptions READ getDescriptions WRITE setDescriptions NOTIFY descriptionsChanged);
+    Q_PROPERTY(QList< QSharedPointer<License> > licenses READ getLicenses WRITE setLicenses NOTIFY licensesChanged);
+    Q_PROPERTY(QList< QSharedPointer<PreviewPicture> > previewPictures READ getPreviewpictures WRITE setPreviewpictures NOTIFY previewPicturesChanged);
+    Q_PROPERTY(QList< QSharedPointer<Category> > categories READ getCategories WRITE setCategories NOTIFY categoriesChanged);
+    Q_PROPERTY(QList< QSharedPointer<Association> > associations READ getAssociations WRITE setAssociations NOTIFY associationsChanged);
 
   public:
-    Application(QString const& id, QString const& appdata, QString const& icon, int const& clockFrequency, Author const& author, Version const& osVersion, Version const& version, ExecutionInfo const& executionInfo, DocumentationInfo const& documentationInfo, QList<TranslatedString> const& titles, QList<TranslatedString> const& descriptions, QList<License> const& licenses, QList<PreviewPicture> const& previewPictures, QList<Category> const& categories, QList<Association> const& associations, QObject* parent = 0);
+    Application(QString const& id, QString const& appdata, QString const& icon, int const& clockFrequency, Author const& author, Version const& osVersion, Version const& version, ExecutionInfo const& executionInfo, DocumentationInfo const& documentationInfo, QList< QSharedPointer<TranslatedString> > const& titles, QList< QSharedPointer<TranslatedString> > const& descriptions, QList< QSharedPointer<License> > const& licenses, QList< QSharedPointer<PreviewPicture> > const& previewPictures, QList< QSharedPointer<Category> > const& categories, QList< QSharedPointer<Association> > const& associations, QObject* parent = 0);
+    Application(pndman_application const* p);
     Application(Application const& other);
     Application& operator=(Application const& other);
 
@@ -50,12 +54,12 @@ namespace QPndman
     Version getVersion() const;
     ExecutionInfo getExecutioninfo() const;
     DocumentationInfo getDocumentationinfo() const;
-    QList<TranslatedString> getTitles() const;
-    QList<TranslatedString> getDescriptions() const;
-    QList<License> getLicenses() const;
-    QList<PreviewPicture> getPreviewpictures() const;
-    QList<Category> getCategories() const;
-    QList<Association> getAssociations() const;
+    QList< QSharedPointer<TranslatedString> > getTitles() const;
+    QList< QSharedPointer<TranslatedString> > getDescriptions() const;
+    QList< QSharedPointer<License> > getLicenses() const;
+    QList< QSharedPointer<PreviewPicture> > getPreviewpictures() const;
+    QList< QSharedPointer<Category> > getCategories() const;
+    QList< QSharedPointer<Association> > getAssociations() const;
 
     void setId(QString const& id);
     void setAppdata(QString const& appdata);
@@ -66,12 +70,12 @@ namespace QPndman
     void setVersion(Version const& version);
     void setExecutioninfo(ExecutionInfo const& executionInfo);
     void setDocumentationinfo(DocumentationInfo const& documentationInfo);
-    void setTitles(QList<TranslatedString> const& titles);
-    void setDescriptions(QList<TranslatedString> const& descriptions);
-    void setLicenses(QList<License> const& licenses);
-    void setPreviewpictures(QList<PreviewPicture> const& previewPictures);
-    void setCategories(QList<Category> const& categories);
-    void setAssociations(QList<Association> const& associations);
+    void setTitles(QList< QSharedPointer<TranslatedString> > const& titles);
+    void setDescriptions(QList< QSharedPointer<TranslatedString> > const& descriptions);
+    void setLicenses(QList< QSharedPointer<License> > const& licenses);
+    void setPreviewpictures(QList< QSharedPointer<PreviewPicture> > const& previewPictures);
+    void setCategories(QList< QSharedPointer<Category> > const& categories);
+    void setAssociations(QList< QSharedPointer<Association> > const& associations);
 
   signals:
     void idChanged(QString newId);
@@ -83,12 +87,12 @@ namespace QPndman
     void versionChanged(Version newVersion);
     void executionInfoChanged(ExecutionInfo newExecutioninfo);
     void documentationInfoChanged(DocumentationInfo newDocumentationinfo);
-    void titlesChanged(QList<TranslatedString> newTitles);
-    void descriptionsChanged(QList<TranslatedString> newDescriptions);
-    void licensesChanged(QList<License> newLicenses);
-    void previewPicturesChanged(QList<PreviewPicture> newPreviewpictures);
-    void categoriesChanged(QList<Category> newCategories);
-    void associationsChanged(QList<Association> newAssociations);
+    void titlesChanged(QList< QSharedPointer<TranslatedString> > newTitles);
+    void descriptionsChanged(QList< QSharedPointer<TranslatedString> > newDescriptions);
+    void licensesChanged(QList< QSharedPointer<License> > newLicenses);
+    void previewPicturesChanged(QList< QSharedPointer<PreviewPicture> > newPreviewpictures);
+    void categoriesChanged(QList< QSharedPointer<Category> > newCategories);
+    void associationsChanged(QList< QSharedPointer<Association> > newAssociations);
 
   private:
     QString _id;
@@ -100,12 +104,12 @@ namespace QPndman
     Version _version;
     ExecutionInfo _executionInfo;
     DocumentationInfo _documentationInfo;
-    QList<TranslatedString> _titles;
-    QList<TranslatedString> _descriptions;
-    QList<License> _licenses;
-    QList<PreviewPicture> _previewPictures;
-    QList<Category> _categories;
-    QList<Association> _associations;
+    QList< QSharedPointer<TranslatedString> > _titles;
+    QList< QSharedPointer<TranslatedString> > _descriptions;
+    QList< QSharedPointer<License> > _licenses;
+    QList< QSharedPointer<PreviewPicture> > _previewPictures;
+    QList< QSharedPointer<Category> > _categories;
+    QList< QSharedPointer<Association> > _associations;
 
   };
 }

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QScopedPointer>
+#include <QSharedPointer>
 #include "repository.h"
 #include "device.h"
 #include "handle.h"
@@ -25,13 +26,13 @@ namespace QPndman
     bool addRepository(QString const& url);
     bool removeRepository(QString const& url);
     bool removeAllRepositories();
-    QList<Repository*> getRepositories();
+    QList< QSharedPointer<Repository> > getRepositories();
     
     bool addDevice(QString const& path);
     bool detectDevices();
     bool removeDevice(QString const& path);
     bool removeAllDevices();
-    QList<Device*> getDevices();
+    QList< QSharedPointer<Device> > getDevices();
     
     Handle* createHandle(QString const& name);
     bool performHandle(Handle* handle);
@@ -43,8 +44,8 @@ namespace QPndman
     int syncAll();
   
   signals:
-    void repositoriesChanged(QList<Repository*>);
-    void devicesChanged(QList<Device*>);
+    void repositoriesChanged(QList< QSharedPointer<Repository> >);
+    void devicesChanged(QList< QSharedPointer<Device> >);
     void handleCreated(Handle*);
     
   private:

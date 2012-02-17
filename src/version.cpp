@@ -5,6 +5,13 @@ QPndman::Version::Version(QString const& major, QString const& minor, QString co
 {
 }
 
+QPndman::Version::Version(pndman_version const* p) : QObject(0), 
+  _major(p->major), _minor(p->minor), _release(p->release), _build(p->build), _type(Version::ReleaseVersion)
+{
+  if(p->type == PND_VERSION_BETA)       _type = Version::BetaVersion;
+  else if(p->type == PND_VERSION_ALPHA) _type = Version::AlphaVersion;
+}
+
 QPndman::Version::Version(Version const& other) : QObject(0), 
   _major(other._major), _minor(other._minor), _release(other._release), _build(other._build), _type(other._type)
 {

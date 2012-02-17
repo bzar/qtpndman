@@ -5,6 +5,11 @@ QPndman::TranslatedString::TranslatedString(QString const& language, QString con
 {
 }
 
+QPndman::TranslatedString::TranslatedString(pndman_translated const* p) : QObject(0), 
+  _language(p->lang), _content(p->string)
+{
+}
+
 QPndman::TranslatedString::TranslatedString(TranslatedString const& other) : QObject(0), 
   _language(other._language), _content(other._content)
 {

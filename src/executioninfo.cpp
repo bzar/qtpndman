@@ -10,6 +10,13 @@ QPndman::ExecutionInfo::ExecutionInfo(ExecutionInfo const& other) : QObject(0),
 {
 }
 
+QPndman::ExecutionInfo::ExecutionInfo(pndman_exec const* p) : QObject(0), 
+  _background(p->background), _startDir(p->startdir), _standalone(p->standalone), _command(p->command), _arguments(p->arguments), _x11(ExecutionInfo::ExecReq)
+{
+  if(p->x11 == PND_EXEC_STOP) _x11 = ExecStop;
+  else if(p->x11 == PND_EXEC_IGNORE) _x11 = ExecIgnore;
+}
+
 QPndman::ExecutionInfo& QPndman::ExecutionInfo::operator=(ExecutionInfo const& other)
 {
   if(&other == this)

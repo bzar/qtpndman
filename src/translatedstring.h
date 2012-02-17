@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+#include "pndman.h"
+
 namespace QPndman
 {
   class TranslatedString : public QObject
@@ -14,6 +16,7 @@ namespace QPndman
 
   public:
     TranslatedString(QString const& language, QString const& content, QObject* parent = 0);
+    TranslatedString(pndman_translated const* p);
     TranslatedString(TranslatedString const& other);
     TranslatedString& operator=(TranslatedString const& other);
 

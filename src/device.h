@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+#include "pndman.h"
+
 namespace QPndman
 {
   class Device : public QObject
@@ -18,6 +20,7 @@ namespace QPndman
 
   public:
     Device(QString const& mount, QString const& device, qint64 const& size, qint64 const& free, qint64 const& available, QString const& appdata, QObject* parent = 0);
+    Device(pndman_device const* p);
     Device(Device const& other);
     Device& operator=(Device const& other);
 

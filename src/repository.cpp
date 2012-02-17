@@ -1,7 +1,16 @@
 #include "repository.h"
+#include "util.h"
 
-QPndman::Repository::Repository(QString const& url, QString const& name, QString const& updates, QDateTime const& timestamp, QString const& version, QList<Package> const& packages, bool exists, QObject* parent) : QObject(parent), 
+#include <QDebug>
+
+QPndman::Repository::Repository(QString const& url, QString const& name, QString const& updates, QDateTime const& timestamp, QString const& version, QList< QSharedPointer<Package> > const& packages, bool exists, QObject* parent) : QObject(parent), 
   _url(url), _name(name), _updates(updates), _timestamp(timestamp), _version(version), _packages(packages), _exists(exists)
+{
+}
+
+QPndman::Repository::Repository(pndman_repository const* p) : QObject(0), 
+  _url(p->url), _name(p->name), _updates(p->updates), _timestamp(QDateTime::fromTime_t(p->timestamp)), _version(p->version), 
+  _packages(makeQList<pndman_package, Package>(p->pnd)), _exists(p->exist)
 {
 }
 
@@ -10,6 +19,10 @@ QPndman::Repository::Repository(Repository const& other) : QObject(0),
 {
 }
 
+QPndman::Repository::~Repository()
+{
+  qDebug() << "Repository destructor";
+}
 QPndman::Repository& QPndman::Repository::operator=(Repository const& other)
 {
   if(&other == this)
@@ -45,7 +58,7 @@ QString QPndman::Repository::getVersion() const
 {
   return _version;
 }
-QList<QPndman::Package> QPndman::Repository::getPackages() const
+QList< QSharedPointer<QPndman::Package> > QPndman::Repository::getPackages() const
 {
   return _packages;
 }
@@ -94,7 +107,7 @@ void QPndman::Repository::setVersion(QString const& version)
     emit versionChanged(_version);
   }
 }
-void QPndman::Repository::setPackages(QList<Package> const& packages)
+void QPndman::Repository::setPackages(QList< QSharedPointer<Package> > const& packages)
 {
   _packages = packages; 
   emit packagesChanged(_packages);

@@ -5,6 +5,12 @@ QPndman::DocumentationInfo::DocumentationInfo(QString const& name, QString const
 {
 }
 
+QPndman::DocumentationInfo::DocumentationInfo(pndman_info const* p) : QObject(0),
+  _name(p->name), _type(p->type), _src(p->src)
+{
+  
+}
+
 QPndman::DocumentationInfo::DocumentationInfo(DocumentationInfo const& other) : QObject(0), 
   _name(other._name), _type(other._type), _src(other._src)
 {

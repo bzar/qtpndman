@@ -1,4 +1,5 @@
 #include "manager.h"
+#include "util.h"
 
 #include <QDebug>
 
@@ -50,33 +51,9 @@ bool QPndman::Manager::removeAllRepositories()
   pndman_repository_free_all(&_repositories);
 }
 
-QList<QPndman::Repository*> QPndman::Manager::getRepositories()
+QList< QSharedPointer<QPndman::Repository> > QPndman::Manager::getRepositories()
 {
-  QList<Repository*> repositories;
-  for(pndman_repository* r = &_repositories; r != 0; r = r->next)
-  {
-    QList<Package> packages;
-    /*for(pndman_package* p = r->pnd; p != 0; p = p->next)
-    {
-      packages << Package(p->path, p->id, p->icon, 
-                          DocumentationInfo const& documentationInfo, 
-                          p->md5, p->url, p->vendor, p->size, 
-                          QDateTime::fromTime_t(modified), p->rating, 
-                          Author const& author, 
-                          Version const& version, 
-                          QList<Application> const& applications, 
-                          QList<TranslatedString> const& titles, 
-                          QList<TranslatedString> const& descriptions, 
-                          QList<PreviewPicture> const& previewPictures, 
-                          QList<Category> const& categories, 
-                          unsigned int const& flags, 
-                          QList<Package> const& installInstances);
-    }
-    */
-    repositories << new Repository(r->url, r->name, r->updates, QDateTime::fromTime_t(r->timestamp), r->version, packages, r->exist);
-  }
-  
-  return repositories;
+  return makeQList<pndman_repository, Repository>(&_repositories);
 }
 
 
@@ -116,15 +93,9 @@ bool QPndman::Manager::removeAllDevices()
   return pndman_device_free_all(&_devices) == 0;
 }
 
-QList<QPndman::Device*> QPndman::Manager::getDevices()
+QList< QSharedPointer<QPndman::Device> > QPndman::Manager::getDevices()
 {
-  QList<Device*> devices;
-  for(pndman_device* d = &_devices; d != 0; d = d->next)
-  {
-    devices << new Device(d->mount, d->device, d->size, d->free, d->available, d->appdata);
-  }
-  
-  return devices;
+  return makeQList<pndman_device, Device>(&_devices);
 }
 
 
@@ -162,8 +133,7 @@ bool QPndman::Manager::sync(Repository* repository)
     if(QString(r->url) == repository->getUrl())
     {
       pndman_sync_request(r);
-      pndman_sync();
-      return true;
+      return pndman_sync() > 0;
     }
   }
   

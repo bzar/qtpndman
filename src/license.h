@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+#include "pndman.h"
+
 namespace QPndman
 {
   class License : public QObject
@@ -15,6 +17,7 @@ namespace QPndman
 
   public:
     License(QString const& name, QString const& url, QString const& sourceCodeUrl, QObject* parent = 0);
+    License(pndman_license const* p);
     License(License const& other);
     License& operator=(License const& other);
 

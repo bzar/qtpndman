@@ -5,6 +5,11 @@ QPndman::Author::Author(QString const& name, QString const& website, QObject* pa
 {
 }
 
+QPndman::Author::Author(pndman_author const* p) : QObject(0), 
+  _name(p->name), _website(p->website)
+{
+}
+
 QPndman::Author::Author(Author const& other) : QObject(0), 
   _name(other._name), _website(other._website)
 {

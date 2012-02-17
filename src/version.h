@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+#include "pndman.h"
+
 namespace QPndman
 {
   class Version : public QObject
@@ -19,6 +21,7 @@ namespace QPndman
     enum Type { ReleaseVersion, BetaVersion, AlphaVersion };
 
     Version(QString const& major, QString const& minor, QString const& release, QString const& build, Type const& type, QObject* parent = 0);
+    Version(pndman_version const* p);
     Version(Version const& other);
     Version& operator=(Version const& other);
 

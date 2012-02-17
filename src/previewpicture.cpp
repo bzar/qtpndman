@@ -5,6 +5,11 @@ QPndman::PreviewPicture::PreviewPicture(QString const& src, QObject* parent) : Q
 {
 }
 
+QPndman::PreviewPicture::PreviewPicture(pndman_previewpic const* p) : QObject(0), 
+  _src(p->src)
+{
+}
+
 QPndman::PreviewPicture::PreviewPicture(PreviewPicture const& other) : QObject(0), 
   _src(other._src)
 {
