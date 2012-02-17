@@ -126,7 +126,7 @@ int QPndman::Manager::download()
   return pndman_download();
 }
 
-bool QPndman::Manager::sync(Repository* repository)
+void QPndman::Manager::sync(Repository* repository)
 {
   for(pndman_repository* r = &_repositories; r != 0; r = r->next)
   {
@@ -136,12 +136,11 @@ bool QPndman::Manager::sync(Repository* repository)
     }
   }
 
-  int result = 0;
-  while(result = pndman_sync() > 0);
-  return result != -1;
+  _syncTimer.start();
+  emit syncStarted();
 }
 
-bool QPndman::Manager::sync(QList<Repository*> const& repositories)
+void QPndman::Manager::sync(QList<Repository*> const& repositories)
 {
   foreach(Repository* repository, repositories)
   {
@@ -154,27 +153,56 @@ bool QPndman::Manager::sync(QList<Repository*> const& repositories)
     }
   }
 
-  int result = 0;
-  while(result = pndman_sync() > 0);
-  return result != -1;
+  _syncTimer.start();
+  emit syncStarted();
 }
 
-bool QPndman::Manager::syncAll()
+void QPndman::Manager::syncAll()
 {
   for(pndman_repository* r = &_repositories; r != 0; r = r->next)
   {
     pndman_sync_request(r);
   }
 
-  int result = 0;
-  while(result = pndman_sync() > 0);
-  return result != -1;
+  _syncTimer.start();
+  emit syncStarted();
 }
 
 
-QPndman::Manager::Manager() : QObject(0), _repositories(), _devices()
+QPndman::Manager::Manager() : QObject(0), _repositories(), _devices(), _syncTimer()
 {
   pndman_init();
   pndman_repository_init(&_repositories);
   pndman_device_init(&_devices);
+  
+  _syncTimer.setInterval(100);
+  _syncTimer.setSingleShot(false);
+  connect(&_syncTimer, SIGNAL(timeout()), this, SLOT(continueSyncing()));
+}
+
+bool QPndman::Manager::syncDone() const
+{
+  return !_syncTimer.isActive();
+}
+
+void QPndman::Manager::continueSyncing()
+{
+  qDebug() << "syncing";
+  int status = pndman_sync();
+  if(status > 0)
+  {
+    return;
+  }
+  else if(status == 0)
+  {
+    qDebug() << "syncing finished";
+    _syncTimer.stop();
+    emit syncFinished();
+  }
+  else
+  {
+    qDebug() << "syncing error";
+    _syncTimer.stop();
+    emit syncError();    
+  }
 }

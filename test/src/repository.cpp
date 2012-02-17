@@ -1,7 +1,8 @@
-#include "qtpndman.h"
+#include "repository.h"
 
 #include <QDebug>
 #include <QDateTime>
+#include <QCoreApplication>
 
 qint64 time()
 {
@@ -11,35 +12,44 @@ qint64 time()
   return d;
 }
 
-int main()
+Test::Test() : QObject(0), manager(QPndman::Manager::getManager()) {}
+void Test::run()
 {
-  QPndman::Manager* manager = QPndman::Manager::getManager();
+  
+  connect(manager, SIGNAL(syncError()), this, SLOT(syncError()));
+  connect(manager, SIGNAL(syncFinished()), this, SLOT(syncFinished()));
   if(!manager->addDevice("/tmp"))
   {
     qDebug() << "Error adding device!";
-    return 1;
+    QCoreApplication::exit(1);
   }
   
   if(!manager->addRepository("http://repo.openpandora.org/includes/get_data.php"))
   {
     qDebug() << "Error adding repository!";
-    return 1;
+    QCoreApplication::exit(1);
   }
   
   if(manager->addRepository("http://repo.openpandora.org/includes/get_data.php"))
   {
     qDebug() << "Duplicate repository add succeeded!";
-    return 1;
+    QCoreApplication::exit(1);
   }
   
   time();
-  if(!manager->syncAll())
-  {
-    qDebug() << "Error syncing repositories!";
-    return 1;    
-  }
-  qDebug() << "Synced in" << time() << "msec";
+  manager->syncAll();
+}
   
+void Test::syncError()
+{
+  qDebug() << "Error syncing repositories!";
+  QCoreApplication::exit(1);
+}
+  
+void Test::syncFinished()
+{
+  qDebug() << "Synced in" << time() << "msec";
+
   QList< QSharedPointer<QPndman::Repository> > repositories = manager->getRepositories();
   qDebug() << "Generated repository list in" << time() << "msec";
   
@@ -55,6 +65,16 @@ int main()
     qDebug() << "";
   }
   qDebug() << "Listed repo information in" << time() << "msec";
-  
-  return 0;
+  QCoreApplication::exit(0);
+}
+
+int main(int argc, char** argv)
+{
+  QCoreApplication application(argc, argv);
+  Test test;
+  QTimer t;
+  t.setSingleShot(true);
+  t.connect(&t, SIGNAL(timeout()), &test, SLOT(run()));
+  t.start();
+  return application.exec();
 }

@@ -2,6 +2,7 @@
 #define QT_PNDMAN_H
 
 #include <QObject>
+#include <QTimer>
 #include <QScopedPointer>
 #include <QSharedPointer>
 #include "repository.h"
@@ -39,14 +40,22 @@ namespace QPndman
     bool removeHandle(Handle* handle);
     
     int download();
-    bool sync(Repository* repository);
-    bool sync(QList<Repository*> const& repositories);
-    bool syncAll();
+    void sync(Repository* repository);
+    void sync(QList<Repository*> const& repositories);
+    void syncAll();
+    bool syncDone() const;
   
   signals:
     void repositoriesChanged(QList< QSharedPointer<Repository> >);
     void devicesChanged(QList< QSharedPointer<Device> >);
     void handleCreated(Handle*);
+    
+    void syncStarted();
+    void syncFinished();
+    void syncError();
+    
+  private slots:
+    void continueSyncing();
     
   private:
     Manager();
@@ -57,6 +66,8 @@ namespace QPndman
     
     pndman_repository _repositories;
     pndman_device _devices;
+    
+    QTimer _syncTimer;
   };
 }
 

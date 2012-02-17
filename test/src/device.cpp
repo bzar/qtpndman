@@ -1,27 +1,37 @@
-#include "qtpndman.h"
+#include "device.h"
 
 #include <QDebug>
+#include <QDateTime>
+#include <QCoreApplication>
+#include <QTimer>
 
-int main()
+qint64 time()
 {
-  QPndman::Manager* manager = QPndman::Manager::getManager();
-  
+  static qint64 t = QDateTime::currentMSecsSinceEpoch();
+  qint64 d = QDateTime::currentMSecsSinceEpoch() - t;
+  t = QDateTime::currentMSecsSinceEpoch();
+  return d;
+}
+
+Test::Test() : QObject(0), manager(QPndman::Manager::getManager()) {}
+void Test::run()
+{
   if(!manager->addDevice("/tmp"))
   {
     qDebug() << "Error adding device!";
-    return 1;
+    QCoreApplication::exit(1);
   }
 
   if(manager->addDevice("/tmp"))
   {
     qDebug() << "Duplicate device add succeeded!";
-    return 1;
+    QCoreApplication::exit(1);
   }
 
   if(!manager->detectDevices())
   {
     qDebug() << "Error detecting devices!";
-    return 1;
+    QCoreApplication::exit(1);
   }
   
   foreach(const QSharedPointer<QPndman::Device> d, manager->getDevices())
@@ -34,5 +44,16 @@ int main()
     qDebug() << "";
   }
   
-  return 0;
+  QCoreApplication::exit(0);
+}
+
+int main(int argc, char** argv)
+{
+  QCoreApplication application(argc, argv);
+  Test test;
+  QTimer t;
+  t.setSingleShot(true);
+  t.connect(&t, SIGNAL(timeout()), &test, SLOT(run()));
+  t.start();
+  return application.exec();
 }
