@@ -21,7 +21,6 @@ QPndman::Repository::Repository(Repository const& other) : QObject(0),
 
 QPndman::Repository::~Repository()
 {
-  qDebug() << "Repository destructor";
 }
 QPndman::Repository& QPndman::Repository::operator=(Repository const& other)
 {
