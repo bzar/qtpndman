@@ -189,17 +189,13 @@ void QPndman::Manager::continueSyncing()
 {
   qDebug() << "syncing";
   int status = pndman_sync();
-  if(status > 0)
-  {
-    return;
-  }
-  else if(status == 0)
+  if(status == 0)
   {
     qDebug() << "syncing finished";
     d->syncTimer.stop();
     emit syncFinished();
   }
-  else
+  else if(status < 0)
   {
     qDebug() << "syncing error";
     d->syncTimer.stop();
