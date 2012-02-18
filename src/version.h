@@ -2,7 +2,7 @@
 #define VERSION_H
 
 #include <QObject>
-#include <QExplicitlySharedDataPointer>
+#include <QSharedPointer>
 
 #include "pndman.h"
 
@@ -46,7 +46,7 @@ namespace QPndman
     void typeChanged(Type newType);
 
   private:
-    struct Data : public QSharedData
+    struct Data
     {
       Data(pndman_version const* p);
       QString _major;
@@ -56,7 +56,7 @@ namespace QPndman
       Type type;
     };
 
-    QExplicitlySharedDataPointer<Data> d;
+    QSharedPointer<Data> d;
 
   };
 }

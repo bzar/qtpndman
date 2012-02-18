@@ -2,7 +2,7 @@
 #define ASSOCIATION_H
 
 #include <QObject>
-#include <QExplicitlySharedDataPointer>
+#include <QSharedPointer>
 
 #include "pndman.h"
 
@@ -36,7 +36,7 @@ namespace QPndman
     void execChanged(QString newExec);
 
   private:
-    struct Data : public QSharedData
+    struct Data
     {
       Data(pndman_association const* p);
       QString name;
@@ -44,7 +44,7 @@ namespace QPndman
       QString exec;
     };
 
-    QExplicitlySharedDataPointer<Data> d;
+    QSharedPointer<Data> d;
   };
 }
 

@@ -2,7 +2,7 @@
 #define AUTHOR_H
 
 #include <QObject>
-#include <QExplicitlySharedDataPointer>
+#include <QSharedPointer>
 
 #include "pndman.h"
 
@@ -32,14 +32,14 @@ namespace QPndman
     void websiteChanged(QString newWebsite);
 
   private:
-    struct Data : public QSharedData
+    struct Data
     {
       Data(pndman_author const* p);
       QString name;
       QString website;
     };
     
-    QExplicitlySharedDataPointer<Data> d;
+    QSharedPointer<Data> d;
   };
 }
 

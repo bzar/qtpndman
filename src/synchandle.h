@@ -2,7 +2,7 @@
 #define SYNC_HANDLE_H
 
 #include <QObject>
-#include <QExplicitlySharedDataPointer>
+#include <QSharedPointer>
 #include "pndman.h"
 #include "repository.h"
 
@@ -41,7 +41,7 @@ namespace QPndman
     void setError(QString const& error);
     void setDone(bool const& done);
 
-    struct Data : public QSharedData
+    struct Data
     {
       Data();
       ~Data();
@@ -51,7 +51,7 @@ namespace QPndman
       bool done;
     };
 
-    QExplicitlySharedDataPointer<Data> d;
+    QSharedPointer<Data> d;
   };
 }
 

@@ -2,7 +2,7 @@
 #define CATEGORY_H
 
 #include <QObject>
-#include <QExplicitlySharedDataPointer>
+#include <QSharedPointer>
 
 #include "pndman.h"
 
@@ -32,14 +32,14 @@ namespace QPndman
     void subChanged(QString newSub);
 
   private:
-    struct Data : public QSharedData
+    struct Data
     {
       Data(pndman_category const* p);
       QString main;
       QString sub;
     };
     
-    QExplicitlySharedDataPointer<Data> d;
+    QSharedPointer<Data> d;
   };
 }
 

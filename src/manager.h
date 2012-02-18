@@ -60,7 +60,7 @@ namespace QPndman
     void cleanUp();
     
   private:
-    struct Data : public QSharedData
+    struct Data
     {
       Data();
       pndman_repository pndmanRepositories;
@@ -81,7 +81,7 @@ namespace QPndman
     
     bool initSyncHandle(SyncHandle& handle, Repository repository);
     
-    QExplicitlySharedDataPointer<Data> d;
+    QSharedPointer<Data> d;
     
   };
 }

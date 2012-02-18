@@ -2,7 +2,7 @@
 #define HANDLE_H
 
 #include <QObject>
-#include <QExplicitlySharedDataPointer>
+#include <QSharedPointer>
 #include "pndman.h"
 
 #include "package.h"
@@ -81,7 +81,7 @@ namespace QPndman
     void setError(QString const& error);
     void setDone(bool const& done);
 
-    struct Data : public QSharedData
+    struct Data
     {
       Data();
       ~Data();
@@ -97,7 +97,7 @@ namespace QPndman
       bool cancelled;
     };
 
-    QExplicitlySharedDataPointer<Data> d;
+    QSharedPointer<Data> d;
   };
 }
 

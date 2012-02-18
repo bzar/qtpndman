@@ -2,7 +2,7 @@
 #define DEVICE_H
 
 #include <QObject>
-#include <QExplicitlySharedDataPointer>
+#include <QSharedPointer>
 
 #include "pndman.h"
 
@@ -54,7 +54,7 @@ namespace QPndman
     void appdataChanged(QString newAppdata);
 
   private:
-    struct Data : public QSharedData
+    struct Data
     {
       Data(pndman_device* p);
       int identifier;
@@ -69,7 +69,7 @@ namespace QPndman
       static int nextIdentifier;
     };
 
-    QExplicitlySharedDataPointer<Data> d;
+    QSharedPointer<Data> d;
   };
 }
 

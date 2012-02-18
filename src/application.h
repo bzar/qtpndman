@@ -2,7 +2,7 @@
 #define APPLICATION_H
 
 #include <QObject>
-#include <QExplicitlySharedDataPointer>
+#include <QSharedPointer>
 
 #include "executioninfo.h"
 #include "documentationinfo.h"
@@ -94,7 +94,7 @@ namespace QPndman
     void associationsChanged(QList<Association> newAssociations);
 
   private:
-    struct Data : public QSharedData
+    struct Data
     {
       Data(pndman_application const* p);
       
@@ -115,7 +115,7 @@ namespace QPndman
       QList<Association> associations;
     };
     
-    QExplicitlySharedDataPointer<Data> d;
+    QSharedPointer<Data> d;
 
   };
 }

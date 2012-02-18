@@ -2,7 +2,7 @@
 #define LICENSE_H
 
 #include <QObject>
-#include <QExplicitlySharedDataPointer>
+#include <QSharedPointer>
 
 #include "pndman.h"
 
@@ -36,7 +36,7 @@ namespace QPndman
     void sourceCodeUrlChanged(QString newSourcecodeurl);
 
   private:
-    struct Data : public QSharedData
+    struct Data
     {
       Data(pndman_license const* p);
       QString name;
@@ -44,7 +44,7 @@ namespace QPndman
       QString sourceCodeUrl;
     };
 
-    QExplicitlySharedDataPointer<Data> d;
+    QSharedPointer<Data> d;
 
   };
 }

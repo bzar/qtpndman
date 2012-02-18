@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QDateTime>
-#include <QExplicitlySharedDataPointer>
+#include <QSharedPointer>
 
 #include "author.h"
 #include "version.h"
@@ -93,7 +93,7 @@ namespace QPndman
     void flagsChanged(unsigned int newFlags);
 
   private:
-    struct Data : public QSharedData
+    struct Data
     {
       Data(pndman_package* p);
       pndman_package* package;
@@ -118,7 +118,7 @@ namespace QPndman
       unsigned int flags;
     };
 
-    QExplicitlySharedDataPointer<Data> d;
+    QSharedPointer<Data> d;
 
   };
 }

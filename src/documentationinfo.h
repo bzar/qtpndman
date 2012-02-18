@@ -2,7 +2,7 @@
 #define DOCUMENTATIONINFO_H
 
 #include <QObject>
-#include <QExplicitlySharedDataPointer>
+#include <QSharedPointer>
 
 #include "pndman.h"
 
@@ -36,7 +36,7 @@ namespace QPndman
     void srcChanged(QString newSrc);
 
   private:
-    struct Data : public QSharedData
+    struct Data
     {
       Data(pndman_info const* p);
       QString name;
@@ -44,7 +44,7 @@ namespace QPndman
       QString src;
     };
     
-    QExplicitlySharedDataPointer<Data> d;
+    QSharedPointer<Data> d;
   };
 }
 

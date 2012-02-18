@@ -229,7 +229,6 @@ bool QPndman::Manager::currentlySyncing() const
 void QPndman::Manager::continueSyncing()
 {
   int status = pndman_sync();
-  
   foreach(SyncHandle handle, d->syncHandles)
   {
     handle.update();

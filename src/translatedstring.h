@@ -2,7 +2,7 @@
 #define TRANSLATEDSTRING_H
 
 #include <QObject>
-#include <QExplicitlySharedDataPointer>
+#include <QSharedPointer>
 
 #include "pndman.h"
 
@@ -32,14 +32,14 @@ namespace QPndman
     void contentChanged(QString newContent);
 
   private:
-    struct Data : public QSharedData
+    struct Data
     {
       Data(pndman_translated const* p);
       QString language;
       QString content;
     };
     
-    QExplicitlySharedDataPointer<Data> d;
+    QSharedPointer<Data> d;
   };
 }
 

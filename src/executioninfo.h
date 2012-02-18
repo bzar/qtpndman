@@ -2,7 +2,7 @@
 #define EXECUTIONINFO_H
 
 #include <QObject>
-#include <QExplicitlySharedDataPointer>
+#include <QSharedPointer>
 
 #include "pndman.h"
 
@@ -50,7 +50,7 @@ namespace QPndman
     void x11Changed(ExecX11 newX11);
 
   private:
-    struct Data : public QSharedData
+    struct Data
     {
       Data(pndman_exec const* p);
       bool background;
@@ -61,7 +61,7 @@ namespace QPndman
       ExecX11 x11;
     };
     
-    QExplicitlySharedDataPointer<Data> d;
+    QSharedPointer<Data> d;
   };
 }
 
