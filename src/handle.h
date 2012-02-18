@@ -84,6 +84,7 @@ namespace QPndman
     struct Data : public QSharedData
     {
       Data();
+      ~Data();
       pndman_handle handle;
       QString name;
       QString error;

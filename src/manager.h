@@ -35,7 +35,8 @@ namespace QPndman
     bool removeAllDevices();
     QList<Device> getDevices();
     
-    Handle createHandle(QString const& name);
+    Handle install(Package package, Device device, Handle::InstallLocation location);
+    Handle remove(Package package, Device device);
     
     int download();
     SyncHandle sync(Repository repository);
@@ -56,20 +57,27 @@ namespace QPndman
     
   private slots:
     void continueSyncing();
+    void cleanUp();
     
   private:
-    Manager();
-    Manager& operator=(const Manager& other);
-        
     struct Data : public QSharedData
     {
       Data();
       pndman_repository repositories;
       pndman_device devices;
       
+      QList<Handle> handles;
+      QList<SyncHandle> syncHandles;
+      
       QTimer syncTimer;
+      QTimer cleanTimer;
     };
 
+    Manager();
+    Manager& operator=(const Manager& other);
+    
+    bool initSyncHandle(SyncHandle& handle, pndman_repository* r);
+    
     QExplicitlySharedDataPointer<Data> d;
     
   };

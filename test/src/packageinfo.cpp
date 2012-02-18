@@ -16,15 +16,9 @@ Test::Test() : QObject(0), manager(QPndman::Manager::getManager()) {}
 void Test::run()
 {
   connect(manager, SIGNAL(syncStarted(SyncHandle)), this, SLOT(syncStarted(SyncHandle)));
-  connect(manager, SIGNAL(syncing()), this, SLOT(syncing()));  
   connect(manager, SIGNAL(syncError()), this, SLOT(syncError()));
   connect(manager, SIGNAL(syncError(SyncHandle)), this, SLOT(syncError(SyncHandle)));
   connect(manager, SIGNAL(syncFinished()), this, SLOT(syncFinished()));
-  if(!manager->addDevice("/tmp"))
-  {
-    qDebug() << "Error adding device!";
-    QCoreApplication::exit(1);
-  }
   
   if(!manager->addRepository("http://repo.openpandora.org/includes/get_data.php"))
   {
@@ -32,14 +26,8 @@ void Test::run()
     QCoreApplication::exit(1);
   }
   
-  if(manager->addRepository("http://repo.openpandora.org/includes/get_data.php"))
-  {
-    qDebug() << "Duplicate repository add succeeded!";
-    QCoreApplication::exit(1);
-  }
-  
   time();
-  syncHandles = manager->syncAll();
+  manager->syncAll();
 }
 
 void Test::syncStarted(QPndman::SyncHandle handle)
@@ -48,7 +36,6 @@ void Test::syncStarted(QPndman::SyncHandle handle)
 }
 void Test::syncing()
 {
-  qDebug() << "syncing...";
 }
 
 void Test::syncError()
@@ -59,11 +46,7 @@ void Test::syncError()
 
 void Test::syncError(QPndman::SyncHandle handle)
 {
-  if(handle.getRepository().getUrl().isEmpty())
-  {
-    qDebug() << "Cannot sync local repository. This is expected.";
-  }
-  else
+  if(!handle.getRepository().getUrl().isEmpty())
   {
     qDebug() << "Error initiating sync for repository" << handle.getRepository().getUrl();
     QCoreApplication::exit(1);
@@ -75,20 +58,16 @@ void Test::syncFinished()
   qDebug() << "Synced in" << time() << "msec";
 
   QList<QPndman::Repository> repositories = manager->getRepositories();
-  qDebug() << "Generated repository list in" << time() << "msec";
   
   foreach(const QPndman::Repository r, repositories)
   {
-    qDebug() << "url:       " << r.getUrl();
-    qDebug() << "name:      " << r.getName();
-    qDebug() << "updates:   " << r.getUpdates();
-    qDebug() << "timestamp: " << r.getTimestamp();
-    qDebug() << "version:   " << r.getVersion();
-    qDebug() << "exists:    " << r.getExists();
-    qDebug() << "packages:  " << r.getPackages().size();
-    qDebug() << "";
+    QList<QPndman::Package> packages = r.getPackages();
+    foreach(QPndman::Package p, packages)
+    {
+      qDebug() << p.getTitle() << "-" << p.getDescription();
+    }
   }
-  qDebug() << "Listed repo information in" << time() << "msec";
+  
   QCoreApplication::exit(0);
 }
 

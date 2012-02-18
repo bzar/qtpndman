@@ -105,6 +105,18 @@ QList<QPndman::TranslatedString> QPndman::Package::getTitles()
   }
   return d->titles;
 }
+
+QString QPndman::Package::getTitle()
+{
+  getTitles();
+  if(d->titles.size() == 0)
+  {
+    return "";
+  }
+  
+  return d->titles.at(0).getContent();
+}
+
 QList<QPndman::TranslatedString> QPndman::Package::getDescriptions()
 {
   if(d->descriptions.size() == 0)
@@ -113,6 +125,17 @@ QList<QPndman::TranslatedString> QPndman::Package::getDescriptions()
   }
   return d->descriptions;
 }
+QString QPndman::Package::getDescription()
+{
+  getDescriptions();
+  if(d->descriptions.size() == 0)
+  {
+    return "";
+  }
+  
+  return d->descriptions.at(0).getContent();
+}
+
 QList<QPndman::Category> QPndman::Package::getCategories()
 {
   if(d->categories.size() == 0)

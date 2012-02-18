@@ -8,7 +8,10 @@ QPndman::SyncHandle::Data::Data() :
   handle(), error(""), repository(), done(false)
 {
 }
-
+QPndman::SyncHandle::Data::~Data()
+{
+  pndman_sync_request_free(&handle);
+}
 QPndman::SyncHandle::SyncHandle(SyncHandle const& other) : QObject(0), d(other.d)
 {
 }

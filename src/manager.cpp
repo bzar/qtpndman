@@ -96,11 +96,28 @@ QList<QPndman::Device> QPndman::Manager::getDevices()
 }
 
 
-QPndman::Handle QPndman::Manager::createHandle(QString const& name)
+QPndman::Handle QPndman::Manager::install(Package package, Device device, Handle::InstallLocation location)
 {
   Handle handle;
-  pndman_handle_init(name.toLocal8Bit().data(), handle.getPndmanHandle());
+  pndman_handle_init("FOO", handle.getPndmanHandle());
   handle.update();
+  handle.setOperation(Handle::Install);
+  handle.setPackage(package);
+  handle.setDevice(device);
+  handle.setInstallLocation(location);
+  handle.execute();
+  return handle;  
+}
+
+QPndman::Handle QPndman::Manager::remove(Package package, Device device)
+{
+  Handle handle;
+  pndman_handle_init("FOO", handle.getPndmanHandle());
+  handle.update();
+  handle.setOperation(Handle::Remove);
+  handle.setPackage(package);
+  handle.setDevice(device);
+  handle.execute();
   return handle;
 }
 
@@ -116,16 +133,9 @@ QPndman::SyncHandle QPndman::Manager::sync(Repository repository)
   {
     if(QString(r->url) == repository.getUrl())
     {
-      if(pndman_sync_request(handle.getPndmanSyncHandle(), r) == 0)
+      if(initSyncHandle(handle, r))
       {
-        handle.update();
         d->syncTimer.start();
-        emit syncStarted(handle);
-      }
-      else
-      {
-        handle.update();
-        emit syncError(handle);
       }
     }
   }
@@ -143,22 +153,17 @@ QList<QPndman::SyncHandle> QPndman::Manager::sync(QList<Repository> const& repos
       if(QString(r->url) == repository.getUrl())
       {
         SyncHandle handle;
-        if(pndman_sync_request(handle.getPndmanSyncHandle(), r) == 0)
+        if(initSyncHandle(handle, r))
         {
-          handle.update();
           handles << handle;
-          emit syncStarted(handle);
-        }
-        else
-        {
-          handle.update();
-          emit syncError(handle);
         }
       }
     }
   }
 
-  d->syncTimer.start();
+  if(!handles.isEmpty())
+    d->syncTimer.start();
+  
   return handles;
 }
 
@@ -168,21 +173,15 @@ QList<QPndman::SyncHandle> QPndman::Manager::syncAll()
   for(pndman_repository* r = &d->repositories; r != 0; r = r->next)
   {
     SyncHandle handle;
-    if(pndman_sync_request(handle.getPndmanSyncHandle(), r) == 0)
+    if(initSyncHandle(handle, r))
     {
-      handle.update();
       handles << handle;
-      emit syncStarted(handle);
     }
-    else
-    {
-      handle.update();
-      emit syncError(handle);
-    }
-    
   }
 
-  d->syncTimer.start();
+  if(!handles.isEmpty())
+    d->syncTimer.start();
+  
   return handles;
 }
 
@@ -195,10 +194,14 @@ QPndman::Manager::Manager() : QObject(0), d(new Data)
   
   d->syncTimer.setInterval(100);
   d->syncTimer.setSingleShot(false);
+  d->cleanTimer.setInterval(1000);
+  d->cleanTimer.setSingleShot(false);
   connect(&d->syncTimer, SIGNAL(timeout()), this, SLOT(continueSyncing()));
+  connect(&d->cleanTimer, SIGNAL(timeout()), this, SLOT(cleanUp()));
+  connect(this, SIGNAL(syncStarted(SyncHandle)), &d->cleanTimer, SLOT(start()));
 }
 
-QPndman::Manager::Data::Data() : repositories(), devices(), syncTimer()
+QPndman::Manager::Data::Data() : repositories(), devices(), handles(), syncHandles(), syncTimer(), cleanTimer()
 {
   
 }
@@ -225,3 +228,47 @@ void QPndman::Manager::continueSyncing()
     emit syncing();
   }
 }
+
+bool QPndman::Manager::initSyncHandle(SyncHandle& handle, pndman_repository* r)
+{
+  if(pndman_sync_request(handle.getPndmanSyncHandle(), r))
+  {
+    handle.update();
+    emit syncError(handle);
+    return false;
+  }
+  
+  handle.update();
+  d->syncHandles << handle;
+  emit syncStarted(handle);
+  return true;
+}
+
+void QPndman::Manager::cleanUp()
+{
+  QMutableListIterator<SyncHandle> shi(d->syncHandles);
+  while(shi.hasNext()) 
+  {
+    SyncHandle sh = shi.next();
+    if(sh.getPndmanSyncHandle()->done)
+    {
+      shi.remove();
+    }
+  }
+
+  QMutableListIterator<Handle> hi(d->handles);
+  while(hi.hasNext()) 
+  {
+    Handle h = hi.next();
+    if(h.getPndmanHandle()->done)
+    {
+      hi.remove();
+    }
+  }
+  
+  if(d->syncHandles.size() == 0 && d->handles.size() == 0)
+  {
+    d->cleanTimer.stop();
+  }
+}
+

@@ -43,6 +43,7 @@ namespace QPndman
     struct Data : public QSharedData
     {
       Data();
+      ~Data();
       pndman_sync_handle handle;
       QString error;
       Repository repository;

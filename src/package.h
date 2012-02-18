@@ -33,7 +33,9 @@ namespace QPndman
     Q_PROPERTY(Version version READ getVersion NOTIFY versionChanged);
     Q_PROPERTY(QList<Application> applications READ getApplications NOTIFY applicationsChanged);
     Q_PROPERTY(QList<TranslatedString> titles READ getTitles NOTIFY titlesChanged);
+    Q_PROPERTY(QString title READ getTitle NOTIFY titlesChanged);
     Q_PROPERTY(QList<TranslatedString> descriptions READ getDescriptions NOTIFY descriptionsChanged);
+    Q_PROPERTY(QString description READ getDescription NOTIFY descriptionsChanged);
     Q_PROPERTY(QList<Category> categories READ getCategories NOTIFY categoriesChanged);
     Q_PROPERTY(QList<Package> installInstances READ getInstallinstances NOTIFY installInstancesChanged);
     Q_PROPERTY(unsigned int flags READ getFlags NOTIFY flagsChanged);
@@ -63,7 +65,9 @@ namespace QPndman
     Version getVersion() const;
     QList<Application> getApplications();
     QList<TranslatedString> getTitles();
+    QString getTitle();
     QList<TranslatedString> getDescriptions();
+    QString getDescription();
     QList<Category> getCategories();
     QList<Package> getInstallinstances();
     unsigned int getFlags() const;

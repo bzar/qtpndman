@@ -10,6 +10,11 @@ QPndman::Handle::Data::Data() :
 {
 }
 
+QPndman::Handle::Data::~Data()
+{
+  if(!cancelled)
+    pndman_handle_free(&handle);
+}
 QPndman::Handle::Handle(Handle const& other) : QObject(0), d(other.d)
 {
 }

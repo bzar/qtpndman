@@ -10,3 +10,6 @@ target_link_libraries(repository qtpndman)
 
 add_executable(device src/device.cpp src/moc_device.cxx)
 target_link_libraries(device qtpndman)
+
+add_executable(packageinfo src/packageinfo.cpp src/moc_packageinfo.cxx)
+target_link_libraries(packageinfo qtpndman)
