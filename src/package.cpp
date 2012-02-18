@@ -33,7 +33,7 @@ QPndman::Package& QPndman::Package::operator=(Package const& other)
 
 pndman_package* QPndman::Package::getPndmanPackage() const
 {
-  return d->package;
+  return isNull() ? 0 : d->package;
 }
 
 bool QPndman::Package::isNull() const
@@ -43,43 +43,43 @@ bool QPndman::Package::isNull() const
 
 QString QPndman::Package::getPath() const
 {
-  return d->path;
+  return isNull() ? "" : d->path;
 }
 QString QPndman::Package::getId() const
 {
-  return d->id;
+  return isNull() ? "" : d->id;
 }
 QString QPndman::Package::getIcon() const
 {
-  return d->icon;
+  return isNull() ? "" : d->icon;
 }
 QString QPndman::Package::getInfo() const
 {
-  return d->info;
+  return isNull() ? "" : d->info;
 }
 QString QPndman::Package::getMd5() const
 {
-  return d->md5;
+  return isNull() ? "" : d->md5;
 }
 QString QPndman::Package::getUrl() const
 {
-  return d->url;
+  return isNull() ? "" : d->url;
 }
 QString QPndman::Package::getVendor() const
 {
-  return d->vendor;
+  return isNull() ? "" : d->vendor;
 }
 qint64 QPndman::Package::getSize() const
 {
-  return d->size;
+  return isNull() ? 0 : d->size;
 }
 QDateTime QPndman::Package::getModified() const
 {
-  return d->modified;
+  return isNull() ? QDateTime() : d->modified;
 }
 int QPndman::Package::getRating() const
 {
-  return d->rating;
+  return isNull() ? 0 : d->rating;
 }
 QPndman::Author QPndman::Package::getAuthor() const
 {

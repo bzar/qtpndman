@@ -24,14 +24,14 @@ namespace QPndman
     ~Manager();
     
   public slots:
-    bool addRepository(QString const& url);
-    bool removeRepository(QString const& url);
+    Repository addRepository(QString const& url);
+    bool removeRepository(Repository repository);
     bool removeAllRepositories();
     QList<Repository> getRepositories();
     
-    bool addDevice(QString const& path);
-    bool detectDevices();
-    bool removeDevice(QString const& path);
+    Device addDevice(QString const& path);
+    QList<QPndman::Device> detectDevices();
+    bool removeDevice(Device device);
     bool removeAllDevices();
     QList<Device> getDevices();
     
@@ -45,8 +45,8 @@ namespace QPndman
     bool currentlySyncing() const;
   
   signals:
-    void repositoriesChanged(QList<Repository>);
-    void devicesChanged(QList<Device>);
+    void repositoriesChanged();
+    void devicesChanged();
     void handleCreated(Handle);
     
     void syncStarted(SyncHandle);
@@ -63,11 +63,14 @@ namespace QPndman
     struct Data : public QSharedData
     {
       Data();
-      pndman_repository repositories;
-      pndman_device devices;
+      pndman_repository pndmanRepositories;
+      pndman_device pndmanDevices;
       
       QList<Handle> handles;
       QList<SyncHandle> syncHandles;
+      
+      QList<Repository> repositories;
+      QList<Device> devices;
       
       QTimer syncTimer;
       QTimer cleanTimer;
@@ -76,7 +79,7 @@ namespace QPndman
     Manager();
     Manager& operator=(const Manager& other);
     
-    bool initSyncHandle(SyncHandle& handle, pndman_repository* r);
+    bool initSyncHandle(SyncHandle& handle, Repository repository);
     
     QExplicitlySharedDataPointer<Data> d;
     

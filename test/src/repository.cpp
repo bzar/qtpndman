@@ -20,19 +20,19 @@ void Test::run()
   connect(manager, SIGNAL(syncError()), this, SLOT(syncError()));
   connect(manager, SIGNAL(syncError(SyncHandle)), this, SLOT(syncError(SyncHandle)));
   connect(manager, SIGNAL(syncFinished()), this, SLOT(syncFinished()));
-  if(!manager->addDevice("/tmp"))
+  if(manager->addDevice("/tmp").isNull())
   {
     qDebug() << "Error adding device!";
     QCoreApplication::exit(1);
   }
   
-  if(!manager->addRepository("http://repo.openpandora.org/includes/get_data.php"))
+  if(manager->addRepository("http://repo.openpandora.org/includes/get_data.php").isNull())
   {
     qDebug() << "Error adding repository!";
     QCoreApplication::exit(1);
   }
   
-  if(manager->addRepository("http://repo.openpandora.org/includes/get_data.php"))
+  if(!manager->addRepository("http://repo.openpandora.org/includes/get_data.php").isNull())
   {
     qDebug() << "Duplicate repository add succeeded!";
     QCoreApplication::exit(1);

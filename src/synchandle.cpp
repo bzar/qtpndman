@@ -34,11 +34,6 @@ void QPndman::SyncHandle::update()
 {
   setError(d->handle.error);
   setDone(d->handle.done);
-  if(d->repository.isNull() || d->repository.getPndmanRepository() != d->handle.repository)
-  {
-    d->repository = Repository(d->handle.repository);
-    emit repositoryChanged(d->repository);
-  }
 }
 
 QPndman::Repository QPndman::SyncHandle::getRepository() const
@@ -77,6 +72,7 @@ void QPndman::SyncHandle::setDone(bool const& done)
     emit doneChanged(d->done);
     if(done)
     {
+      d->repository.update();
       emit SyncHandle::done();
     }
   }

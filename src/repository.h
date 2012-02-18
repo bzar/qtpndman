@@ -29,8 +29,8 @@ namespace QPndman
 
     pndman_repository* getPndmanRepository() const;
     bool isNull() const;
+    int getIdentifier() const;
     
-  public slots:
     QString getUrl() const;
     QString getName() const;
     QString getUpdates() const;
@@ -39,6 +39,8 @@ namespace QPndman
     QList<Package> getPackages() const;
     bool getExists() const;
 
+  public slots:
+    void update();
     void setUrl(QString const& url);
     void setName(QString const& name);
     void setUpdates(QString const& updates);
@@ -60,6 +62,7 @@ namespace QPndman
     struct Data : public QSharedData
     {
       Data(pndman_repository* p);
+      int identifier;
       pndman_repository* repository;
       QString url;
       QString name;
@@ -68,10 +71,11 @@ namespace QPndman
       QString version;
       QList<Package> packages;
       bool exists;
+      
+      static int nextIdentifier;
     };
 
-    QExplicitlySharedDataPointer<Data> d;
-
+    QExplicitlySharedDataPointer<Data> d;    
   };
 }
 

@@ -23,6 +23,8 @@ namespace QPndman
     
     pndman_sync_handle* getPndmanSyncHandle();
     void update();
+
+    void setRepository(Repository repository);
     
   public slots:
     QString getError() const;
@@ -38,7 +40,6 @@ namespace QPndman
   private:
     void setError(QString const& error);
     void setDone(bool const& done);
-    void setRepository(Repository repository);
 
     struct Data : public QSharedData
     {

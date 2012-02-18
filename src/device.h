@@ -27,8 +27,8 @@ namespace QPndman
 
     pndman_device* getPndmanDevice() const;
     bool isNull() const;
+    int getIdentifier() const;
     
-  public slots:
     QString getMount() const;
     QString getDevice() const;
     qint64 getSize() const;
@@ -36,6 +36,8 @@ namespace QPndman
     qint64 getAvailable() const;
     QString getAppdata() const;
 
+  public slots:
+    void update();
     void setMount(QString const& mount);
     void setDevice(QString const& device);
     void setSize(qint64 const& size);
@@ -55,6 +57,7 @@ namespace QPndman
     struct Data : public QSharedData
     {
       Data(pndman_device* p);
+      int identifier;
       pndman_device* pndmanDevice;
       QString mount;
       QString device;
@@ -62,6 +65,8 @@ namespace QPndman
       qint64 free;
       qint64 available;
       QString appdata;
+      
+      static int nextIdentifier;
     };
 
     QExplicitlySharedDataPointer<Data> d;

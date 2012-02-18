@@ -20,13 +20,7 @@ void Test::run()
   connect(manager, SIGNAL(syncError(SyncHandle)), this, SLOT(syncError(SyncHandle)));
   connect(manager, SIGNAL(syncFinished()), this, SLOT(syncFinished()));
   
-  if(!manager->addRepository("http://repo.openpandora.org/includes/get_data.php"))
-  {
-    qDebug() << "Error adding repository!";
-    QCoreApplication::exit(1);
-  }
-  
-  time();
+  manager->addRepository("http://repo.openpandora.org/includes/get_data.php");
   manager->syncAll();
 }
 
@@ -55,7 +49,7 @@ void Test::syncError(QPndman::SyncHandle handle)
 
 void Test::syncFinished()
 {
-  qDebug() << "Synced in" << time() << "msec";
+  qDebug() << "Synced.";
 
   QList<QPndman::Repository> repositories = manager->getRepositories();
   

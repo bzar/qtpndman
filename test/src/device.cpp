@@ -16,22 +16,21 @@ qint64 time()
 Test::Test() : QObject(0), manager(QPndman::Manager::getManager()) {}
 void Test::run()
 {
-  if(!manager->addDevice("/tmp"))
+  if(manager->addDevice("/tmp").isNull())
   {
     qDebug() << "Error adding device!";
     QCoreApplication::exit(1);
   }
 
-  if(manager->addDevice("/tmp"))
+  if(!manager->addDevice("/tmp").isNull())
   {
     qDebug() << "Duplicate device add succeeded!";
     QCoreApplication::exit(1);
   }
 
-  if(!manager->detectDevices())
+  foreach(QPndman::Device device, manager->detectDevices())
   {
-    qDebug() << "Error detecting devices!";
-    QCoreApplication::exit(1);
+    qDebug() << "Detected device" << device.getDevice();
   }
   
   foreach(const QPndman::Device d, manager->getDevices())

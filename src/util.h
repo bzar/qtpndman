@@ -15,5 +15,16 @@ namespace QPndman
     }
     return result;
   }
+  
+  template<typename T>
+  T* getLast(T* s)
+  {
+    T* last = s;
+    while(last->next)
+    {
+      last = last->next;
+    }
+    return last;
+  }
 }
 #endif
