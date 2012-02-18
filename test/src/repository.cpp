@@ -37,7 +37,7 @@ void Test::run()
   }
   
   time();
-  manager->syncAll();
+  syncHandles = manager->syncAll();
 }
   
 void Test::syncError()
