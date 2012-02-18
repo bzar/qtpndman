@@ -49,8 +49,10 @@ namespace QPndman
     void handleCreated(Handle);
     
     void syncStarted(SyncHandle);
+    void syncing();
     void syncFinished();
     void syncError();
+    void syncError(SyncHandle);
     
   private slots:
     void continueSyncing();

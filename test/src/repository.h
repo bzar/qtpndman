@@ -1,4 +1,5 @@
 #include "qtpndman.h"
+using QPndman::SyncHandle;
 
 class Test : public QObject
 {
@@ -6,12 +7,15 @@ class Test : public QObject
 public:
   Test();
 public slots:
-  void run();  
-  void syncError();  
+  void run(); 
+  void syncStarted(SyncHandle);
+  void syncing();
+  void syncError();
+  void syncError(SyncHandle);
   void syncFinished();
 private:
   QPndman::Manager* manager;
-  QList<QPndman::SyncHandle> syncHandles;
+  QList<SyncHandle> syncHandles;
 };
 
 

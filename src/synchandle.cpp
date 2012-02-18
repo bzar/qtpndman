@@ -31,8 +31,7 @@ void QPndman::SyncHandle::update()
 {
   setError(d->handle.error);
   setDone(d->handle.done);
-  if(d->handle.repository && 
-    (d->repository.isNull() || d->repository.getPndmanRepository() != d->handle.repository))
+  if(d->repository.isNull() || d->repository.getPndmanRepository() != d->handle.repository)
   {
     d->repository = Repository(d->handle.repository);
     emit repositoryChanged(d->repository);

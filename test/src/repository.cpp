@@ -15,8 +15,10 @@ qint64 time()
 Test::Test() : QObject(0), manager(QPndman::Manager::getManager()) {}
 void Test::run()
 {
-  
+  connect(manager, SIGNAL(syncStarted(SyncHandle)), this, SLOT(syncStarted(SyncHandle)));
+  connect(manager, SIGNAL(syncing()), this, SLOT(syncing()));  
   connect(manager, SIGNAL(syncError()), this, SLOT(syncError()));
+  connect(manager, SIGNAL(syncError(SyncHandle)), this, SLOT(syncError(SyncHandle)));
   connect(manager, SIGNAL(syncFinished()), this, SLOT(syncFinished()));
   if(!manager->addDevice("/tmp"))
   {
@@ -39,13 +41,35 @@ void Test::run()
   time();
   syncHandles = manager->syncAll();
 }
-  
+
+void Test::syncStarted(QPndman::SyncHandle handle)
+{
+  qDebug() << "Starting sync for repository" << handle.getRepository().getUrl();
+}
+void Test::syncing()
+{
+  qDebug() << "syncing...";
+}
+
 void Test::syncError()
 {
   qDebug() << "Error syncing repositories!";
   QCoreApplication::exit(1);
 }
-  
+
+void Test::syncError(QPndman::SyncHandle handle)
+{
+  if(handle.getRepository().getUrl().isEmpty())
+  {
+    qDebug() << "Cannot sync local repository. This is expected.";
+  }
+  else
+  {
+    qDebug() << "Error initiating sync for repository" << handle.getRepository().getUrl();
+    QCoreApplication::exit(1);
+  }
+}
+
 void Test::syncFinished()
 {
   qDebug() << "Synced in" << time() << "msec";

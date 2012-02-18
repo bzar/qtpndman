@@ -116,10 +116,17 @@ QPndman::SyncHandle QPndman::Manager::sync(Repository repository)
   {
     if(QString(r->url) == repository.getUrl())
     {
-      pndman_sync_request(handle.getPndmanSyncHandle(), r);
-      handle.update();
-      d->syncTimer.start();
-      emit syncStarted(handle);
+      if(pndman_sync_request(handle.getPndmanSyncHandle(), r) == 0)
+      {
+        handle.update();
+        d->syncTimer.start();
+        emit syncStarted(handle);
+      }
+      else
+      {
+        handle.update();
+        emit syncError(handle);
+      }
     }
   }
 
@@ -136,10 +143,17 @@ QList<QPndman::SyncHandle> QPndman::Manager::sync(QList<Repository> const& repos
       if(QString(r->url) == repository.getUrl())
       {
         SyncHandle handle;
-        pndman_sync_request(handle.getPndmanSyncHandle(), r);
-        handle.update();
-        handles << handle;
-        emit syncStarted(handle);
+        if(pndman_sync_request(handle.getPndmanSyncHandle(), r) == 0)
+        {
+          handle.update();
+          handles << handle;
+          emit syncStarted(handle);
+        }
+        else
+        {
+          handle.update();
+          emit syncError(handle);
+        }
       }
     }
   }
@@ -154,10 +168,18 @@ QList<QPndman::SyncHandle> QPndman::Manager::syncAll()
   for(pndman_repository* r = &d->repositories; r != 0; r = r->next)
   {
     SyncHandle handle;
-    pndman_sync_request(handle.getPndmanSyncHandle(), r);
-    handle.update();
-    handles << handle;
-    emit syncStarted(handle);
+    if(pndman_sync_request(handle.getPndmanSyncHandle(), r) == 0)
+    {
+      handle.update();
+      handles << handle;
+      emit syncStarted(handle);
+    }
+    else
+    {
+      handle.update();
+      emit syncError(handle);
+    }
+    
   }
 
   d->syncTimer.start();
@@ -187,18 +209,19 @@ bool QPndman::Manager::currentlySyncing() const
 
 void QPndman::Manager::continueSyncing()
 {
-  qDebug() << "syncing";
   int status = pndman_sync();
   if(status == 0)
   {
-    qDebug() << "syncing finished";
     d->syncTimer.stop();
     emit syncFinished();
   }
   else if(status < 0)
   {
-    qDebug() << "syncing error";
     d->syncTimer.stop();
     emit syncError();    
+  }
+  else
+  {
+    emit syncing();
   }
 }
