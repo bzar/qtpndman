@@ -1,17 +1,14 @@
 #include "category.h"
 
-QPndman::Category::Category(QString const& main, QString const& sub, QObject* parent) : QObject(parent), 
-  _main(main), _sub(sub)
+QPndman::Category::Category(pndman_category const* p) : QObject(0), d(new Data(p))
+{
+}
+QPndman::Category::Data::Data(pndman_category const* p) : 
+  main(p->main), sub(p->sub)
 {
 }
 
-QPndman::Category::Category(Category const& other) : QObject(0), 
-  _main(other._main), _sub(other._sub)
-{
-}
-
-QPndman::Category::Category(pndman_category const* p) : QObject(0), 
-  _main(p->main), _sub(p->sub)
+QPndman::Category::Category(Category const& other) : QObject(0), d(other.d)
 {
 }
 
@@ -20,34 +17,33 @@ QPndman::Category& QPndman::Category::operator=(Category const& other)
   if(&other == this)
     return *this;
   
-  _main = other._main;
-  _sub = other._sub;
+  d = other.d;
   
   return *this;
 }
 
 QString QPndman::Category::getMain() const
 {
-  return _main;
+  return d->main;
 }
 QString QPndman::Category::getSub() const
 {
-  return _sub;
+  return d->sub;
 }
 
 void QPndman::Category::setMain(QString const& main)
 {
-  if(main != _main) 
+  if(main != d->main) 
   {
-    _main = main; 
-    emit mainChanged(_main);
+    d->main = main; 
+    emit mainChanged(d->main);
   }
 }
 void QPndman::Category::setSub(QString const& sub)
 {
-  if(sub != _sub) 
+  if(sub != d->sub) 
   {
-    _sub = sub; 
-    emit subChanged(_sub);
+    d->sub = sub; 
+    emit subChanged(d->sub);
   }
 }

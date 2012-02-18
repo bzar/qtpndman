@@ -3,11 +3,10 @@
 
 #include <QObject>
 #include <QTimer>
-#include <QScopedPointer>
-#include <QSharedPointer>
 #include "repository.h"
 #include "device.h"
 #include "handle.h"
+#include "synchandle.h"
 
 
 #include "pndman.h"
@@ -21,36 +20,35 @@ namespace QPndman
   public:
     static Manager* getManager();
     
+    Manager(const Manager& other);
     ~Manager();
     
   public slots:
     bool addRepository(QString const& url);
     bool removeRepository(QString const& url);
     bool removeAllRepositories();
-    QList< QSharedPointer<Repository> > getRepositories();
+    QList<Repository> getRepositories();
     
     bool addDevice(QString const& path);
     bool detectDevices();
     bool removeDevice(QString const& path);
     bool removeAllDevices();
-    QList< QSharedPointer<Device> > getDevices();
+    QList<Device> getDevices();
     
-    Handle* createHandle(QString const& name);
-    bool performHandle(Handle* handle);
-    bool removeHandle(Handle* handle);
+    Handle createHandle(QString const& name);
     
     int download();
-    void sync(Repository* repository);
-    void sync(QList<Repository*> const& repositories);
-    void syncAll();
-    bool syncDone() const;
+    SyncHandle sync(Repository repository);
+    QList<SyncHandle> sync(QList<Repository> const& repositories);
+    QList<SyncHandle> syncAll();
+    bool currentlySyncing() const;
   
   signals:
-    void repositoriesChanged(QList< QSharedPointer<Repository> >);
-    void devicesChanged(QList< QSharedPointer<Device> >);
-    void handleCreated(Handle*);
+    void repositoriesChanged(QList<Repository>);
+    void devicesChanged(QList<Device>);
+    void handleCreated(Handle);
     
-    void syncStarted();
+    void syncStarted(SyncHandle);
     void syncFinished();
     void syncError();
     
@@ -59,15 +57,19 @@ namespace QPndman
     
   private:
     Manager();
-    Manager(const Manager& other);
     Manager& operator=(const Manager& other);
+        
+    struct Data : public QSharedData
+    {
+      Data();
+      pndman_repository repositories;
+      pndman_device devices;
+      
+      QTimer syncTimer;
+    };
+
+    QExplicitlySharedDataPointer<Data> d;
     
-    static QScopedPointer<Manager> _manager;
-    
-    pndman_repository _repositories;
-    pndman_device _devices;
-    
-    QTimer _syncTimer;
   };
 }
 

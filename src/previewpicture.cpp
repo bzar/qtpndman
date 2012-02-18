@@ -1,17 +1,15 @@
 #include "previewpicture.h"
 
-QPndman::PreviewPicture::PreviewPicture(QString const& src, QObject* parent) : QObject(parent), 
-  _src(src)
+QPndman::PreviewPicture::PreviewPicture(pndman_previewpic const* p) : QObject(0), d(new Data(p))
 {
 }
 
-QPndman::PreviewPicture::PreviewPicture(pndman_previewpic const* p) : QObject(0), 
-  _src(p->src)
+QPndman::PreviewPicture::Data::Data(pndman_previewpic const* p) :
+  src(p->src)
 {
+  
 }
-
-QPndman::PreviewPicture::PreviewPicture(PreviewPicture const& other) : QObject(0), 
-  _src(other._src)
+QPndman::PreviewPicture::PreviewPicture(PreviewPicture const& other) : QObject(0), d(other.d)
 {
 }
 
@@ -20,21 +18,21 @@ QPndman::PreviewPicture& QPndman::PreviewPicture::operator=(PreviewPicture const
   if(&other == this)
     return *this;
   
-  _src = other._src;
+  d = other.d;
   
   return *this;
 }
 
 QString QPndman::PreviewPicture::getSrc() const
 {
-  return _src;
+  return d->src;
 }
 
 void QPndman::PreviewPicture::setSrc(QString const& src)
 {
-  if(src != _src) 
+  if(src != d->src) 
   {
-    _src = src; 
-    emit srcChanged(_src);
+    d->src = src; 
+    emit srcChanged(d->src);
   }
 }

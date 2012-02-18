@@ -1,20 +1,19 @@
 #include "executioninfo.h"
 
-QPndman::ExecutionInfo::ExecutionInfo(bool const& background, QString const& startDir, bool const& standalone, QString const& command, QString const& arguments, ExecX11 const& x11, QObject* parent) : QObject(parent), 
-  _background(background), _startDir(startDir), _standalone(standalone), _command(command), _arguments(arguments), _x11(x11)
+QPndman::ExecutionInfo::ExecutionInfo(pndman_exec const* p) : QObject(0), d(new Data(p))
 {
+  
+}
+QPndman::ExecutionInfo::Data::Data(pndman_exec const* p) :  
+  background(p->background), startDir(p->startdir), standalone(p->standalone), command(p->command), 
+  arguments(p->arguments), x11(ExecutionInfo::ExecReq)
+{
+  if(p->x11 == PND_EXEC_STOP) x11 = ExecStop;
+  else if(p->x11 == PND_EXEC_IGNORE) x11 = ExecIgnore;
 }
 
-QPndman::ExecutionInfo::ExecutionInfo(ExecutionInfo const& other) : QObject(0), 
-  _background(other._background), _startDir(other._startDir), _standalone(other._standalone), _command(other._command), _arguments(other._arguments), _x11(other._x11)
+QPndman::ExecutionInfo::ExecutionInfo(ExecutionInfo const& other) : QObject(0), d(other.d)
 {
-}
-
-QPndman::ExecutionInfo::ExecutionInfo(pndman_exec const* p) : QObject(0), 
-  _background(p->background), _startDir(p->startdir), _standalone(p->standalone), _command(p->command), _arguments(p->arguments), _x11(ExecutionInfo::ExecReq)
-{
-  if(p->x11 == PND_EXEC_STOP) _x11 = ExecStop;
-  else if(p->x11 == PND_EXEC_IGNORE) _x11 = ExecIgnore;
 }
 
 QPndman::ExecutionInfo& QPndman::ExecutionInfo::operator=(ExecutionInfo const& other)
@@ -22,86 +21,81 @@ QPndman::ExecutionInfo& QPndman::ExecutionInfo::operator=(ExecutionInfo const& o
   if(&other == this)
     return *this;
   
-  _background = other._background;
-  _startDir = other._startDir;
-  _standalone = other._standalone;
-  _command = other._command;
-  _arguments = other._arguments;
-  _x11 = other._x11;
+  d = other.d;
   
   return *this;
 }
 
 bool QPndman::ExecutionInfo::getBackground() const
 {
-  return _background;
+  return d->background;
 }
 QString QPndman::ExecutionInfo::getStartdir() const
 {
-  return _startDir;
+  return d->startDir;
 }
 bool QPndman::ExecutionInfo::getStandalone() const
 {
-  return _standalone;
+  return d->standalone;
 }
 QString QPndman::ExecutionInfo::getCommand() const
 {
-  return _command;
+  return d->command;
 }
 QString QPndman::ExecutionInfo::getArguments() const
 {
-  return _arguments;
+  return d->arguments;
 }
 QPndman::ExecutionInfo::ExecX11 QPndman::ExecutionInfo::getX11() const
 {
-  return _x11;
+  return d->x11;
 }
 
 void QPndman::ExecutionInfo::setBackground(bool const& background)
 {
-  if(background != _background) 
+  if(background != d->background) 
   {
-    _background = background; 
-    emit backgroundChanged(_background);
+    d->background = background; 
+    emit backgroundChanged(d->background);
   }
 }
 void QPndman::ExecutionInfo::setStartdir(QString const& startDir)
 {
-  if(startDir != _startDir) 
+  if(startDir != d->startDir) 
   {
-    _startDir = startDir; 
-    emit startDirChanged(_startDir);
+    d->startDir = startDir; 
+    emit startDirChanged(d->startDir);
   }
 }
 void QPndman::ExecutionInfo::setStandalone(bool const& standalone)
 {
-  if(standalone != _standalone) 
+  if(standalone != d->standalone) 
   {
-    _standalone = standalone; 
-    emit standaloneChanged(_standalone);
+    d->standalone = standalone; 
+    emit standaloneChanged(d->standalone);
   }
 }
 void QPndman::ExecutionInfo::setCommand(QString const& command)
 {
-  if(command != _command) 
+  if(command != d->command) 
   {
-    _command = command; 
-    emit commandChanged(_command);
+    d->command = command; 
+    emit commandChanged(d->command);
   }
 }
 void QPndman::ExecutionInfo::setArguments(QString const& arguments)
 {
-  if(arguments != _arguments) 
+  if(arguments != d->arguments) 
   {
-    _arguments = arguments; 
-    emit argumentsChanged(_arguments);
+    d->arguments = arguments; 
+    emit argumentsChanged(d->arguments);
   }
 }
 void QPndman::ExecutionInfo::setX11(ExecX11 const& x11)
 {
-  if(x11 != _x11) 
+  if(x11 != d->x11) 
   {
-    _x11 = x11; 
-    emit x11Changed(_x11);
+    d->x11 = x11; 
+    emit x11Changed(d->x11);
   }
 }

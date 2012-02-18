@@ -1,18 +1,16 @@
 #include "documentationinfo.h"
 
-QPndman::DocumentationInfo::DocumentationInfo(QString const& name, QString const& type, QString const& src, QObject* parent) : QObject(parent), 
-  _name(name), _type(type), _src(src)
+QPndman::DocumentationInfo::DocumentationInfo(pndman_info const* p) : QObject(0), d(new Data(p))
 {
 }
 
-QPndman::DocumentationInfo::DocumentationInfo(pndman_info const* p) : QObject(0),
-  _name(p->name), _type(p->type), _src(p->src)
+QPndman::DocumentationInfo::Data::Data(pndman_info const* p) : 
+  name(p->name), type(p->type), src(p->src)
 {
   
 }
 
-QPndman::DocumentationInfo::DocumentationInfo(DocumentationInfo const& other) : QObject(0), 
-  _name(other._name), _type(other._type), _src(other._src)
+QPndman::DocumentationInfo::DocumentationInfo(DocumentationInfo const& other) : QObject(0), d(other.d)
 {
 }
 
@@ -21,47 +19,45 @@ QPndman::DocumentationInfo& QPndman::DocumentationInfo::operator=(DocumentationI
   if(&other == this)
     return *this;
   
-  _name = other._name;
-  _type = other._type;
-  _src = other._src;
+  d = other.d;
   
   return *this;
 }
 
 QString QPndman::DocumentationInfo::getName() const
 {
-  return _name;
+  return d->name;
 }
 QString QPndman::DocumentationInfo::getType() const
 {
-  return _type;
+  return d->type;
 }
 QString QPndman::DocumentationInfo::getSrc() const
 {
-  return _src;
+  return d->src;
 }
 
 void QPndman::DocumentationInfo::setName(QString const& name)
 {
-  if(name != _name) 
+  if(name != d->name) 
   {
-    _name = name; 
-    emit nameChanged(_name);
+    d->name = name; 
+    emit nameChanged(d->name);
   }
 }
 void QPndman::DocumentationInfo::setType(QString const& type)
 {
-  if(type != _type) 
+  if(type != d->type) 
   {
-    _type = type; 
-    emit typeChanged(_type);
+    d->type = type; 
+    emit typeChanged(d->type);
   }
 }
 void QPndman::DocumentationInfo::setSrc(QString const& src)
 {
-  if(src != _src) 
+  if(src != d->src) 
   {
-    _src = src; 
-    emit srcChanged(_src);
+    d->src = src; 
+    emit srcChanged(d->src);
   }
 }

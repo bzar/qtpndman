@@ -1,17 +1,15 @@
 #include "license.h"
 
-QPndman::License::License(QString const& name, QString const& url, QString const& sourceCodeUrl, QObject* parent) : QObject(parent), 
-  _name(name), _url(url), _sourceCodeUrl(sourceCodeUrl)
+QPndman::License::License(pndman_license const* p) : QObject(0), d(new Data(p))
+{
+  
+}
+QPndman::License::Data::Data(pndman_license const* p) :
+  name(p->name), url(p->url), sourceCodeUrl(p->sourcecodeurl)
 {
 }
 
-QPndman::License::License(pndman_license const* p) : QObject(0), 
-  _name(p->name), _url(p->url), _sourceCodeUrl(p->sourcecodeurl)
-{
-}
-
-QPndman::License::License(License const& other) : QObject(0), 
-  _name(other._name), _url(other._url), _sourceCodeUrl(other._sourceCodeUrl)
+QPndman::License::License(License const& other) : QObject(0), d(other.d)
 {
 }
 
@@ -20,47 +18,45 @@ QPndman::License& QPndman::License::operator=(License const& other)
   if(&other == this)
     return *this;
   
-  _name = other._name;
-  _url = other._url;
-  _sourceCodeUrl = other._sourceCodeUrl;
+  d = other.d;
   
   return *this;
 }
 
 QString QPndman::License::getName() const
 {
-  return _name;
+  return d->name;
 }
 QString QPndman::License::getUrl() const
 {
-  return _url;
+  return d->url;
 }
 QString QPndman::License::getSourcecodeurl() const
 {
-  return _sourceCodeUrl;
+  return d->sourceCodeUrl;
 }
 
 void QPndman::License::setName(QString const& name)
 {
-  if(name != _name) 
+  if(name != d->name) 
   {
-    _name = name; 
-    emit nameChanged(_name);
+    d->name = name; 
+    emit nameChanged(d->name);
   }
 }
 void QPndman::License::setUrl(QString const& url)
 {
-  if(url != _url) 
+  if(url != d->url) 
   {
-    _url = url; 
-    emit urlChanged(_url);
+    d->url = url; 
+    emit urlChanged(d->url);
   }
 }
 void QPndman::License::setSourcecodeurl(QString const& sourceCodeUrl)
 {
-  if(sourceCodeUrl != _sourceCodeUrl) 
+  if(sourceCodeUrl != d->sourceCodeUrl) 
   {
-    _sourceCodeUrl = sourceCodeUrl; 
-    emit sourceCodeUrlChanged(_sourceCodeUrl);
+    d->sourceCodeUrl = sourceCodeUrl; 
+    emit sourceCodeUrlChanged(d->sourceCodeUrl);
   }
 }

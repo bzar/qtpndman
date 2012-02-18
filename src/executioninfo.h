@@ -2,6 +2,7 @@
 #define EXECUTIONINFO_H
 
 #include <QObject>
+#include <QExplicitlySharedDataPointer>
 
 #include "pndman.h"
 
@@ -21,7 +22,6 @@ namespace QPndman
   public:
     enum ExecX11 { ExecReq, ExecStop, ExecIgnore};
 
-    ExecutionInfo(bool const& background, QString const& startDir, bool const& standalone, QString const& command, QString const& arguments, ExecX11 const& x11, QObject* parent = 0);
     ExecutionInfo(pndman_exec const* p);
     ExecutionInfo(ExecutionInfo const& other);
     ExecutionInfo& operator=(ExecutionInfo const& other);
@@ -50,13 +50,18 @@ namespace QPndman
     void x11Changed(ExecX11 newX11);
 
   private:
-    bool _background;
-    QString _startDir;
-    bool _standalone;
-    QString _command;
-    QString _arguments;
-    ExecX11 _x11;
-
+    struct Data : public QSharedData
+    {
+      Data(pndman_exec const* p);
+      bool background;
+      QString startDir;
+      bool standalone;
+      QString command;
+      QString arguments;
+      ExecX11 x11;
+    };
+    
+    QExplicitlySharedDataPointer<Data> d;
   };
 }
 

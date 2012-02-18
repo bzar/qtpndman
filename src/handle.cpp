@@ -1,123 +1,202 @@
 #include "handle.h"
 
-QPndman::Handle::Handle() : QObject(0), 
-  _handle(), _name(""), _error(""), _force(false), _operation(Handle::Install), _installLocation(Handle::Desktop), _done(false)
+QPndman::Handle::Handle() : QObject(0), d(new Data())
+{
+}
+QPndman::Handle::Data::Data() :
+  handle(), name(""), error(""), force(false), package(), device(), 
+  operation(Handle::Install), installLocation(Handle::Desktop), done(false), 
+  cancelled(false)
 {
 }
 
+QPndman::Handle::Handle(Handle const& other) : QObject(0), d(other.d)
+{
+}
+QPndman::Handle& QPndman::Handle::operator=(Handle const& other)
+{
+  if(&other == this)
+    return *this;
+  
+  d = other.d;
+  
+  return *this;
+}
 pndman_handle* QPndman::Handle::getPndmanHandle()
 {
-  return &_handle;
+  return &(d->handle);
+}
+
+bool QPndman::Handle::execute()
+{
+  if(pndman_handle_perform(&d->handle) == 0)
+  {
+    emit executed();
+    return true;
+  }
+  else
+  {
+    emit error(d->error);
+    return false;
+  }
+}
+
+bool QPndman::Handle::cancel()
+{
+  if(pndman_handle_free(&d->handle) == 0)
+  {
+    d->cancelled = true;
+    emit cancelledChanged(true);
+    emit cancelled();
+    return true;
+  }
+  else
+  {
+    emit error(d->error);
+    return false;      
+  }
 }
 
 void QPndman::Handle::update()
 {
-  setName(_handle.name);
-  setError(_handle.error);
-  setForce(_handle.flags & PNDMAN_HANDLE_FORCE);
+  setName(d->handle.name);
+  setError(d->handle.error);
+  setForce(d->handle.flags & PNDMAN_HANDLE_FORCE);
   
-  if(_handle.flags & PNDMAN_HANDLE_INSTALL) setOperation(Handle::Install);
-  else if(_handle.flags & PNDMAN_HANDLE_REMOVE) setOperation(Handle::Remove);
+  if(d->handle.flags & PNDMAN_HANDLE_INSTALL) setOperation(Handle::Install);
+  else if(d->handle.flags & PNDMAN_HANDLE_REMOVE) setOperation(Handle::Remove);
   
-  if(_handle.flags & PNDMAN_HANDLE_INSTALL_DESKTOP) setInstallLocation(Handle::Desktop);
-  else if(_handle.flags & PNDMAN_HANDLE_INSTALL_MENU) setInstallLocation(Handle::Menu);
-  else if(_handle.flags & PNDMAN_HANDLE_INSTALL_APPS) setInstallLocation(Handle::DesktopAndMenu);
+  if(d->handle.flags & PNDMAN_HANDLE_INSTALL_DESKTOP) setInstallLocation(Handle::Desktop);
+  else if(d->handle.flags & PNDMAN_HANDLE_INSTALL_MENU) setInstallLocation(Handle::Menu);
+  else if(d->handle.flags & PNDMAN_HANDLE_INSTALL_APPS) setInstallLocation(Handle::DesktopAndMenu);
   
-  setDone(_handle.done);
+  setDone(d->handle.done);
 }
 
 QString QPndman::Handle::getName() const
 {
-  return _name;
+  return d->name;
 }
 QString QPndman::Handle::getError() const
 {
-  return _error;
+  return d->error;
 }
 bool QPndman::Handle::getForce() const
 {
-  return _force;
+  return d->force;
+}
+QPndman::Package QPndman::Handle::getPackage() const
+{
+  return d->package;
+}
+QPndman::Device QPndman::Handle::getDevice() const
+{
+  return d->device;
 }
 QPndman::Handle::Operation QPndman::Handle::getOperation() const
 {
-  return _operation;
+  return d->operation;
 }
 QPndman::Handle::InstallLocation QPndman::Handle::getInstallLocation() const
 {
-  return _installLocation;
+  return d->installLocation;
 }
 bool QPndman::Handle::getDone() const
 {
-  return _done;
+  return d->done;
 }
+
+bool QPndman::Handle::getCancelled() const
+{
+  return d->cancelled;
+}
+
 
 void QPndman::Handle::setForce(bool const& force)
 {
-  if(force != _force) 
+  if(force != d->force) 
   {
-    _force = force;
+    d->force = force;
     updateHandleFlags();
-    emit forceChanged(_force);
+    emit forceChanged(d->force);
   }
 }
+void QPndman::Handle::setPackage(Package package)
+{
+  if(package.getMd5() != d->package.getMd5()) 
+  {
+    d->package = package;
+    d->handle.pnd = d->package.getPndmanPackage();
+    emit packageChanged(d->package);
+  }
+}
+void QPndman::Handle::setDevice(Device device)
+{
+  if(device.getMount() != d->device.getMount()) 
+  {
+    d->device = device;
+    emit deviceChanged(d->device);
+    d->handle.device = d->device.getPndmanDevice();
+  }
+}
+
 void QPndman::Handle::setOperation(Operation const operation)
 {
-  if(operation != _operation) 
+  if(operation != d->operation) 
   {
-    _operation = operation; 
+    d->operation = operation; 
     updateHandleFlags();
-    emit operationChanged(_operation);
+    emit operationChanged(d->operation);
   }
 }
 void QPndman::Handle::setInstallLocation(InstallLocation const installLocation)
 {
-  if(installLocation != _installLocation) 
+  if(installLocation != d->installLocation) 
   {
-    _installLocation = installLocation; 
+    d->installLocation = installLocation; 
     updateHandleFlags();
-    emit installLocationChanged(_installLocation);
+    emit installLocationChanged(d->installLocation);
   }
 }
 
 void QPndman::Handle::updateHandleFlags()
 {
-  _handle.flags = 0;
-  if(_force) _handle.flags |= PNDMAN_HANDLE_FORCE;
+  d->handle.flags = 0;
+  if(d->force) d->handle.flags |= PNDMAN_HANDLE_FORCE;
   
-  if(_operation == Handle::Install) _handle.flags |= PNDMAN_HANDLE_INSTALL;
-  else if(_operation == Handle::Remove) _handle.flags |= PNDMAN_HANDLE_REMOVE;
+  if(d->operation == Handle::Install) d->handle.flags |= PNDMAN_HANDLE_INSTALL;
+  else if(d->operation == Handle::Remove) d->handle.flags |= PNDMAN_HANDLE_REMOVE;
 
-  if(_installLocation == Handle::Desktop) _handle.flags |= PNDMAN_HANDLE_INSTALL_DESKTOP;
-  else if(_installLocation == Handle::Menu) _handle.flags |= PNDMAN_HANDLE_INSTALL_MENU;
-  else if(_installLocation == Handle::DesktopAndMenu) _handle.flags |= PNDMAN_HANDLE_INSTALL_APPS;
+  if(d->installLocation == Handle::Desktop) d->handle.flags |= PNDMAN_HANDLE_INSTALL_DESKTOP;
+  else if(d->installLocation == Handle::Menu) d->handle.flags |= PNDMAN_HANDLE_INSTALL_MENU;
+  else if(d->installLocation == Handle::DesktopAndMenu) d->handle.flags |= PNDMAN_HANDLE_INSTALL_APPS;
 }
 
 void QPndman::Handle::setName(QString const& name)
 {
-  if(name != _name) 
+  if(name != d->name) 
   {
-    _name = name;
-    emit nameChanged(_name);
+    d->name = name;
+    emit nameChanged(d->name);
   }
 }
 void QPndman::Handle::setError(QString const& error)
 {
-  if(error != _error) 
+  if(error != d->error) 
   {
-    _error = error; 
-    emit errorChanged(_error);
+    d->error = error; 
+    emit errorChanged(d->error);
   }
 }
 void QPndman::Handle::setDone(bool const& done)
 {
-  if(done != _done) 
+  if(done != d->done) 
   {
-    _done = done; 
-    emit doneChanged(_done);
+    d->done = done; 
+    emit doneChanged(d->done);
     if(done)
     {
       emit Handle::done();
     }
   }
 }
-

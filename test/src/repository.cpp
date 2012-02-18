@@ -50,18 +50,18 @@ void Test::syncFinished()
 {
   qDebug() << "Synced in" << time() << "msec";
 
-  QList< QSharedPointer<QPndman::Repository> > repositories = manager->getRepositories();
+  QList<QPndman::Repository> repositories = manager->getRepositories();
   qDebug() << "Generated repository list in" << time() << "msec";
   
-  foreach(const QSharedPointer<QPndman::Repository> r, repositories)
+  foreach(const QPndman::Repository r, repositories)
   {
-    qDebug() << "url:       " << r->getUrl();
-    qDebug() << "name:      " << r->getName();
-    qDebug() << "updates:   " << r->getUpdates();
-    qDebug() << "timestamp: " << r->getTimestamp();
-    qDebug() << "version:   " << r->getVersion();
-    qDebug() << "exists:    " << r->getExists();
-    qDebug() << "packages:  " << r->getPackages().size();
+    qDebug() << "url:       " << r.getUrl();
+    qDebug() << "name:      " << r.getName();
+    qDebug() << "updates:   " << r.getUpdates();
+    qDebug() << "timestamp: " << r.getTimestamp();
+    qDebug() << "version:   " << r.getVersion();
+    qDebug() << "exists:    " << r.getExists();
+    qDebug() << "packages:  " << r.getPackages().size();
     qDebug() << "";
   }
   qDebug() << "Listed repo information in" << time() << "msec";

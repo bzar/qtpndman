@@ -2,6 +2,7 @@
 #define ASSOCIATION_H
 
 #include <QObject>
+#include <QExplicitlySharedDataPointer>
 
 #include "pndman.h"
 
@@ -16,7 +17,6 @@ namespace QPndman
     Q_PROPERTY(QString exec READ getExec WRITE setExec NOTIFY execChanged);
 
   public:
-    Association(QString const& name, QString const& fileType, QString const& exec, QObject* parent = 0);
     Association(pndman_association const* p);
     Association(Association const& other);
     Association& operator=(Association const& other);
@@ -36,10 +36,15 @@ namespace QPndman
     void execChanged(QString newExec);
 
   private:
-    QString _name;
-    QString _fileType;
-    QString _exec;
+    struct Data : public QSharedData
+    {
+      Data(pndman_association const* p);
+      QString name;
+      QString fileType;
+      QString exec;
+    };
 
+    QExplicitlySharedDataPointer<Data> d;
   };
 }
 

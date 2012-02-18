@@ -34,13 +34,13 @@ void Test::run()
     QCoreApplication::exit(1);
   }
   
-  foreach(const QSharedPointer<QPndman::Device> d, manager->getDevices())
+  foreach(const QPndman::Device d, manager->getDevices())
   {
-    qDebug() << "mount:    " << d->getMount();
-    qDebug() << "device:   " << d->getDevice();
-    qDebug() << "size:     " << d->getSize();
-    qDebug() << "free:     " << d->getFree();
-    qDebug() << "available:" << d->getAvailable();
+    qDebug() << "mount:    " << d.getMount();
+    qDebug() << "device:   " << d.getDevice();
+    qDebug() << "size:     " << d.getSize();
+    qDebug() << "free:     " << d.getFree();
+    qDebug() << "available:" << d.getAvailable();
     qDebug() << "";
   }
   

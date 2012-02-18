@@ -11,6 +11,7 @@ public slots:
   void syncFinished();
 private:
   QPndman::Manager* manager;
+  QList<QPndman::SyncHandle> syncHandles;
 };
 
 

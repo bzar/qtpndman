@@ -3,119 +3,124 @@
 
 #include <QDebug>
 
-QPndman::Repository::Repository(QString const& url, QString const& name, QString const& updates, QDateTime const& timestamp, QString const& version, QList< QSharedPointer<Package> > const& packages, bool exists, QObject* parent) : QObject(parent), 
-  _url(url), _name(name), _updates(updates), _timestamp(timestamp), _version(version), _packages(packages), _exists(exists)
+QPndman::Repository::Repository() : QObject(0), d()
+{
+  
+}
+QPndman::Repository::Repository(pndman_repository* p) : QObject(0), d(new Data(p))
+{
+  
+}
+QPndman::Repository::Data::Data(pndman_repository* p) : repository(p), 
+  url(p->url), name(p->name), updates(p->updates), 
+  timestamp(QDateTime::fromTime_t(p->timestamp)), version(p->version), 
+  packages(makeQList<pndman_package, Package>(p->pnd)), exists(p->exist)
 {
 }
 
-QPndman::Repository::Repository(pndman_repository const* p) : QObject(0), 
-  _url(p->url), _name(p->name), _updates(p->updates), _timestamp(QDateTime::fromTime_t(p->timestamp)), _version(p->version), 
-  _packages(makeQList<pndman_package, Package>(p->pnd)), _exists(p->exist)
+QPndman::Repository::Repository(Repository const& other) : QObject(0), d(other.d)
 {
 }
 
-QPndman::Repository::Repository(Repository const& other) : QObject(0), 
-  _url(other._url), _name(other._name), _updates(other._updates), _timestamp(other._timestamp), _version(other._version), _packages(other._packages), _exists(other._exists)
-{
-}
-
-QPndman::Repository::~Repository()
-{
-}
 QPndman::Repository& QPndman::Repository::operator=(Repository const& other)
 {
   if(&other == this)
     return *this;
   
-  _url = other._url;
-  _name = other._name;
-  _updates = other._updates;
-  _timestamp = other._timestamp;
-  _version = other._version;
-  _packages = other._packages;
+  d = other.d;
   
   return *this;
 }
 
+pndman_repository* QPndman::Repository::getPndmanRepository() const
+{
+  return d->repository;
+}
+
+bool QPndman::Repository::isNull() const
+{
+  return !d;
+}
+
 QString QPndman::Repository::getUrl() const
 {
-  return _url;
+  return d->url;
 }
 QString QPndman::Repository::getName() const
 {
-  return _name;
+  return d->name;
 }
 QString QPndman::Repository::getUpdates() const
 {
-  return _updates;
+  return d->updates;
 }
 QDateTime QPndman::Repository::getTimestamp() const
 {
-  return _timestamp;
+  return d->timestamp;
 }
 QString QPndman::Repository::getVersion() const
 {
-  return _version;
+  return d->version;
 }
-QList< QSharedPointer<QPndman::Package> > QPndman::Repository::getPackages() const
+QList<QPndman::Package> QPndman::Repository::getPackages() const
 {
-  return _packages;
+  return d->packages;
 }
 bool QPndman::Repository::getExists() const
 {
-  return _exists;
+  return d->exists;
 }
 
 void QPndman::Repository::setUrl(QString const& url)
 {
-  if(url != _url) 
+  if(url != d->url) 
   {
-    _url = url; 
-    emit urlChanged(_url);
+    d->url = url; 
+    emit urlChanged(d->url);
   }
 }
 void QPndman::Repository::setName(QString const& name)
 {
-  if(name != _name) 
+  if(name != d->name) 
   {
-    _name = name; 
-    emit nameChanged(_name);
+    d->name = name; 
+    emit nameChanged(d->name);
   }
 }
 void QPndman::Repository::setUpdates(QString const& updates)
 {
-  if(updates != _updates) 
+  if(updates != d->updates) 
   {
-    _updates = updates; 
-    emit updatesChanged(_updates);
+    d->updates = updates; 
+    emit updatesChanged(d->updates);
   }
 }
 void QPndman::Repository::setTimestamp(QDateTime const& timestamp)
 {
-  if(timestamp != _timestamp) 
+  if(timestamp != d->timestamp) 
   {
-    _timestamp = timestamp; 
-    emit timestampChanged(_timestamp);
+    d->timestamp = timestamp; 
+    emit timestampChanged(d->timestamp);
   }
 }
 void QPndman::Repository::setVersion(QString const& version)
 {
-  if(version != _version) 
+  if(version != d->version) 
   {
-    _version = version; 
-    emit versionChanged(_version);
+    d->version = version; 
+    emit versionChanged(d->version);
   }
 }
-void QPndman::Repository::setPackages(QList< QSharedPointer<Package> > const& packages)
+void QPndman::Repository::setPackages(QList<Package> const& packages)
 {
-  _packages = packages; 
-  emit packagesChanged(_packages);
+  d->packages = packages; 
+  emit packagesChanged(d->packages);
 }
 void QPndman::Repository::setExists(bool const exists)
 {
-  if(exists != _exists) 
+  if(exists != d->exists) 
   {
-    _exists = exists; 
-    emit existsChanged(_exists);
+    d->exists = exists; 
+    emit existsChanged(d->exists);
   }
 }

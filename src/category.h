@@ -2,6 +2,7 @@
 #define CATEGORY_H
 
 #include <QObject>
+#include <QExplicitlySharedDataPointer>
 
 #include "pndman.h"
 
@@ -15,9 +16,8 @@ namespace QPndman
     Q_PROPERTY(QString sub READ getSub WRITE setSub NOTIFY subChanged);
 
   public:
-    Category(QString const& main, QString const& sub, QObject* parent = 0);
-    Category(Category const& other);
     Category(pndman_category const* p);
+    Category(Category const& other);
     Category& operator=(Category const& other);
 
   public slots:
@@ -32,9 +32,14 @@ namespace QPndman
     void subChanged(QString newSub);
 
   private:
-    QString _main;
-    QString _sub;
-
+    struct Data : public QSharedData
+    {
+      Data(pndman_category const* p);
+      QString main;
+      QString sub;
+    };
+    
+    QExplicitlySharedDataPointer<Data> d;
   };
 }
 

@@ -3,18 +3,15 @@
 
 #include <QDebug>
 
-QScopedPointer<QPndman::Manager> QPndman::Manager::_manager(0);
-
 QPndman::Manager* QPndman::Manager::getManager()
 {
-  if(_manager.isNull())
-  {
-    _manager.reset(new Manager);
-  }
-  
-  return _manager.data();
+  static Manager manager;
+  return &manager;
 }
 
+QPndman::Manager::Manager(Manager const& other) : d(other.d)
+{
+}
 
 QPndman::Manager::~Manager()
 {
@@ -26,7 +23,7 @@ QPndman::Manager::~Manager()
 
 bool QPndman::Manager::addRepository(QString const& url)
 {
-  if(pndman_repository_add(url.toLocal8Bit().data(), &_repositories))
+  if(pndman_repository_add(url.toLocal8Bit().data(), &d->repositories))
     return false;
   
   emit repositoriesChanged(getRepositories());
@@ -35,7 +32,7 @@ bool QPndman::Manager::addRepository(QString const& url)
 
 bool QPndman::Manager::removeRepository(QString const& url)
 {
-  for(pndman_repository* r = &_repositories; r != 0; r = r->next)
+  for(pndman_repository* r = &d->repositories; r != 0; r = r->next)
   {
     if(QString(r->url) == url)
     {
@@ -48,21 +45,21 @@ bool QPndman::Manager::removeRepository(QString const& url)
 
 bool QPndman::Manager::removeAllRepositories()
 {
-  pndman_repository_free_all(&_repositories);
+  return pndman_repository_free_all(&d->repositories) == 0;
 }
 
-QList< QSharedPointer<QPndman::Repository> > QPndman::Manager::getRepositories()
+QList<QPndman::Repository> QPndman::Manager::getRepositories()
 {
-  return makeQList<pndman_repository, Repository>(&_repositories);
+  return makeQList<pndman_repository, Repository>(&d->repositories);
 }
 
 
 bool QPndman::Manager::addDevice(QString const& path)
 {
-  if(pndman_device_add(path.toLocal8Bit().data(), &_devices))
+  if(pndman_device_add(path.toLocal8Bit().data(), &d->devices))
     return false;
   
-  pndman_device* latestDevice = &_devices;
+  pndman_device* latestDevice = &d->devices;
   while(latestDevice->next != 0)
     latestDevice = latestDevice->next;
   
@@ -72,16 +69,16 @@ bool QPndman::Manager::addDevice(QString const& path)
 
 bool QPndman::Manager::detectDevices()
 {
-  return pndman_device_detect(&_devices) == 0;
+  return pndman_device_detect(&d->devices) == 0;
 }
 
 bool QPndman::Manager::removeDevice(QString const& path)
 {
-  for(pndman_device* d = &_devices; d != 0; d = d->next)
+  for(pndman_device* dev = &d->devices; dev != 0; dev = dev->next)
   {
-    if(QString(d->mount) == path || QString(d->device) == path)
+    if(QString(dev->mount) == path || QString(dev->device) == path)
     {
-      pndman_device_free(d);
+      pndman_device_free(dev);
       return true;
     }
   }
@@ -90,99 +87,102 @@ bool QPndman::Manager::removeDevice(QString const& path)
 
 bool QPndman::Manager::removeAllDevices()
 {
-  return pndman_device_free_all(&_devices) == 0;
+  return pndman_device_free_all(&d->devices) == 0;
 }
 
-QList< QSharedPointer<QPndman::Device> > QPndman::Manager::getDevices()
+QList<QPndman::Device> QPndman::Manager::getDevices()
 {
-  return makeQList<pndman_device, Device>(&_devices);
+  return makeQList<pndman_device, Device>(&d->devices);
 }
 
 
-QPndman::Handle* QPndman::Manager::createHandle(QString const& name)
+QPndman::Handle QPndman::Manager::createHandle(QString const& name)
 {
-  Handle* handle = new Handle;
-  if(pndman_handle_init(name.toLocal8Bit().data(), handle->getPndmanHandle()))
-    return 0;
-  handle->update();
+  Handle handle;
+  pndman_handle_init(name.toLocal8Bit().data(), handle.getPndmanHandle());
+  handle.update();
   return handle;
 }
-
-bool QPndman::Manager::performHandle(Handle* handle)
-{
-  return pndman_handle_perform(handle->getPndmanHandle()) == 0;
-}
-
-bool QPndman::Manager::removeHandle(Handle* handle)
-{
-  if(pndman_handle_free(handle->getPndmanHandle()))
-    return false;
-  delete handle;
-}
-
 
 int QPndman::Manager::download()
 {
   return pndman_download();
 }
 
-void QPndman::Manager::sync(Repository* repository)
+QPndman::SyncHandle QPndman::Manager::sync(Repository repository)
 {
-  for(pndman_repository* r = &_repositories; r != 0; r = r->next)
+  SyncHandle handle;
+  for(pndman_repository* r = &d->repositories; r != 0; r = r->next)
   {
-    if(QString(r->url) == repository->getUrl())
+    if(QString(r->url) == repository.getUrl())
     {
-      pndman_sync_request(r);
+      pndman_sync_request(handle.getPndmanSyncHandle(), r);
+      handle.update();
+      d->syncTimer.start();
+      emit syncStarted(handle);
     }
   }
 
-  _syncTimer.start();
-  emit syncStarted();
+  return handle;
 }
 
-void QPndman::Manager::sync(QList<Repository*> const& repositories)
+QList<QPndman::SyncHandle> QPndman::Manager::sync(QList<Repository> const& repositories)
 {
-  foreach(Repository* repository, repositories)
+  QList<SyncHandle> handles;
+  foreach(Repository repository, repositories)
   {
-    for(pndman_repository* r = &_repositories; r != 0; r = r->next)
+    for(pndman_repository* r = &d->repositories; r != 0; r = r->next)
     {
-      if(QString(r->url) == repository->getUrl())
+      if(QString(r->url) == repository.getUrl())
       {
-        pndman_sync_request(r);
+        SyncHandle handle;
+        pndman_sync_request(handle.getPndmanSyncHandle(), r);
+        handle.update();
+        handles << handle;
+        emit syncStarted(handle);
       }
     }
   }
 
-  _syncTimer.start();
-  emit syncStarted();
+  d->syncTimer.start();
+  return handles;
 }
 
-void QPndman::Manager::syncAll()
+QList<QPndman::SyncHandle> QPndman::Manager::syncAll()
 {
-  for(pndman_repository* r = &_repositories; r != 0; r = r->next)
+  QList<SyncHandle> handles;
+  for(pndman_repository* r = &d->repositories; r != 0; r = r->next)
   {
-    pndman_sync_request(r);
+    SyncHandle handle;
+    pndman_sync_request(handle.getPndmanSyncHandle(), r);
+    handle.update();
+    handles << handle;
+    emit syncStarted(handle);
   }
 
-  _syncTimer.start();
-  emit syncStarted();
+  d->syncTimer.start();
+  return handles;
 }
 
 
-QPndman::Manager::Manager() : QObject(0), _repositories(), _devices(), _syncTimer()
+QPndman::Manager::Manager() : QObject(0), d(new Data)
 {
   pndman_init();
-  pndman_repository_init(&_repositories);
-  pndman_device_init(&_devices);
+  pndman_repository_init(&d->repositories);
+  pndman_device_init(&d->devices);
   
-  _syncTimer.setInterval(100);
-  _syncTimer.setSingleShot(false);
-  connect(&_syncTimer, SIGNAL(timeout()), this, SLOT(continueSyncing()));
+  d->syncTimer.setInterval(100);
+  d->syncTimer.setSingleShot(false);
+  connect(&d->syncTimer, SIGNAL(timeout()), this, SLOT(continueSyncing()));
 }
 
-bool QPndman::Manager::syncDone() const
+QPndman::Manager::Data::Data() : repositories(), devices(), syncTimer()
 {
-  return !_syncTimer.isActive();
+  
+}
+bool QPndman::Manager::currentlySyncing() const
+{
+  return d->syncTimer.isActive();
 }
 
 void QPndman::Manager::continueSyncing()
@@ -196,13 +196,13 @@ void QPndman::Manager::continueSyncing()
   else if(status == 0)
   {
     qDebug() << "syncing finished";
-    _syncTimer.stop();
+    d->syncTimer.stop();
     emit syncFinished();
   }
   else
   {
     qDebug() << "syncing error";
-    _syncTimer.stop();
+    d->syncTimer.stop();
     emit syncError();    
   }
 }

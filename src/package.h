@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QDateTime>
+#include <QExplicitlySharedDataPointer>
 
 #include "author.h"
 #include "version.h"
@@ -30,19 +31,23 @@ namespace QPndman
     Q_PROPERTY(int rating READ getRating NOTIFY ratingChanged);
     Q_PROPERTY(Author author READ getAuthor NOTIFY authorChanged);
     Q_PROPERTY(Version version READ getVersion NOTIFY versionChanged);
-    Q_PROPERTY(QList< QSharedPointer<Application> > applications READ getApplications NOTIFY applicationsChanged);
-    Q_PROPERTY(QList< QSharedPointer<TranslatedString> > titles READ getTitles NOTIFY titlesChanged);
-    Q_PROPERTY(QList< QSharedPointer<TranslatedString> > descriptions READ getDescriptions NOTIFY descriptionsChanged);
-    Q_PROPERTY(QList< QSharedPointer<Category> > categories READ getCategories NOTIFY categoriesChanged);
-    Q_PROPERTY(QList< QSharedPointer<Package> > installInstances READ getInstallinstances NOTIFY installInstancesChanged);
+    Q_PROPERTY(QList<Application> applications READ getApplications NOTIFY applicationsChanged);
+    Q_PROPERTY(QList<TranslatedString> titles READ getTitles NOTIFY titlesChanged);
+    Q_PROPERTY(QList<TranslatedString> descriptions READ getDescriptions NOTIFY descriptionsChanged);
+    Q_PROPERTY(QList<Category> categories READ getCategories NOTIFY categoriesChanged);
+    Q_PROPERTY(QList<Package> installInstances READ getInstallinstances NOTIFY installInstancesChanged);
     Q_PROPERTY(unsigned int flags READ getFlags NOTIFY flagsChanged);
 
   public:
-    Package(pndman_package const* p);
+    Package();
+    Package(pndman_package* p);
     Package(Package const& other);
     
     Package& operator=(Package const& other);
 
+    pndman_package* getPndmanPackage() const;
+    bool isNull() const;
+    
   public slots:
     QString getPath() const;
     QString getId() const;
@@ -56,11 +61,11 @@ namespace QPndman
     int getRating() const;
     Author getAuthor() const;
     Version getVersion() const;
-    QList< QSharedPointer<Application> > getApplications();
-    QList< QSharedPointer<TranslatedString> > getTitles();
-    QList< QSharedPointer<TranslatedString> > getDescriptions();
-    QList< QSharedPointer<Category> > getCategories();
-    QList< QSharedPointer<Package> > getInstallinstances();
+    QList<Application> getApplications();
+    QList<TranslatedString> getTitles();
+    QList<TranslatedString> getDescriptions();
+    QList<Category> getCategories();
+    QList<Package> getInstallinstances();
     unsigned int getFlags() const;
 
   signals:
@@ -76,34 +81,40 @@ namespace QPndman
     void ratingChanged(int newRating);
     void authorChanged(Author newAuthor);
     void versionChanged(Version newVersion);
-    void applicationsChanged(QList< QSharedPointer<Application> > newApplications);
-    void titlesChanged(QList< QSharedPointer<TranslatedString> > newTitles);
-    void descriptionsChanged(QList< QSharedPointer<TranslatedString> > newDescriptions);
-    void categoriesChanged(QList< QSharedPointer<Category> > newCategories);
-    void installInstancesChanged(QList< QSharedPointer<Package> > newInstallinstances);
+    void applicationsChanged(QList<Application> newApplications);
+    void titlesChanged(QList<TranslatedString> newTitles);
+    void descriptionsChanged(QList<TranslatedString> newDescriptions);
+    void categoriesChanged(QList<Category> newCategories);
+    void installInstancesChanged(QList<Package> newInstallinstances);
     void flagsChanged(unsigned int newFlags);
 
   private:
-    pndman_package const* _pndman_package;
+    struct Data : public QSharedData
+    {
+      Data(pndman_package* p);
+      pndman_package* package;
     
-    QString _path;
-    QString _id;
-    QString _icon;
-    QString _info;
-    QString _md5;
-    QString _url;
-    QString _vendor;
-    qint64 _size;
-    QDateTime _modified;
-    int _rating;
-    Author _author;
-    Version _version;
-    QList< QSharedPointer<Application> > _applications;
-    QList< QSharedPointer<TranslatedString> > _titles;
-    QList< QSharedPointer<TranslatedString> > _descriptions;
-    QList< QSharedPointer<Category> > _categories;
-    QList< QSharedPointer<Package> > _installInstances;
-    unsigned int _flags;
+      QString path;
+      QString id;
+      QString icon;
+      QString info;
+      QString md5;
+      QString url;
+      QString vendor;
+      qint64 size;
+      QDateTime modified;
+      int rating;
+      Author author;
+      Version version;
+      QList<Application> applications;
+      QList<TranslatedString> titles;
+      QList<TranslatedString> descriptions;
+      QList<Category> categories;
+      QList<Package> installInstances;
+      unsigned int flags;
+    };
+
+    QExplicitlySharedDataPointer<Data> d;
 
   };
 }

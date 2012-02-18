@@ -2,6 +2,7 @@
 #define DEVICE_H
 
 #include <QObject>
+#include <QExplicitlySharedDataPointer>
 
 #include "pndman.h"
 
@@ -19,11 +20,14 @@ namespace QPndman
     Q_PROPERTY(QString appdata READ getAppdata WRITE setAppdata NOTIFY appdataChanged);
 
   public:
-    Device(QString const& mount, QString const& device, qint64 const& size, qint64 const& free, qint64 const& available, QString const& appdata, QObject* parent = 0);
-    Device(pndman_device const* p);
+    Device();
+    Device(pndman_device* p);
     Device(Device const& other);
     Device& operator=(Device const& other);
 
+    pndman_device* getPndmanDevice() const;
+    bool isNull() const;
+    
   public slots:
     QString getMount() const;
     QString getDevice() const;
@@ -48,13 +52,19 @@ namespace QPndman
     void appdataChanged(QString newAppdata);
 
   private:
-    QString _mount;
-    QString _device;
-    qint64 _size;
-    qint64 _free;
-    qint64 _available;
-    QString _appdata;
+    struct Data : public QSharedData
+    {
+      Data(pndman_device* p);
+      pndman_device* pndmanDevice;
+      QString mount;
+      QString device;
+      qint64 size;
+      qint64 free;
+      qint64 available;
+      QString appdata;
+    };
 
+    QExplicitlySharedDataPointer<Data> d;
   };
 }
 

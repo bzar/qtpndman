@@ -1,17 +1,15 @@
 #include "translatedstring.h"
 
-QPndman::TranslatedString::TranslatedString(QString const& language, QString const& content, QObject* parent) : QObject(parent), 
-  _language(language), _content(content)
+QPndman::TranslatedString::TranslatedString(pndman_translated const* p) : QObject(0), d(new Data(p))
+{
+  
+}
+QPndman::TranslatedString::Data::Data(pndman_translated const* p) : 
+  language(p->lang), content(p->string)
 {
 }
 
-QPndman::TranslatedString::TranslatedString(pndman_translated const* p) : QObject(0), 
-  _language(p->lang), _content(p->string)
-{
-}
-
-QPndman::TranslatedString::TranslatedString(TranslatedString const& other) : QObject(0), 
-  _language(other._language), _content(other._content)
+QPndman::TranslatedString::TranslatedString(TranslatedString const& other) : QObject(0), d(other.d)
 {
 }
 
@@ -20,34 +18,33 @@ QPndman::TranslatedString& QPndman::TranslatedString::operator=(TranslatedString
   if(&other == this)
     return *this;
   
-  _language = other._language;
-  _content = other._content;
+  d = other.d;
   
   return *this;
 }
 
 QString QPndman::TranslatedString::getLanguage() const
 {
-  return _language;
+  return d->language;
 }
 QString QPndman::TranslatedString::getContent() const
 {
-  return _content;
+  return d->content;
 }
 
 void QPndman::TranslatedString::setLanguage(QString const& language)
 {
-  if(language != _language) 
+  if(language != d->language) 
   {
-    _language = language; 
-    emit languageChanged(_language);
+    d->language = language; 
+    emit languageChanged(d->language);
   }
 }
 void QPndman::TranslatedString::setContent(QString const& content)
 {
-  if(content != _content) 
+  if(content != d->content) 
   {
-    _content = content; 
-    emit contentChanged(_content);
+    d->content = content; 
+    emit contentChanged(d->content);
   }
 }

@@ -1,18 +1,23 @@
 #include "package.h"
 #include "util.h"
 
-QPndman::Package::Package(pndman_package const* p) : QObject(0), _pndman_package(p),
-  _path(p->path), _id(p->id), _icon(p->icon), _info(p->info), _md5(p->md5), _url(p->url), _vendor(p->vendor), _size(p->size), 
-  _modified(QDateTime::fromTime_t(p->modified_time)), _rating(p->rating), 
-  _author(&(p->author)), _version(&(p->version)), 
-  _applications(), _titles(), _descriptions(), _categories(), _installInstances(), _flags(p->flags)
+QPndman::Package::Package() : QObject(0), d()
+{
+  
+}
+QPndman::Package::Package(pndman_package* p) : QObject(0), d(new Data(p))
+{
+  
+}
+QPndman::Package::Data::Data(pndman_package* p) : package(p),
+  path(p->path), id(p->id), icon(p->icon), info(p->info), md5(p->md5), url(p->url), vendor(p->vendor), 
+  size(p->size), modified(QDateTime::fromTime_t(p->modified_time)), rating(p->rating), 
+  author(&(p->author)), version(&(p->version)), 
+  applications(), titles(), descriptions(), categories(), installInstances(), flags(p->flags)
 {
 }
 
-QPndman::Package::Package(Package const& other) : QObject(0), _pndman_package(other._pndman_package),
-  _path(other._path), _id(other._id), _icon(other._icon), _info(other._info), _md5(other._md5), _url(other._url), _vendor(other._vendor), _size(other._size), 
-  _modified(other._modified), _rating(other._rating), _author(other._author), _version(other._version), _applications(other._applications), _titles(other._titles), 
-  _descriptions(other._descriptions), _categories(other._categories), _installInstances(other._installInstances), _flags(other._flags)
+QPndman::Package::Package(Package const& other) : QObject(0), d(other.d)
 {
 }
 
@@ -21,122 +26,114 @@ QPndman::Package& QPndman::Package::operator=(Package const& other)
   if(&other == this)
     return *this;
   
-  _pndman_package = other._pndman_package;
-  _path = other._path;
-  _id = other._id;
-  _icon = other._icon;
-  _info = other._info;
-  _md5 = other._md5;
-  _url = other._url;
-  _vendor = other._vendor;
-  _size = other._size;
-  _modified = other._modified;
-  _rating = other._rating;
-  _author = other._author;
-  _version = other._version;
-  _applications = other._applications;
-  _titles = other._titles;
-  _descriptions = other._descriptions;
-  _categories = other._categories;
-  _installInstances = other._installInstances;
-  _flags = other._flags;
+  d = other.d;
   
   return *this;
 }
 
+pndman_package* QPndman::Package::getPndmanPackage() const
+{
+  return d->package;
+}
+
+bool QPndman::Package::isNull() const
+{
+  return !d;
+}
+
 QString QPndman::Package::getPath() const
 {
-  return _path;
+  return d->path;
 }
 QString QPndman::Package::getId() const
 {
-  return _id;
+  return d->id;
 }
 QString QPndman::Package::getIcon() const
 {
-  return _icon;
+  return d->icon;
 }
 QString QPndman::Package::getInfo() const
 {
-  return _info;
+  return d->info;
 }
 QString QPndman::Package::getMd5() const
 {
-  return _md5;
+  return d->md5;
 }
 QString QPndman::Package::getUrl() const
 {
-  return _url;
+  return d->url;
 }
 QString QPndman::Package::getVendor() const
 {
-  return _vendor;
+  return d->vendor;
 }
 qint64 QPndman::Package::getSize() const
 {
-  return _size;
+  return d->size;
 }
 QDateTime QPndman::Package::getModified() const
 {
-  return _modified;
+  return d->modified;
 }
 int QPndman::Package::getRating() const
 {
-  return _rating;
+  return d->rating;
 }
 QPndman::Author QPndman::Package::getAuthor() const
 {
-  return _author;
+  return d->author;
 }
 QPndman::Version QPndman::Package::getVersion() const
 {
-  return _version;
+  return d->version;
 }
-QList< QSharedPointer<QPndman::Application> > QPndman::Package::getApplications()
+QList<QPndman::Application> QPndman::Package::getApplications()
 {
-  if(_applications.size() == 0)
+  if(d->applications.size() == 0)
   {
-    _applications = makeQList<pndman_application, Application>(_pndman_package->app);
+    d->applications = makeQList<pndman_application const, Application>(d->package->app);
   }
-  return _applications;
+  return d->applications;
 }
-QList< QSharedPointer<QPndman::TranslatedString> > QPndman::Package::getTitles()
+QList<QPndman::TranslatedString> QPndman::Package::getTitles()
 {
-  if(_titles.size() == 0)
+  if(d->titles.size() == 0)
   {
-    _titles = makeQList<pndman_translated, TranslatedString>(_pndman_package->title);
+    d->titles = makeQList<pndman_translated const, TranslatedString>(d->package->title);
   }
-  return _titles;
+  return d->titles;
 }
-QList< QSharedPointer<QPndman::TranslatedString> > QPndman::Package::getDescriptions()
+QList<QPndman::TranslatedString> QPndman::Package::getDescriptions()
 {
-  if(_descriptions.size() == 0)
+  if(d->descriptions.size() == 0)
   {
-    _descriptions = makeQList<pndman_translated, TranslatedString>(_pndman_package->description);
+    d->descriptions = makeQList<pndman_translated const, TranslatedString>(d->package->description);
   }
-  return _descriptions;
+  return d->descriptions;
 }
-QList< QSharedPointer<QPndman::Category> > QPndman::Package::getCategories()
+QList<QPndman::Category> QPndman::Package::getCategories()
 {
-  if(_categories.size() == 0)
+  if(d->categories.size() == 0)
   {
-    _categories = makeQList<pndman_category, Category>(_pndman_package->category);
+    d->categories = makeQList<pndman_category const, Category>(d->package->category);
   }
-  return _categories;
+  return d->categories;
 }
-QList< QSharedPointer<QPndman::Package> > QPndman::Package::getInstallinstances()
+QList<QPndman::Package> QPndman::Package::getInstallinstances()
 {
-  if(_installInstances.size() == 0)
+  if(d->installInstances.size() == 0)
   {
-    for(pndman_package const* x = _pndman_package->next_installed; x != 0; x = x->next_installed)
+    for(pndman_package* x = d->package->next_installed; x != 0; x = x->next_installed)
     {
-      _installInstances << QSharedPointer<Package>(new Package(x));
+      d->installInstances << Package(x);
     }
   }
-  return _installInstances;
+  return d->installInstances;
 }
 
 unsigned int QPndman::Package::getFlags() const
 {
-  return _flags;
+  return d->flags;
 }

@@ -2,7 +2,7 @@
 #define PREVIEWPICTURE_H
 
 #include <QObject>
-
+#include <QExplicitlySharedDataPointer>
 #include "pndman.h"
 
 namespace QPndman
@@ -14,7 +14,6 @@ namespace QPndman
     Q_PROPERTY(QString src READ getSrc WRITE setSrc NOTIFY srcChanged);
 
   public:
-    PreviewPicture(QString const& src, QObject* parent = 0);
     PreviewPicture(pndman_previewpic const* p);
     PreviewPicture(PreviewPicture const& other);
     PreviewPicture& operator=(PreviewPicture const& other);
@@ -28,8 +27,13 @@ namespace QPndman
     void srcChanged(QString newSrc);
 
   private:
-    QString _src;
-
+    struct Data : public QSharedData
+    {
+      Data(pndman_previewpic const* p);
+      QString src;
+    };
+    
+    QExplicitlySharedDataPointer<Data> d;
   };
 }
 

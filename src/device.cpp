@@ -1,17 +1,20 @@
 #include "device.h"
 
-QPndman::Device::Device(QString const& mount, QString const& device, qint64 const& size, qint64 const& free, qint64 const& available, QString const& appdata, QObject* parent) : QObject(parent), 
-  _mount(mount), _device(device), _size(size), _free(free), _available(available), _appdata(appdata)
+QPndman::Device::Device() : QObject(0), d()
+{
+  
+}
+QPndman::Device::Device(pndman_device* p) : QObject(0), d(new Data(p))
+{
+  
+}
+
+QPndman::Device::Data::Data(pndman_device* p) : 
+  pndmanDevice(p), mount(p->mount), device(p->device), size(p->size), free(p->free), available(p->available), appdata(p->appdata)
 {
 }
 
-QPndman::Device::Device(pndman_device const* p) : QObject(0), 
-  _mount(p->mount), _device(p->device), _size(p->size), _free(p->free), _available(p->available), _appdata(p->appdata)
-{
-}
-
-QPndman::Device::Device(Device const& other) : QObject(0), 
-  _mount(other._mount), _device(other._device), _size(other._size), _free(other._free), _available(other._available), _appdata(other._appdata)
+QPndman::Device::Device(Device const& other) : QObject(0), d(other.d)
 {
 }
 
@@ -20,86 +23,91 @@ QPndman::Device& QPndman::Device::operator=(Device const& other)
   if(&other == this)
     return *this;
   
-  _mount = other._mount;
-  _device = other._device;
-  _size = other._size;
-  _free = other._free;
-  _available = other._available;
-  _appdata = other._appdata;
+  d = other.d;
   
   return *this;
 }
 
+pndman_device* QPndman::Device::getPndmanDevice() const
+{
+  return d->pndmanDevice;
+}
+
+bool QPndman::Device::isNull() const
+{
+  return !d;
+}
+
 QString QPndman::Device::getMount() const
 {
-  return _mount;
+  return d->mount;
 }
 QString QPndman::Device::getDevice() const
 {
-  return _device;
+  return d->device;
 }
 qint64 QPndman::Device::getSize() const
 {
-  return _size;
+  return d->size;
 }
 qint64 QPndman::Device::getFree() const
 {
-  return _free;
+  return d->free;
 }
 qint64 QPndman::Device::getAvailable() const
 {
-  return _available;
+  return d->available;
 }
 QString QPndman::Device::getAppdata() const
 {
-  return _appdata;
+  return d->appdata;
 }
 
 void QPndman::Device::setMount(QString const& mount)
 {
-  if(mount != _mount) 
+  if(mount != d->mount) 
   {
-    _mount = mount; 
-    emit mountChanged(_mount);
+    d->mount = mount; 
+    emit mountChanged(d->mount);
   }
 }
 void QPndman::Device::setDevice(QString const& device)
 {
-  if(device != _device) 
+  if(device != d->device) 
   {
-    _device = device; 
-    emit deviceChanged(_device);
+    d->device = device; 
+    emit deviceChanged(d->device);
   }
 }
 void QPndman::Device::setSize(qint64 const& size)
 {
-  if(size != _size) 
+  if(size != d->size) 
   {
-    _size = size; 
-    emit sizeChanged(_size);
+    d->size = size; 
+    emit sizeChanged(d->size);
   }
 }
 void QPndman::Device::setFree(qint64 const& free)
 {
-  if(free != _free) 
+  if(free != d->free) 
   {
-    _free = free; 
-    emit freeChanged(_free);
+    d->free = free; 
+    emit freeChanged(d->free);
   }
 }
 void QPndman::Device::setAvailable(qint64 const& available)
 {
-  if(available != _available) 
+  if(available != d->available) 
   {
-    _available = available; 
-    emit availableChanged(_available);
+    d->available = available; 
+    emit availableChanged(d->available);
   }
 }
 void QPndman::Device::setAppdata(QString const& appdata)
 {
-  if(appdata != _appdata) 
+  if(appdata != d->appdata) 
   {
-    _appdata = appdata; 
-    emit appdataChanged(_appdata);
+    d->appdata = appdata; 
+    emit appdataChanged(d->appdata);
   }
 }

@@ -1,19 +1,17 @@
 #include "version.h"
 
-QPndman::Version::Version(QString const& major, QString const& minor, QString const& release, QString const& build, Type const& type, QObject* parent) : QObject(parent), 
-  _major(major), _minor(minor), _release(release), _build(build), _type(type)
+QPndman::Version::Version(pndman_version const* p) : QObject(0), d(new Data(p))
 {
 }
 
-QPndman::Version::Version(pndman_version const* p) : QObject(0), 
-  _major(p->major), _minor(p->minor), _release(p->release), _build(p->build), _type(Version::ReleaseVersion)
+QPndman::Version::Data::Data(pndman_version const* p) : 
+  _major(p->major), _minor(p->minor), release(p->release), build(p->build), type(Version::ReleaseVersion)
 {
-  if(p->type == PND_VERSION_BETA)       _type = Version::BetaVersion;
-  else if(p->type == PND_VERSION_ALPHA) _type = Version::AlphaVersion;
+  if(p->type == PND_VERSION_BETA)       type = Version::BetaVersion;
+  else if(p->type == PND_VERSION_ALPHA) type = Version::AlphaVersion;
 }
 
-QPndman::Version::Version(Version const& other) : QObject(0), 
-  _major(other._major), _minor(other._minor), _release(other._release), _build(other._build), _type(other._type)
+QPndman::Version::Version(Version const& other) : QObject(0), d(other.d)
 {
 }
 
@@ -22,73 +20,69 @@ QPndman::Version& QPndman::Version::operator=(Version const& other)
   if(&other == this)
     return *this;
   
-  _major = other._major;
-  _minor = other._minor;
-  _release = other._release;
-  _build = other._build;
-  _type = other._type;
+  d = other.d;
   
   return *this;
 }
 
 QString QPndman::Version::getMajor() const
 {
-  return _major;
+  return d->_major;
 }
 QString QPndman::Version::getMinor() const
 {
-  return _minor;
+  return d->_minor;
 }
 QString QPndman::Version::getRelease() const
 {
-  return _release;
+  return d->release;
 }
 QString QPndman::Version::getBuild() const
 {
-  return _build;
+  return d->build;
 }
 QPndman::Version::Type QPndman::Version::getType() const
 {
-  return _type;
+  return d->type;
 }
 
-void QPndman::Version::setMajor(QString const& major)
+void QPndman::Version::setMajor(QString const& _major)
 {
-  if(major != _major) 
+  if(_major != d->_major) 
   {
-    _major = major; 
-    emit majorChanged(_major);
+    d->_major = _major; 
+    emit majorChanged(d->_major);
   }
 }
-void QPndman::Version::setMinor(QString const& minor)
+void QPndman::Version::setMinor(QString const& _minor)
 {
-  if(minor != _minor) 
+  if(_minor != d->_minor) 
   {
-    _minor = minor; 
-    emit minorChanged(_minor);
+    d->_minor = _minor; 
+    emit minorChanged(d->_minor);
   }
 }
 void QPndman::Version::setRelease(QString const& release)
 {
-  if(release != _release) 
+  if(release != d->release) 
   {
-    _release = release; 
-    emit releaseChanged(_release);
+    d->release = release; 
+    emit releaseChanged(d->release);
   }
 }
 void QPndman::Version::setBuild(QString const& build)
 {
-  if(build != _build) 
+  if(build != d->build) 
   {
-    _build = build; 
-    emit buildChanged(_build);
+    d->build = build; 
+    emit buildChanged(d->build);
   }
 }
 void QPndman::Version::setType(Type const& type)
 {
-  if(type != _type) 
+  if(type != d->type) 
   {
-    _type = type; 
-    emit typeChanged(_type);
+    d->type = type; 
+    emit typeChanged(d->type);
   }
 }

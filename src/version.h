@@ -2,6 +2,7 @@
 #define VERSION_H
 
 #include <QObject>
+#include <QExplicitlySharedDataPointer>
 
 #include "pndman.h"
 
@@ -20,7 +21,6 @@ namespace QPndman
   public:
     enum Type { ReleaseVersion, BetaVersion, AlphaVersion };
 
-    Version(QString const& major, QString const& minor, QString const& release, QString const& build, Type const& type, QObject* parent = 0);
     Version(pndman_version const* p);
     Version(Version const& other);
     Version& operator=(Version const& other);
@@ -46,11 +46,17 @@ namespace QPndman
     void typeChanged(Type newType);
 
   private:
-    QString _major;
-    QString _minor;
-    QString _release;
-    QString _build;
-    Type _type;
+    struct Data : public QSharedData
+    {
+      Data(pndman_version const* p);
+      QString _major;
+      QString _minor;
+      QString release;
+      QString build;
+      Type type;
+    };
+
+    QExplicitlySharedDataPointer<Data> d;
 
   };
 }

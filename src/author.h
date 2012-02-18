@@ -2,6 +2,7 @@
 #define AUTHOR_H
 
 #include <QObject>
+#include <QExplicitlySharedDataPointer>
 
 #include "pndman.h"
 
@@ -15,7 +16,6 @@ namespace QPndman
     Q_PROPERTY(QString website READ getWebsite WRITE setWebsite NOTIFY websiteChanged);
 
   public:
-    Author(QString const& name, QString const& website, QObject* parent = 0);
     Author(pndman_author const* p);
     Author(Author const& other);
     Author& operator=(Author const& other);
@@ -32,9 +32,14 @@ namespace QPndman
     void websiteChanged(QString newWebsite);
 
   private:
-    QString _name;
-    QString _website;
-
+    struct Data : public QSharedData
+    {
+      Data(pndman_author const* p);
+      QString name;
+      QString website;
+    };
+    
+    QExplicitlySharedDataPointer<Data> d;
   };
 }
 
