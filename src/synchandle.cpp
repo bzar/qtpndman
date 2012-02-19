@@ -1,11 +1,12 @@
 #include "synchandle.h"
 #include <QDebug>
 
-QPndman::SyncHandle::SyncHandle() : QObject(0), d(new Data)
+QPndman::SyncHandle::SyncHandle(Repository* repository) : QObject(0), d(new Data(repository))
 {
+  connect(this, SIGNAL(done()), d->repository, SLOT(update()));
 }
-QPndman::SyncHandle::Data::Data() : 
-  handle(), error(""), repository(), done(false)
+QPndman::SyncHandle::Data::Data(Repository* repository) : 
+  handle(), error(""), repository(repository), done(false)
 {
 }
 QPndman::SyncHandle::Data::~Data()
@@ -36,7 +37,7 @@ void QPndman::SyncHandle::update()
   setDone(d->handle.done);
 }
 
-QPndman::Repository QPndman::SyncHandle::getRepository() const
+QPndman::Repository* QPndman::SyncHandle::getRepository() const
 {
   return d->repository;
 }
@@ -47,13 +48,6 @@ QString QPndman::SyncHandle::getError() const
 bool QPndman::SyncHandle::getDone() const
 {
   return d->done;
-}
-
-void QPndman::SyncHandle::setRepository(Repository repository)
-{
-  d->repository = repository;
-  d->handle.repository = d->repository.getPndmanRepository();
-  emit repositoryChanged(d->repository);
 }
 
 void QPndman::SyncHandle::setError(QString const& error)
@@ -72,7 +66,6 @@ void QPndman::SyncHandle::setDone(bool const& done)
     emit doneChanged(d->done);
     if(done)
     {
-      d->repository.update();
       emit SyncHandle::done();
     }
   }

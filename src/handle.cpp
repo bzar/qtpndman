@@ -4,7 +4,7 @@ QPndman::Handle::Handle() : QObject(0), d(new Data())
 {
 }
 QPndman::Handle::Data::Data() :
-  handle(), name(""), error(""), force(false), package(), device(), 
+  handle(), name(""), error(""), force(false), package(), device(0), 
   operation(Handle::Install), installLocation(Handle::Desktop), done(false), 
   cancelled(false)
 {
@@ -93,7 +93,7 @@ QPndman::Package QPndman::Handle::getPackage() const
 {
   return d->package;
 }
-QPndman::Device QPndman::Handle::getDevice() const
+QPndman::Device* QPndman::Handle::getDevice() const
 {
   return d->device;
 }
@@ -134,13 +134,13 @@ void QPndman::Handle::setPackage(Package package)
     emit packageChanged(d->package);
   }
 }
-void QPndman::Handle::setDevice(Device device)
+void QPndman::Handle::setDevice(Device* device)
 {
-  if(device.getMount() != d->device.getMount()) 
+  if(device->getIdentifier() != d->device->getIdentifier()) 
   {
     d->device = device;
     emit deviceChanged(d->device);
-    d->handle.device = d->device.getPndmanDevice();
+    d->handle.device = d->device->getPndmanDevice();
   }
 }
 

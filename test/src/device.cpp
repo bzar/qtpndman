@@ -16,30 +16,30 @@ qint64 time()
 Test::Test() : QObject(0), manager(QPndman::Manager::getManager()) {}
 void Test::run()
 {
-  if(manager->addDevice("/tmp").isNull())
+  if(!manager->addDevice("/tmp"))
   {
     qDebug() << "Error adding device!";
     QCoreApplication::exit(1);
   }
 
-  if(!manager->addDevice("/tmp").isNull())
+  if(manager->addDevice("/tmp"))
   {
     qDebug() << "Duplicate device add succeeded!";
     QCoreApplication::exit(1);
   }
 
-  foreach(QPndman::Device device, manager->detectDevices())
+  foreach(QPndman::Device* device, manager->detectDevices())
   {
-    qDebug() << "Detected device" << device.getDevice();
+    qDebug() << "Detected device" << device->getDevice();
   }
   
-  foreach(const QPndman::Device d, manager->getDevices())
+  foreach(const QPndman::Device* d, manager->getDevices())
   {
-    qDebug() << "mount:    " << d.getMount();
-    qDebug() << "device:   " << d.getDevice();
-    qDebug() << "size:     " << d.getSize();
-    qDebug() << "free:     " << d.getFree();
-    qDebug() << "available:" << d.getAvailable();
+    qDebug() << "mount:    " << d->getMount();
+    qDebug() << "device:   " << d->getDevice();
+    qDebug() << "size:     " << d->getSize();
+    qDebug() << "free:     " << d->getFree();
+    qDebug() << "available:" << d->getAvailable();
     qDebug() << "";
   }
   

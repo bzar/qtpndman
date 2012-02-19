@@ -2,6 +2,7 @@
 #define QT_PNDMAN_H
 
 #include <QObject>
+#include <QPointer>
 #include <QTimer>
 #include "repository.h"
 #include "device.h"
@@ -24,24 +25,24 @@ namespace QPndman
     ~Manager();
     
   public slots:
-    Repository addRepository(QString const& url);
-    bool removeRepository(Repository repository);
+    Repository* addRepository(QString const& url);
+    bool removeRepository(Repository* repository);
     bool removeAllRepositories();
-    QList<Repository> getRepositories();
+    QList<Repository*> getRepositories();
     
-    Device addDevice(QString const& path);
-    QList<QPndman::Device> detectDevices();
-    bool removeDevice(Device device);
+    Device* addDevice(QString const& path);
+    QList<QPndman::Device*> detectDevices();
+    bool removeDevice(Device* device);
     bool removeAllDevices();
-    QList<Device> getDevices();
+    QList<Device*> getDevices();
     
-    Handle install(Package package, Device device, Handle::InstallLocation location);
-    Handle remove(Package package, Device device);
+    Handle* install(Package package, Device* device, Handle::InstallLocation location);
+    Handle* remove(Package package, Device* device);
     
     int download();
-    SyncHandle sync(Repository repository);
-    QList<SyncHandle> sync(QList<Repository> const& repositories);
-    QList<SyncHandle> syncAll();
+    SyncHandle* sync(Repository* repository);
+    QList<SyncHandle*> sync(QList<Repository*> const& repositories);
+    QList<SyncHandle*> syncAll();
     bool currentlySyncing() const;
   
   signals:
@@ -49,11 +50,11 @@ namespace QPndman
     void devicesChanged();
     void handleCreated(Handle);
     
-    void syncStarted(SyncHandle);
+    void syncStarted(SyncHandle*);
     void syncing();
     void syncFinished();
     void syncError();
-    void syncError(SyncHandle);
+    void syncError(SyncHandle*);
     
   private slots:
     void continueSyncing();
@@ -66,11 +67,11 @@ namespace QPndman
       pndman_repository pndmanRepositories;
       pndman_device pndmanDevices;
       
-      QList<Handle> handles;
-      QList<SyncHandle> syncHandles;
+      QList<Handle*> handles;
+      QList<SyncHandle*> syncHandles;
       
-      QList<Repository> repositories;
-      QList<Device> devices;
+      QList<Repository*> repositories;
+      QList<Device*> devices;
       
       QTimer syncTimer;
       QTimer cleanTimer;
@@ -79,7 +80,7 @@ namespace QPndman
     Manager();
     Manager& operator=(const Manager& other);
     
-    bool initSyncHandle(SyncHandle& handle, Repository repository);
+    SyncHandle* createSyncHandle(Repository* repository);
     
     QSharedPointer<Data> d;
     

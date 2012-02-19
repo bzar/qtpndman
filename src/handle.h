@@ -19,7 +19,7 @@ namespace QPndman
     Q_PROPERTY(QString error READ getError NOTIFY errorChanged);
     Q_PROPERTY(bool force READ getForce WRITE setForce NOTIFY forceChanged);
     Q_PROPERTY(Package package READ getPackage WRITE setPackage NOTIFY packageChanged);
-    Q_PROPERTY(Device device READ getDevice WRITE setDevice NOTIFY deviceChanged);
+    Q_PROPERTY(Device* device READ getDevice WRITE setDevice NOTIFY deviceChanged);
     Q_PROPERTY(Operation operation READ getOperation WRITE setOperation NOTIFY operationChanged);
     Q_PROPERTY(InstallLocation installLocation READ getInstallLocation WRITE setInstallLocation NOTIFY installLocationChanged);
     Q_PROPERTY(bool done READ getDone NOTIFY doneChanged);
@@ -46,7 +46,7 @@ namespace QPndman
     QString getError() const;
     bool getForce() const;
     Package getPackage() const;
-    Device getDevice() const;
+    Device* getDevice() const;
     Operation getOperation() const;
     InstallLocation getInstallLocation() const;
     bool getDone() const;
@@ -54,7 +54,7 @@ namespace QPndman
 
     void setForce(bool const& force);
     void setPackage(Package package);
-    void setDevice(Device device);
+    void setDevice(Device* device);
     void setOperation(Operation const operation);
     void setInstallLocation(InstallLocation const installLocation);
 
@@ -63,7 +63,7 @@ namespace QPndman
     void errorChanged(QString newError);
     void forceChanged(bool newForce);
     void packageChanged(Package newPackage);
-    void deviceChanged(Device newDevice);
+    void deviceChanged(Device* newDevice);
     void operationChanged(Operation newOperation);
     void installLocationChanged(InstallLocation newInstallLocation);
     void doneChanged(bool newDone);
@@ -90,7 +90,7 @@ namespace QPndman
       QString error;
       bool force;
       Package package;
-      Device device;
+      Device* device;
       Operation operation;
       InstallLocation installLocation;
       bool done;
