@@ -82,28 +82,15 @@ QPndman::Device* QPndman::Manager::addDevice(QString const& path)
 QList<QPndman::Device*> QPndman::Manager::detectDevices()
 {
   QList<Device*> detectedDevices;
-  
+  pndman_device* prevLast = getLast(&d->pndmanDevices);
   if(pndman_device_detect(&d->pndmanDevices) == 0)
   {
-    for(pndman_device* dev = &d->pndmanDevices; dev != 0; dev = dev->next)
+    for(pndman_device* dev = prevLast->next; dev != 0; dev = dev->next)
     {
-      bool old = false;
-      foreach(Device* device, d->devices)
-      {
-        if(device->getPndmanDevice() == dev)
-        {
-          old = true;
-          break;
-        }
-      }
-      
-      if(!old)
-      {
-        Device* device = new Device(dev);
-        device->setParent(this);
-        d->devices << device;
-        detectedDevices << device;
-      }
+      Device* device = new Device(dev);
+      device->setParent(this);
+      d->devices << device;
+      detectedDevices << device;
     }
   }
   
