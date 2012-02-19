@@ -1,34 +1,34 @@
 #include "handle.h"
+#include "device.h"
 
-QPndman::Handle::Handle() : QObject(0), d(new Data())
+QPndman::Handle::Handle(Operation operation, Package package, Device* device) : QObject(0), 
+  d(new Data(operation, package, device))
 {
+  pndman_handle_init(QString::number(QDateTime::currentMSecsSinceEpoch()).toLocal8Bit().data(), 
+                     &d->handle);
+  updateHandleFlags();
 }
-QPndman::Handle::Data::Data() :
-  handle(), name(""), error(""), force(false), package(), device(0), 
-  operation(Handle::Install), installLocation(Handle::Desktop), done(false), 
+
+QPndman::Handle::Data::Data(Operation operation, Package package, Device* device) :
+  handle(), name(""), error(""), force(false), package(package), device(device), 
+  operation(operation), installLocation(Desktop), done(false), 
   cancelled(false)
 {
 }
-
 QPndman::Handle::Data::~Data()
 {
   pndman_handle_free(&handle);
 }
-QPndman::Handle::Handle(Handle const& other) : QObject(0), d(other.d)
-{
-}
-QPndman::Handle& QPndman::Handle::operator=(Handle const& other)
-{
-  if(&other == this)
-    return *this;
-  
-  d = other.d;
-  
-  return *this;
-}
+
+
 pndman_handle* QPndman::Handle::getPndmanHandle()
 {
   return &(d->handle);
+}
+
+int QPndman::Handle::download()
+{
+  return pndman_download();
 }
 
 bool QPndman::Handle::execute()
@@ -63,17 +63,7 @@ bool QPndman::Handle::cancel()
 
 void QPndman::Handle::update()
 {
-  setName(d->handle.name);
   setError(d->handle.error);
-  setForce(d->handle.flags & PNDMAN_HANDLE_FORCE);
-  
-  if(d->handle.flags & PNDMAN_HANDLE_INSTALL) setOperation(Handle::Install);
-  else if(d->handle.flags & PNDMAN_HANDLE_REMOVE) setOperation(Handle::Remove);
-  
-  if(d->handle.flags & PNDMAN_HANDLE_INSTALL_DESKTOP) setInstallLocation(Handle::Desktop);
-  else if(d->handle.flags & PNDMAN_HANDLE_INSTALL_MENU) setInstallLocation(Handle::Menu);
-  else if(d->handle.flags & PNDMAN_HANDLE_INSTALL_APPS) setInstallLocation(Handle::DesktopAndMenu);
-  
   setDone(d->handle.done);
 }
 
@@ -97,11 +87,11 @@ QPndman::Device* QPndman::Handle::getDevice() const
 {
   return d->device;
 }
-QPndman::Handle::Operation QPndman::Handle::getOperation() const
+QPndman::Operation QPndman::Handle::getOperation() const
 {
   return d->operation;
 }
-QPndman::Handle::InstallLocation QPndman::Handle::getInstallLocation() const
+QPndman::InstallLocation QPndman::Handle::getInstallLocation() const
 {
   return d->installLocation;
 }
@@ -125,34 +115,6 @@ void QPndman::Handle::setForce(bool const& force)
     emit forceChanged(d->force);
   }
 }
-void QPndman::Handle::setPackage(Package package)
-{
-  if(package.getMd5() != d->package.getMd5()) 
-  {
-    d->package = package;
-    d->handle.pnd = d->package.getPndmanPackage();
-    emit packageChanged(d->package);
-  }
-}
-void QPndman::Handle::setDevice(Device* device)
-{
-  if(device->getIdentifier() != d->device->getIdentifier()) 
-  {
-    d->device = device;
-    emit deviceChanged(d->device);
-    d->handle.device = d->device->getPndmanDevice();
-  }
-}
-
-void QPndman::Handle::setOperation(Operation const operation)
-{
-  if(operation != d->operation) 
-  {
-    d->operation = operation; 
-    updateHandleFlags();
-    emit operationChanged(d->operation);
-  }
-}
 void QPndman::Handle::setInstallLocation(InstallLocation const installLocation)
 {
   if(installLocation != d->installLocation) 
@@ -168,12 +130,12 @@ void QPndman::Handle::updateHandleFlags()
   d->handle.flags = 0;
   if(d->force) d->handle.flags |= PNDMAN_HANDLE_FORCE;
   
-  if(d->operation == Handle::Install) d->handle.flags |= PNDMAN_HANDLE_INSTALL;
-  else if(d->operation == Handle::Remove) d->handle.flags |= PNDMAN_HANDLE_REMOVE;
+  if(d->operation == Install) d->handle.flags |= PNDMAN_HANDLE_INSTALL;
+  else if(d->operation == Remove) d->handle.flags |= PNDMAN_HANDLE_REMOVE;
 
-  if(d->installLocation == Handle::Desktop) d->handle.flags |= PNDMAN_HANDLE_INSTALL_DESKTOP;
-  else if(d->installLocation == Handle::Menu) d->handle.flags |= PNDMAN_HANDLE_INSTALL_MENU;
-  else if(d->installLocation == Handle::DesktopAndMenu) d->handle.flags |= PNDMAN_HANDLE_INSTALL_APPS;
+  if(d->installLocation == Desktop) d->handle.flags |= PNDMAN_HANDLE_INSTALL_DESKTOP;
+  else if(d->installLocation == Menu) d->handle.flags |= PNDMAN_HANDLE_INSTALL_MENU;
+  else if(d->installLocation == DesktopAndMenu) d->handle.flags |= PNDMAN_HANDLE_INSTALL_APPS;
 }
 
 void QPndman::Handle::setName(QString const& name)

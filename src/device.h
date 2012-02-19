@@ -5,12 +5,17 @@
 #include <QSharedPointer>
 
 #include "pndman.h"
+#include "context.h"
+#include "handle.h"
+#include "enums.h"
 
 namespace QPndman
 {
+  
   class Device : public QObject
   {
   Q_OBJECT
+  Q_ENUMS(Operation InstallLocation)
 
     Q_PROPERTY(QString mount READ getMount WRITE setMount NOTIFY mountChanged);
     Q_PROPERTY(QString device READ getDevice WRITE setDevice NOTIFY deviceChanged);
@@ -20,11 +25,15 @@ namespace QPndman
     Q_PROPERTY(QString appdata READ getAppdata WRITE setAppdata NOTIFY appdataChanged);
 
   public:
-    Device();
-    Device(pndman_device* p);
-    Device(Device const& other);
-    Device& operator=(Device const& other);
 
+    static QList<Device*> detectDevices(Context& c, QObject* parent = 0);
+    
+    Device(Context& c, QString const& path, QObject* parent = 0);
+    Device(pndman_device* p, QObject* parent = 0);
+    
+    Handle* install(Package package, InstallLocation location);
+    Handle* remove(Package package);
+    
     pndman_device* getPndmanDevice() const;
     bool isNull() const;
     int getIdentifier() const;
@@ -57,6 +66,8 @@ namespace QPndman
     struct Data
     {
       Data(pndman_device* p);
+      ~Data();
+      
       int identifier;
       pndman_device* pndmanDevice;
       QString mount;

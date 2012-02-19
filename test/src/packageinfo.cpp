@@ -12,56 +12,34 @@ qint64 time()
   return d;
 }
 
-Test::Test() : QObject(0), manager(QPndman::Manager::getManager()) {}
+Test::Test() : QObject(0), context() {}
+
 void Test::run()
 {
-  connect(manager, SIGNAL(syncStarted(SyncHandle*)), this, SLOT(syncStarted(SyncHandle*)));
-  connect(manager, SIGNAL(syncError()), this, SLOT(syncError()));
-  connect(manager, SIGNAL(syncError(SyncHandle*)), this, SLOT(syncError(SyncHandle*)));
-  connect(manager, SIGNAL(syncFinished()), this, SLOT(syncFinished()));
+  QPndman::Repository* repo = new QPndman::Repository(context, "http://repo.openpandora.org/includes/get_data.php");
   
-  manager->addRepository("http://repo.openpandora.org/includes/get_data.php");
-  manager->syncAll();
-}
-
-void Test::syncStarted(QPndman::SyncHandle* handle)
-{
+  QPndman::SyncHandle* handle = repo->sync();
   qDebug() << "Starting sync for repository" << handle->getRepository()->getUrl();
-}
-void Test::syncing()
-{
-}
-
-void Test::syncError()
-{
-  qDebug() << "Error syncing repositories!";
-  QCoreApplication::exit(1);
-}
-
-void Test::syncError(QPndman::SyncHandle* handle)
-{
-  if(!handle->getRepository()->getUrl().isEmpty())
+  
+  while(!handle->getDone())
   {
-    qDebug() << "Error initiating sync for repository" << handle->getRepository()->getUrl();
-    QCoreApplication::exit(1);
+    if(QPndman::SyncHandle::sync() < 0)
+    {
+      qDebug() << "Error syncing repository!";
+      QCoreApplication::exit(1); return;
+    }
+    
+    handle->update();
   }
-}
-
-void Test::syncFinished()
-{
+  
   qDebug() << "Synced.";
 
-  QList<QPndman::Repository*> repositories = manager->getRepositories();
-  
-  foreach(const QPndman::Repository* r, repositories)
+  QList<QPndman::Package> packages = repo->getPackages();
+  foreach(QPndman::Package p, packages)
   {
-    QList<QPndman::Package> packages = r->getPackages();
-    foreach(QPndman::Package p, packages)
-    {
-      qDebug() << p.getTitle() << "-" << p.getDescription();
-    }
+    qDebug() << p.getTitle() << "-" << p.getDescription();
   }
-  
+
   QCoreApplication::exit(0);
 }
 

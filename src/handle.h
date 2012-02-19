@@ -6,21 +6,23 @@
 #include "pndman.h"
 
 #include "package.h"
-#include "device.h"
+
+#include "enums.h"
 
 namespace QPndman
 {
+  class Device;
+  
   class Handle : public QObject
   {
   Q_OBJECT
-  Q_ENUMS(Operation InstallLocation)
   
     Q_PROPERTY(QString name READ getName NOTIFY nameChanged);
     Q_PROPERTY(QString error READ getError NOTIFY errorChanged);
     Q_PROPERTY(bool force READ getForce WRITE setForce NOTIFY forceChanged);
-    Q_PROPERTY(Package package READ getPackage WRITE setPackage NOTIFY packageChanged);
-    Q_PROPERTY(Device* device READ getDevice WRITE setDevice NOTIFY deviceChanged);
-    Q_PROPERTY(Operation operation READ getOperation WRITE setOperation NOTIFY operationChanged);
+    Q_PROPERTY(Package package READ getPackage NOTIFY packageChanged);
+    Q_PROPERTY(Device* device READ getDevice NOTIFY deviceChanged);
+    Q_PROPERTY(Operation operation READ getOperation NOTIFY operationChanged);
     Q_PROPERTY(InstallLocation installLocation READ getInstallLocation WRITE setInstallLocation NOTIFY installLocationChanged);
     Q_PROPERTY(bool done READ getDone NOTIFY doneChanged);
     Q_PROPERTY(bool cancelled READ getCancelled NOTIFY cancelledChanged);
@@ -28,20 +30,11 @@ namespace QPndman
   
   
   public:
-    enum Operation { Install, Remove };
-    enum InstallLocation { Desktop, Menu, DesktopAndMenu };
-    
-    Handle();
-    Handle(Handle const& other);
-    Handle& operator=(Handle const& other);
-
+    Handle(Operation operation, Package package, Device* device);
     pndman_handle* getPndmanHandle();
     
-  public slots:
-    bool execute();
-    void update();
-    bool cancel();
-
+    static int download();
+    
     QString getName() const;
     QString getError() const;
     bool getForce() const;
@@ -52,10 +45,12 @@ namespace QPndman
     bool getDone() const;
     bool getCancelled() const;
 
+  public slots:
+    bool execute();
+    void update();
+    bool cancel();
+
     void setForce(bool const& force);
-    void setPackage(Package package);
-    void setDevice(Device* device);
-    void setOperation(Operation const operation);
     void setInstallLocation(InstallLocation const installLocation);
 
   signals:
@@ -83,7 +78,7 @@ namespace QPndman
 
     struct Data
     {
-      Data();
+      Data(Operation operation, Package package, Device* device);
       ~Data();
       pndman_handle handle;
       QString name;

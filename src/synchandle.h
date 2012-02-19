@@ -4,10 +4,11 @@
 #include <QObject>
 #include <QSharedPointer>
 #include "pndman.h"
-#include "repository.h"
 
 namespace QPndman
 {
+  class Repository;
+  
   class SyncHandle : public QObject
   {
   Q_OBJECT
@@ -18,13 +19,14 @@ namespace QPndman
 
   public:
     SyncHandle(Repository* repository);
-    SyncHandle(SyncHandle const& other);
-    SyncHandle& operator=(SyncHandle const& other);
     
     pndman_sync_handle* getPndmanSyncHandle();
-    void update();
+    
+    static int sync();
+
 
   public slots:
+    void update();
     QString getError() const;
     Repository* getRepository() const;
     bool getDone() const;

@@ -5,8 +5,10 @@
 #include <QDateTime>
 #include <QSharedPointer>
 
+#include "context.h"
 #include "package.h"
 #include "pndman.h"
+#include "synchandle.h"
 
 namespace QPndman
 {
@@ -22,11 +24,12 @@ namespace QPndman
     Q_PROPERTY(QList<Package> packages READ getPackages WRITE setPackages NOTIFY packagesChanged);
 
   public:
-    Repository();
-    Repository(pndman_repository* p);
-    Repository(Repository const& other);
-    Repository& operator=(Repository const& other);
-
+    Repository(Context& c, QObject* parent = 0);
+    Repository(Context& c, QString const& url, QObject* parent = 0);
+    Repository(pndman_repository* p, QObject* parent = 0);
+    
+    SyncHandle* sync();
+    
     pndman_repository* getPndmanRepository() const;
     bool isNull() const;
     int getIdentifier() const;
@@ -62,8 +65,10 @@ namespace QPndman
     struct Data
     {
       Data(pndman_repository* p);
+      ~Data();
+      
       int identifier;
-      pndman_repository* repository;
+      pndman_repository* pndmanRepository;
       QString url;
       QString name;
       QString updates;

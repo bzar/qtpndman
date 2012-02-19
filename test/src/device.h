@@ -8,7 +8,7 @@ public:
 public slots:
   void run();  
 private:
-  QPndman::Manager* manager;
+  QPndman::Context context;
 };
 
 

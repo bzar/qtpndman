@@ -13,27 +13,41 @@ qint64 time()
   return d;
 }
 
-Test::Test() : QObject(0), manager(QPndman::Manager::getManager()) {}
+Test::Test() : QObject(0), context() {}
 void Test::run()
 {
-  if(!manager->addDevice("/tmp"))
+  QList<QPndman::Device*> devices;
+  
+  QPndman::Device* tmpDevice = new QPndman::Device(context, "/tmp");
+  if(tmpDevice->isNull())
   {
     qDebug() << "Error adding device!";
-    QCoreApplication::exit(1);
+    QCoreApplication::exit(1); return;
   }
-
-  if(manager->addDevice("/tmp"))
+  devices << tmpDevice;
+  
+  QPndman::Device* homeDevice = new QPndman::Device(context, "/home/bzar");
+  if(homeDevice->isNull())
+  {
+    qDebug() << "Error adding device!";
+    QCoreApplication::exit(1); return;
+  }
+  devices << homeDevice;
+  
+  /*QPndman::Device* tmpDevice2 = new QPndman::Device(context, "/tmp");
+  if(!tmpDevice2->isNull())
   {
     qDebug() << "Duplicate device add succeeded!";
-    QCoreApplication::exit(1);
+    QCoreApplication::exit(1); return;
   }
 
-  foreach(QPndman::Device* device, manager->detectDevices())
+  foreach(QPndman::Device* device, QPndman::Device::detectDevices(context))
   {
+    devices << device;
     qDebug() << "Detected device" << device->getDevice();
   }
-  
-  foreach(const QPndman::Device* d, manager->getDevices())
+*/  
+  foreach(const QPndman::Device* d, devices)
   {
     qDebug() << "mount:    " << d->getMount();
     qDebug() << "device:   " << d->getDevice();
@@ -42,7 +56,12 @@ void Test::run()
     qDebug() << "available:" << d->getAvailable();
     qDebug() << "";
   }
-  
+
+  foreach(const QPndman::Device* d, devices)
+  {
+    qDebug() << "mount:    " << d->getMount();
+    delete d;
+  }
   QCoreApplication::exit(0);
 }
 

@@ -1,9 +1,10 @@
 #include "synchandle.h"
+#include "repository.h"
 #include <QDebug>
 
 QPndman::SyncHandle::SyncHandle(Repository* repository) : QObject(0), d(new Data(repository))
 {
-  connect(this, SIGNAL(done()), d->repository, SLOT(update()));
+  pndman_sync_request(&d->handle, repository->getPndmanRepository());
 }
 QPndman::SyncHandle::Data::Data(Repository* repository) : 
   handle(), error(""), repository(repository), done(false)
@@ -13,22 +14,16 @@ QPndman::SyncHandle::Data::~Data()
 {
   pndman_sync_request_free(&handle);
 }
-QPndman::SyncHandle::SyncHandle(SyncHandle const& other) : QObject(0), d(other.d)
-{
-}
-QPndman::SyncHandle& QPndman::SyncHandle::operator=(SyncHandle const& other)
-{
-  if(&other == this)
-    return *this;
-  
-  d = other.d;
-  
-  return *this;
-}
+
 
 pndman_sync_handle* QPndman::SyncHandle::getPndmanSyncHandle()
 {
   return &d->handle;
+}
+
+int QPndman::SyncHandle::sync()
+{
+  return pndman_sync();
 }
 
 void QPndman::SyncHandle::update()

@@ -8,13 +8,8 @@ public:
   Test();
 public slots:
   void run(); 
-  void syncStarted(SyncHandle*);
-  void syncing();
-  void syncError();
-  void syncError(SyncHandle*);
-  void syncFinished();
 private:
-  QPndman::Manager* manager;
+  QPndman::Context context;
 };
 
 

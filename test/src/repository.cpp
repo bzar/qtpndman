@@ -12,71 +12,52 @@ qint64 time()
   return d;
 }
 
-Test::Test() : QObject(0), manager(QPndman::Manager::getManager()) {}
+Test::Test() : QObject(0), context() {}
 void Test::run()
 {
-  connect(manager, SIGNAL(syncStarted(SyncHandle*)), this, SLOT(syncStarted(SyncHandle*)));
-  connect(manager, SIGNAL(syncing()), this, SLOT(syncing()));  
-  connect(manager, SIGNAL(syncError()), this, SLOT(syncError()));
-  connect(manager, SIGNAL(syncError(SyncHandle*)), this, SLOT(syncError(SyncHandle*)));
-  connect(manager, SIGNAL(syncFinished()), this, SLOT(syncFinished()));
-  if(!manager->addDevice("/tmp"))
-  {
-    qDebug() << "Error adding device!";
-    QCoreApplication::exit(1);
-  }
+  QList<QPndman::Repository*> repositories;
   
-  if(!manager->addRepository("http://repo.openpandora.org/includes/get_data.php"))
+  QPndman::Repository* localRepo = new QPndman::Repository(context);
+  if(localRepo->isNull())
   {
-    qDebug() << "Error adding repository!";
-    QCoreApplication::exit(1);
+    qDebug() << "Error adding local repository!";
+    QCoreApplication::exit(1); return;
   }
+  repositories << localRepo;
   
-  if(manager->addRepository("http://repo.openpandora.org/includes/get_data.php"))
+  QPndman::Repository* repo = new QPndman::Repository(context, "http://repo.openpandora.org/includes/get_data.php");
+  if(repo->isNull())
+  {
+    qDebug() << "Error adding remote repository!";
+    QCoreApplication::exit(1); return;
+  }
+  repositories << repo;
+  
+  QPndman::Repository* repo2 = new QPndman::Repository(context, "http://repo.openpandora.org/includes/get_data.php");
+  if(!repo2->isNull())
   {
     qDebug() << "Duplicate repository add succeeded!";
-    QCoreApplication::exit(1);
+    QCoreApplication::exit(1); return;
   }
   
   time();
-  manager->syncAll();
-}
-
-void Test::syncStarted(QPndman::SyncHandle* handle)
-{
+  
+  QPndman::SyncHandle* handle = repo->sync();
   qDebug() << "Starting sync for repository" << handle->getRepository()->getUrl();
-}
-void Test::syncing()
-{
-  qDebug() << "syncing...";
-}
-
-void Test::syncError()
-{
-  qDebug() << "Error syncing repositories!";
-  QCoreApplication::exit(1);
-}
-
-void Test::syncError(QPndman::SyncHandle* handle)
-{
-  if(handle->getRepository()->getUrl().isEmpty())
+  
+  while(!handle->getDone())
   {
-    qDebug() << "Cannot sync local repository. This is expected.";
+    if(QPndman::SyncHandle::sync() < 0)
+    {
+      qDebug() << "Error syncing repository!";
+      QCoreApplication::exit(1); return;
+    }
+    
+    handle->update();
   }
-  else
-  {
-    qDebug() << "Error initiating sync for repository" << handle->getRepository()->getUrl();
-    QCoreApplication::exit(1);
-  }
-}
-
-void Test::syncFinished()
-{
+  
   qDebug() << "Synced in" << time() << "msec";
 
-  QList<QPndman::Repository*> repositories = manager->getRepositories();
-  qDebug() << "Generated repository list in" << time() << "msec";
-  
   foreach(const QPndman::Repository* r, repositories)
   {
     qDebug() << "url:       " << r->getUrl();

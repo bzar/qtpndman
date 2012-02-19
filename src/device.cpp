@@ -1,13 +1,33 @@
 #include "device.h"
+#include <QDebug>
 
-QPndman::Device::Device() : QObject(0), d()
+QList<QPndman::Device*> QPndman::Device::detectDevices(Context& c, QObject* parent)
 {
+  QList<Device*> detectedDevices;
+  pndman_device* prevLast = c.getLastPndmanDevice();
+  if(pndman_device_detect(c.getPndmanDevices()) == 0)
+  {
+    for(pndman_device* dev = prevLast->next; dev != 0; dev = dev->next)
+    {
+      detectedDevices << new Device(dev, parent ? parent : &c);
+    }
+  }
   
+  return detectedDevices;
 }
-QPndman::Device::Device(pndman_device* p) : QObject(0), d(new Data(p))
+
+QPndman::Device::Device(Context& c, QString const& path, QObject* parent) : QObject(parent ? parent : &c), d()
 {
-  
+  if(pndman_device_add(path.toLocal8Bit().data(), c.getPndmanDevices()) == 0)
+  {
+    qDebug() << "Created Device for" << c.getLastPndmanDevice() << "to list" << c.getPndmanDevices();
+    d = QSharedPointer<Data>(new Data(c.getLastPndmanDevice()));
+  }
 }
+QPndman::Device::Device(pndman_device* p, QObject* parent) : QObject(parent), d(new Data(p))
+{
+}
+
 int QPndman::Device::Data::nextIdentifier = 1;
 
 QPndman::Device::Data::Data(pndman_device* p) : identifier(nextIdentifier++),
@@ -16,18 +36,26 @@ QPndman::Device::Data::Data(pndman_device* p) : identifier(nextIdentifier++),
 {
 }
 
-QPndman::Device::Device(Device const& other) : QObject(0), d(other.d)
+QPndman::Device::Data::~Data()
 {
+  pndman_device_free(pndmanDevice);
 }
 
-QPndman::Device& QPndman::Device::operator=(Device const& other)
+QPndman::Handle* QPndman::Device::install(Package package, InstallLocation location)
 {
-  if(&other == this)
-    return *this;
-  
-  d = other.d;
-  
-  return *this;
+  Handle* handle = new Handle(Install, package, this);
+  handle->setParent(this);
+  handle->setInstallLocation(location);
+  handle->execute();
+  return handle;
+}
+
+QPndman::Handle* QPndman::Device::remove(Package package)
+{
+  Handle* handle = new Handle(Remove, package, this);
+  handle->setParent(this);
+  handle->execute();
+  return handle;  
 }
 
 pndman_device* QPndman::Device::getPndmanDevice() const
