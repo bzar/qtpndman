@@ -26,15 +26,7 @@ void Test::run()
   }
   devices << tmpDevice;
   
-  QPndman::Device* homeDevice = new QPndman::Device(context, "/home/bzar");
-  if(homeDevice->isNull())
-  {
-    qDebug() << "Error adding device!";
-    QCoreApplication::exit(1); return;
-  }
-  devices << homeDevice;
-  
-  /*QPndman::Device* tmpDevice2 = new QPndman::Device(context, "/tmp");
+  QPndman::Device* tmpDevice2 = new QPndman::Device(context, "/tmp");
   if(!tmpDevice2->isNull())
   {
     qDebug() << "Duplicate device add succeeded!";
@@ -46,7 +38,7 @@ void Test::run()
     devices << device;
     qDebug() << "Detected device" << device->getDevice();
   }
-*/  
+  
   foreach(const QPndman::Device* d, devices)
   {
     qDebug() << "mount:    " << d->getMount();
