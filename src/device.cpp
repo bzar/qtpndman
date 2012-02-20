@@ -39,20 +39,28 @@ QPndman::Device::Data::~Data()
   context.removePndmanDevice(pndmanDevice);
 }
 
-QPndman::Handle* QPndman::Device::install(Package package, InstallLocation location)
+QPndman::Handle* QPndman::Device::install(Package package, InstallLocation location, bool force)
 {
-  Handle* handle = new Handle(Install, package, this);
+  Handle* handle = new Handle(d->context, Install, package, this, force);
   handle->setParent(this);
   handle->setInstallLocation(location);
-  handle->execute();
+  if(!handle->execute())
+  {
+    delete handle;
+    handle = 0;
+  }
   return handle;
 }
 
 QPndman::Handle* QPndman::Device::remove(Package package)
 {
-  Handle* handle = new Handle(Remove, package, this);
+  Handle* handle = new Handle(d->context, Remove, package, this);
   handle->setParent(this);
-  handle->execute();
+  if(!handle->execute())
+  {
+    delete handle;
+    handle = 0;
+  }
   return handle;  
 }
 

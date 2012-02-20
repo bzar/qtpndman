@@ -10,11 +10,15 @@
 #include "application.h"
 #include "translatedstring.h"
 #include "category.h"
+#include "enums.h"
 
 #include "pndman.h"
 
 namespace QPndman
 {
+  class Handle;
+  class Device;
+  
   class Package : public QObject
   {
   Q_OBJECT
@@ -49,6 +53,8 @@ namespace QPndman
 
     pndman_package* getPndmanPackage() const;
     bool isNull() const;
+    
+    Handle* install(Device* device, InstallLocation location, bool force = false);
     
   public slots:
     QString getPath() const;

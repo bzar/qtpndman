@@ -1,17 +1,20 @@
 #include "handle.h"
 #include "device.h"
+#include <QDebug>
 
-QPndman::Handle::Handle(Operation operation, Package package, Device* device) : QObject(0), 
-  d(new Data(operation, package, device))
+QPndman::Handle::Handle(Context& context, Operation operation, Package package, Device* device, bool force) : QObject(0), 
+  d(new Data(context, operation, package, device, force))
 {
-  pndman_handle_init(QString::number(QDateTime::currentMSecsSinceEpoch()).toLocal8Bit().data(), 
-                     &d->handle);
+  pndman_handle_init(d->name.toLocal8Bit().data(), &d->handle);
+  d->handle.device = device->getPndmanDevice();
+  d->handle.pnd = package.getPndmanPackage();
   updateHandleFlags();
 }
 
-QPndman::Handle::Data::Data(Operation operation, Package package, Device* device) :
-  handle(), name(""), error(""), force(false), package(package), device(device), 
-  operation(operation), installLocation(Desktop), done(false), 
+QPndman::Handle::Data::Data(Context& context, Operation operation, Package package, Device* device, bool force) :
+  context(context), handle(), name(QString::number(QDateTime::currentMSecsSinceEpoch())), 
+  error(""), force(force), package(package), 
+  device(device), operation(operation), installLocation(Desktop), done(false), 
   cancelled(false)
 {
 }
@@ -159,10 +162,11 @@ void QPndman::Handle::setDone(bool const& done)
   if(done != d->done) 
   {
     d->done = done; 
-    emit doneChanged(d->done);
     if(done)
     {
+      pndman_handle_commit(&d->handle, d->context.getLocalPndmanRepository());
       emit Handle::done();
     }
+    emit doneChanged(d->done);
   }
 }

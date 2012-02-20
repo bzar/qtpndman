@@ -2,11 +2,10 @@
 #include "util.h"
 
 #include <QDebug>
+#include "device.h"
 
-QPndman::Repository::Repository(Context& c, QObject* parent) : 
-  QObject(parent ? parent : &c), d(new Data(c, c.getLocalPndmanRepository()))
-{
-}
+QPndman::LocalRepository::LocalRepository(Context& c, QObject* parent) : Repository(c, c.getLocalPndmanRepository()) {}
+
 QPndman::Repository::Repository(Context& c, QString const& url, QObject* parent) : 
   QObject(parent ? parent : &c), d()
 {
@@ -40,6 +39,11 @@ QPndman::SyncHandle* QPndman::Repository::sync()
   handle->setParent(this);
   connect(handle, SIGNAL(done()), this, SLOT(update()));
   return handle;
+}
+
+bool QPndman::Repository::loadFrom(Device* device)
+{
+  return device->loadRepository(this);
 }
 
 pndman_repository* QPndman::Repository::getPndmanRepository() const

@@ -1,4 +1,6 @@
 #include "package.h"
+#include "handle.h"
+#include "device.h"
 #include "util.h"
 
 QPndman::Package::Package() : QObject(0), d()
@@ -39,6 +41,11 @@ pndman_package* QPndman::Package::getPndmanPackage() const
 bool QPndman::Package::isNull() const
 {
   return !d;
+}
+
+QPndman::Handle* QPndman::Package::install(Device* device, InstallLocation location, bool force)
+{
+  return device->install(*this, location, force);
 }
 
 QString QPndman::Package::getPath() const

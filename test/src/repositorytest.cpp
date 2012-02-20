@@ -23,7 +23,7 @@ void RepositoryTest::run()
   
   QList<QPndman::Repository*> repositories;
   
-  QPndman::Repository* localRepo = new QPndman::Repository(context);
+  QPndman::Repository* localRepo = new QPndman::LocalRepository(context);
   if(localRepo->isNull())
   {
     qDebug() << "Error adding local repository!";

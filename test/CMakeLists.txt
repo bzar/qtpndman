@@ -13,3 +13,6 @@ target_link_libraries(devicetest qtpndman)
 
 add_executable(packageinfotest src/packageinfotest.cpp src/moc_packageinfotest.cxx)
 target_link_libraries(packageinfotest qtpndman)
+
+add_executable(downloadtest src/downloadtest.cpp)
+target_link_libraries(downloadtest qtpndman)

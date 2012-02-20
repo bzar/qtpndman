@@ -12,23 +12,24 @@
 
 namespace QPndman
 {
+  class Device;
+  
   class Repository : public QObject
   {
   Q_OBJECT
 
-    Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged);
-    Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged);
-    Q_PROPERTY(QString updates READ getUpdates WRITE setUpdates NOTIFY updatesChanged);
-    Q_PROPERTY(QDateTime timestamp READ getTimestamp WRITE setTimestamp NOTIFY timestampChanged);
-    Q_PROPERTY(QString version READ getVersion WRITE setVersion NOTIFY versionChanged);
-    Q_PROPERTY(QList<Package> packages READ getPackages WRITE setPackages NOTIFY packagesChanged);
+    Q_PROPERTY(QString url READ getUrl NOTIFY urlChanged);
+    Q_PROPERTY(QString name READ getName NOTIFY nameChanged);
+    Q_PROPERTY(QString updates READ getUpdates NOTIFY updatesChanged);
+    Q_PROPERTY(QDateTime timestamp READ getTimestamp NOTIFY timestampChanged);
+    Q_PROPERTY(QString version READ getVersion NOTIFY versionChanged);
+    Q_PROPERTY(QList<Package> packages READ getPackages NOTIFY packagesChanged);
 
   public:
-    Repository(Context& c, QObject* parent = 0);
     Repository(Context& c, QString const& url, QObject* parent = 0);
-    Repository(Context& c, pndman_repository* p, QObject* parent = 0);
     
     SyncHandle* sync();
+    bool loadFrom(Device* device);
     
     pndman_repository* getPndmanRepository() const;
     bool isNull() const;
@@ -43,12 +44,6 @@ namespace QPndman
 
   public slots:
     void update();
-    void setUrl(QString const& url);
-    void setName(QString const& name);
-    void setUpdates(QString const& updates);
-    void setTimestamp(QDateTime const& timestamp);
-    void setVersion(QString const& version);
-    void setPackages(QList<Package> const& packages);
     
   signals:
     void urlChanged(QString newUrl);
@@ -58,7 +53,17 @@ namespace QPndman
     void versionChanged(QString newVersion);
     void packagesChanged(QList<Package> newPackages);
     
+  protected:
+    Repository(Context& c, pndman_repository* p, QObject* parent = 0);
+
   private:
+    void setUrl(QString const& url);
+    void setName(QString const& name);
+    void setUpdates(QString const& updates);
+    void setTimestamp(QDateTime const& timestamp);
+    void setVersion(QString const& version);
+    void setPackages(QList<Package> const& packages);
+
     struct Data
     {
       Data(Context& c, pndman_repository* p);
@@ -79,6 +84,14 @@ namespace QPndman
     };
 
     QSharedPointer<Data> d;    
+  };
+  
+  class LocalRepository : public Repository
+  {
+    Q_OBJECT
+  public:
+    LocalRepository(Context& c, QObject* parent = 0);
+
   };
 }
 
