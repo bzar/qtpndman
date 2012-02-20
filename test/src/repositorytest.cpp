@@ -1,4 +1,4 @@
-#include "repository.h"
+#include "repositorytest.h"
 
 #include <QDebug>
 #include <QDateTime>
@@ -12,9 +12,15 @@ qint64 time()
   return d;
 }
 
-RepositoryTest::RepositoryTest() : QObject(0), context() {}
+RepositoryTest::RepositoryTest() : QObject(0) 
+{
+  
+}
+
 void RepositoryTest::run()
 {
+  QPndman::Context context;
+  
   QList<QPndman::Repository*> repositories;
   
   QPndman::Repository* localRepo = new QPndman::Repository(context);
@@ -69,6 +75,26 @@ void RepositoryTest::run()
     qDebug() << "";
   }
   qDebug() << "Listed repo information in" << time() << "msec";
+  
+  
+  qDebug() << "Saving repositories to /tmp";
+  QPndman::Device* tmpDevice = new QPndman::Device(context, "/tmp");
+  tmpDevice->saveRepositories();
+  
+  qDebug() << "Deleting repositories";
+  delete repo;
+  delete repo2;
+  
+  qDebug() << "Loading repositories from /tmp";
+  repo = new QPndman::Repository(context, "http://repo.openpandora.org/includes/get_data.php");
+  tmpDevice->loadRepository(repo);
+  
+  for(pndman_repository* r = context.getPndmanRepositories(); r; r = r->next)
+  {
+    qDebug() << "Found repository" << r->name;
+  }
+  
+  
   QCoreApplication::exit(0);
 }
 

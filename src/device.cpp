@@ -1,5 +1,6 @@
 #include "device.h"
 #include <QDebug>
+#include "repository.h"
 
 QList<QPndman::Device*> QPndman::Device::detectDevices(Context& c, QObject* parent)
 {
@@ -53,6 +54,21 @@ QPndman::Handle* QPndman::Device::remove(Package package)
   handle->setParent(this);
   handle->execute();
   return handle;  
+}
+
+bool QPndman::Device::crawl()
+{
+  return d->context.crawlPndmanDevice(d->pndmanDevice);
+}
+
+bool QPndman::Device::saveRepositories()
+{
+  return d->context.saveRepositories(d->pndmanDevice);
+}
+
+bool QPndman::Device::loadRepository(Repository* repository)
+{
+  return d->context.loadRepository(repository->getPndmanRepository(), d->pndmanDevice);
 }
 
 pndman_device* QPndman::Device::getPndmanDevice() const

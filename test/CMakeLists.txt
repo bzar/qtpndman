@@ -5,11 +5,11 @@ include_directories(../include)
 file (GLOB_RECURSE TEST_HEADERS src/*.h)
 QT4_WRAP_CPP(TEST_SRC_MOC ${TEST_HEADERS})
 
-add_executable(repository src/repository.cpp src/moc_repository.cxx)
-target_link_libraries(repository qtpndman)
+add_executable(repositorytest src/repositorytest.cpp src/moc_repositorytest.cxx)
+target_link_libraries(repositorytest qtpndman)
 
-add_executable(device src/device.cpp src/moc_device.cxx)
-target_link_libraries(device qtpndman)
+add_executable(devicetest src/devicetest.cpp src/moc_devicetest.cxx)
+target_link_libraries(devicetest qtpndman)
 
-add_executable(packageinfo src/packageinfo.cpp src/moc_packageinfo.cxx)
-target_link_libraries(packageinfo qtpndman)
+add_executable(packageinfotest src/packageinfotest.cpp src/moc_packageinfotest.cxx)
+target_link_libraries(packageinfotest qtpndman)

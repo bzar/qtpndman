@@ -109,3 +109,18 @@ pndman_device* QPndman::Context::detectPndmanDevices()
 {
   return pndman_device_detect(d->pndmanDevices);
 }
+
+bool QPndman::Context::crawlPndmanDevice(pndman_device* device)
+{
+  return pndman_crawl(device, d->localPndmanRepository);
+}
+
+bool QPndman::Context::saveRepositories(pndman_device* device)
+{
+  return pndman_commit_all(d->pndmanRepositories, device) == 0;
+}
+
+bool QPndman::Context::loadRepository(pndman_repository* repository, pndman_device* device)
+{
+  return pndman_read_from_device(repository, device);
+}

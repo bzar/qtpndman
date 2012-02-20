@@ -11,6 +11,7 @@
 
 namespace QPndman
 {
+  class Repository;
   
   class Device : public QObject
   {
@@ -25,7 +26,6 @@ namespace QPndman
     Q_PROPERTY(QString appdata READ getAppdata WRITE setAppdata NOTIFY appdataChanged);
 
   public:
-
     static QList<Device*> detectDevices(Context& c, QObject* parent = 0);
     
     Device(Context& c, QString const& path, QObject* parent = 0);
@@ -33,6 +33,9 @@ namespace QPndman
     
     Handle* install(Package package, InstallLocation location);
     Handle* remove(Package package);
+    bool crawl();
+    bool saveRepositories();
+    bool loadRepository(Repository* repository);
     
     pndman_device* getPndmanDevice() const;
     bool isNull() const;

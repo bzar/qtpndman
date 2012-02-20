@@ -9,7 +9,6 @@ public:
 public slots:
   void run(); 
 private:
-  QPndman::Context context;
 };
 
 

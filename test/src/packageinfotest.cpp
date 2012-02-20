@@ -1,4 +1,4 @@
-#include "packageinfo.h"
+#include "packageinfotest.h"
 
 #include <QDebug>
 #include <QDateTime>

@@ -1,4 +1,4 @@
-#include "device.h"
+#include "devicetest.h"
 
 #include <QDebug>
 #include <QDateTime>
