@@ -1,11 +1,11 @@
 #include "qtpndman.h"
 using QPndman::SyncHandle;
 
-class Test : public QObject
+class RepositoryTest : public QObject
 {
   Q_OBJECT
 public:
-  Test();
+  RepositoryTest();
 public slots:
   void run(); 
 private:

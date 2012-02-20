@@ -1,11 +1,10 @@
 #include "qtpndman.h"
-using QPndman::SyncHandle;
 
-class Test : public QObject
+class PackageInfoTest : public QObject
 {
   Q_OBJECT
 public:
-  Test();
+  PackageInfoTest();
 public slots:
   void run(); 
 private:

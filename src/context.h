@@ -18,19 +18,27 @@ namespace QPndman
     Context(const Context& other);
     ~Context();
     
+    pndman_repository* addPndmanRepository(QString const& url);
+    void removePndmanRepository(pndman_repository* repository);
     pndman_repository* getPndmanRepositories();
     pndman_repository* getLastPndmanRepository();
     pndman_repository* getLocalPndmanRepository();
+
+    pndman_device* addPndmanDevice(QString const& path);
+    void removePndmanDevice(pndman_device* device);
     pndman_device* getPndmanDevices();
     pndman_device* getLastPndmanDevice();
+    
+    pndman_device* detectPndmanDevices();
     
   private:
     struct Data
     {
       Data();
       ~Data();
-      pndman_repository pndmanRepositories;
-      pndman_device pndmanDevices;
+      pndman_repository* localPndmanRepository;
+      pndman_repository* pndmanRepositories;
+      pndman_device* pndmanDevices;
     };
         
     QSharedPointer<Data> d;

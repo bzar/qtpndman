@@ -26,7 +26,7 @@ namespace QPndman
   public:
     Repository(Context& c, QObject* parent = 0);
     Repository(Context& c, QString const& url, QObject* parent = 0);
-    Repository(pndman_repository* p, QObject* parent = 0);
+    Repository(Context& c, pndman_repository* p, QObject* parent = 0);
     
     SyncHandle* sync();
     
@@ -40,7 +40,6 @@ namespace QPndman
     QDateTime getTimestamp() const;
     QString getVersion() const;
     QList<Package> getPackages() const;
-    bool getExists() const;
 
   public slots:
     void update();
@@ -50,7 +49,6 @@ namespace QPndman
     void setTimestamp(QDateTime const& timestamp);
     void setVersion(QString const& version);
     void setPackages(QList<Package> const& packages);
-    void setExists(bool const exists);
     
   signals:
     void urlChanged(QString newUrl);
@@ -59,15 +57,16 @@ namespace QPndman
     void timestampChanged(QDateTime newTimestamp);
     void versionChanged(QString newVersion);
     void packagesChanged(QList<Package> newPackages);
-    void existsChanged(bool newExists);
     
   private:
     struct Data
     {
-      Data(pndman_repository* p);
+      Data(Context& c, pndman_repository* p);
       ~Data();
       
       int identifier;
+      Context context;
+
       pndman_repository* pndmanRepository;
       QString url;
       QString name;
@@ -75,7 +74,6 @@ namespace QPndman
       QDateTime timestamp;
       QString version;
       QList<Package> packages;
-      bool exists;
       
       static int nextIdentifier;
     };

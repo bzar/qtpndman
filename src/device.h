@@ -29,7 +29,7 @@ namespace QPndman
     static QList<Device*> detectDevices(Context& c, QObject* parent = 0);
     
     Device(Context& c, QString const& path, QObject* parent = 0);
-    Device(pndman_device* p, QObject* parent = 0);
+    Device(Context& c, pndman_device* p, QObject* parent = 0);
     
     Handle* install(Package package, InstallLocation location);
     Handle* remove(Package package);
@@ -65,10 +65,12 @@ namespace QPndman
   private:
     struct Data
     {
-      Data(pndman_device* p);
+      Data(Context& c, pndman_device* p);
       ~Data();
       
       int identifier;
+      Context context;
+
       pndman_device* pndmanDevice;
       QString mount;
       QString device;

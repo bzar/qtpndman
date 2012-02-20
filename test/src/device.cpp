@@ -13,8 +13,8 @@ qint64 time()
   return d;
 }
 
-Test::Test() : QObject(0), context() {}
-void Test::run()
+DeviceTest::DeviceTest() : QObject(0), context() {}
+void DeviceTest::run()
 {
   QList<QPndman::Device*> devices;
   
@@ -49,18 +49,13 @@ void Test::run()
     qDebug() << "";
   }
 
-  foreach(const QPndman::Device* d, devices)
-  {
-    qDebug() << "mount:    " << d->getMount();
-    delete d;
-  }
   QCoreApplication::exit(0);
 }
 
 int main(int argc, char** argv)
 {
   QCoreApplication application(argc, argv);
-  Test test;
+  DeviceTest test;
   QTimer t;
   t.setSingleShot(true);
   t.connect(&t, SIGNAL(timeout()), &test, SLOT(run()));

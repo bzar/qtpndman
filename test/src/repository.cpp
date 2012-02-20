@@ -12,8 +12,8 @@ qint64 time()
   return d;
 }
 
-Test::Test() : QObject(0), context() {}
-void Test::run()
+RepositoryTest::RepositoryTest() : QObject(0), context() {}
+void RepositoryTest::run()
 {
   QList<QPndman::Repository*> repositories;
   
@@ -65,7 +65,6 @@ void Test::run()
     qDebug() << "updates:   " << r->getUpdates();
     qDebug() << "timestamp: " << r->getTimestamp();
     qDebug() << "version:   " << r->getVersion();
-    qDebug() << "exists:    " << r->getExists();
     qDebug() << "packages:  " << r->getPackages().size();
     qDebug() << "";
   }
@@ -76,7 +75,7 @@ void Test::run()
 int main(int argc, char** argv)
 {
   QCoreApplication application(argc, argv);
-  Test test;
+  RepositoryTest test;
   QTimer t;
   t.setSingleShot(true);
   t.connect(&t, SIGNAL(timeout()), &test, SLOT(run()));

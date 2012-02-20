@@ -4,36 +4,34 @@
 #include <QDebug>
 
 QPndman::Repository::Repository(Context& c, QObject* parent) : 
-  QObject(parent ? parent : &c), d(new Data(c.getLocalPndmanRepository()))
+  QObject(parent ? parent : &c), d(new Data(c, c.getLocalPndmanRepository()))
 {
 }
 QPndman::Repository::Repository(Context& c, QString const& url, QObject* parent) : 
   QObject(parent ? parent : &c), d()
 {
-  if(pndman_repository_add(url.toLocal8Bit().data(), c.getPndmanRepositories()) == 0)
+  pndman_repository* repo = c.addPndmanRepository(url);
+  if(repo)
   {
-    d = QSharedPointer<Data>(new Data(c.getLastPndmanRepository()));
+    d = QSharedPointer<Data>(new Data(c, repo));
   }
 }
-QPndman::Repository::Repository(pndman_repository* p, QObject* parent) : QObject(parent), d(new Data(p))
+QPndman::Repository::Repository(Context& c, pndman_repository* p, QObject* parent) : QObject(parent), d(new Data(c, p))
 {  
 }
 
 int QPndman::Repository::Data::nextIdentifier = 1;
 
-QPndman::Repository::Data::Data(pndman_repository* p) : identifier(nextIdentifier++),
-  pndmanRepository(p), 
+QPndman::Repository::Data::Data(Context& c, pndman_repository* p) : identifier(nextIdentifier++),
+  context(c), pndmanRepository(p),
   url(p->url), name(p->name), updates(p->updates), 
   timestamp(QDateTime::fromTime_t(p->timestamp)), version(p->version), 
-  packages(makeQList<pndman_package, Package>(p->pnd)), exists(p->exist)
+  packages(makeQList<pndman_package, Package>(p->pnd))
 {
 }
 QPndman::Repository::Data::~Data()
 {
-  if(!url.isEmpty())
-  {
-    pndman_repository_free(pndmanRepository);
-  }
+  context.removePndmanRepository(pndmanRepository);
 }
 
 QPndman::SyncHandle* QPndman::Repository::sync()
@@ -83,10 +81,6 @@ QList<QPndman::Package> QPndman::Repository::getPackages() const
 {
   return isNull() ? QList<Package>() : d->packages;
 }
-bool QPndman::Repository::getExists() const
-{
-  return isNull() ? false : d->exists;
-}
 
 void QPndman::Repository::update()
 {
@@ -96,7 +90,6 @@ void QPndman::Repository::update()
   setTimestamp(QDateTime::fromTime_t(d->pndmanRepository->timestamp));
   setVersion(d->pndmanRepository->version);
   setPackages(makeQList<pndman_package, Package>(d->pndmanRepository->pnd));
-  setExists(d->pndmanRepository->exist);
 }
 void QPndman::Repository::setUrl(QString const& url)
 {
@@ -144,13 +137,5 @@ void QPndman::Repository::setPackages(QList<Package> const& packages)
   {
     d->packages = packages; 
     emit packagesChanged(d->packages);
-  }
-}
-void QPndman::Repository::setExists(bool const exists)
-{
-  if(!isNull() && exists != d->exists) 
-  {
-    d->exists = exists; 
-    emit existsChanged(d->exists);
   }
 }

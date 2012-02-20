@@ -1,4 +1,4 @@
-#include "repository.h"
+#include "packageinfo.h"
 
 #include <QDebug>
 #include <QDateTime>
@@ -12,9 +12,9 @@ qint64 time()
   return d;
 }
 
-Test::Test() : QObject(0), context() {}
+PackageInfoTest::PackageInfoTest() : QObject(0), context() {}
 
-void Test::run()
+void PackageInfoTest::run()
 {
   QPndman::Repository* repo = new QPndman::Repository(context, "http://repo.openpandora.org/includes/get_data.php");
   
@@ -46,7 +46,7 @@ void Test::run()
 int main(int argc, char** argv)
 {
   QCoreApplication application(argc, argv);
-  Test test;
+  PackageInfoTest test;
   QTimer t;
   t.setSingleShot(true);
   t.connect(&t, SIGNAL(timeout()), &test, SLOT(run()));

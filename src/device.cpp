@@ -4,13 +4,9 @@
 QList<QPndman::Device*> QPndman::Device::detectDevices(Context& c, QObject* parent)
 {
   QList<Device*> detectedDevices;
-  pndman_device* prevLast = c.getLastPndmanDevice();
-  if(pndman_device_detect(c.getPndmanDevices()) == 0)
+  for(pndman_device* dev = c.detectPndmanDevices(); dev != 0; dev = dev->next)
   {
-    for(pndman_device* dev = prevLast->next; dev != 0; dev = dev->next)
-    {
-      detectedDevices << new Device(dev, parent ? parent : &c);
-    }
+    detectedDevices << new Device(c, dev);
   }
   
   return detectedDevices;
@@ -18,27 +14,28 @@ QList<QPndman::Device*> QPndman::Device::detectDevices(Context& c, QObject* pare
 
 QPndman::Device::Device(Context& c, QString const& path, QObject* parent) : QObject(parent ? parent : &c), d()
 {
-  if(pndman_device_add(path.toLocal8Bit().data(), c.getPndmanDevices()) == 0)
+  pndman_device* dev = c.addPndmanDevice(path);
+  if(dev)
   {
-    qDebug() << "Created Device for" << c.getLastPndmanDevice() << "to list" << c.getPndmanDevices();
-    d = QSharedPointer<Data>(new Data(c.getLastPndmanDevice()));
+    d = QSharedPointer<Data>(new Data(c, dev));
   }
 }
-QPndman::Device::Device(pndman_device* p, QObject* parent) : QObject(parent), d(new Data(p))
+
+QPndman::Device::Device(Context& c, pndman_device* p, QObject* parent) : QObject(parent ? parent : &c), d(new Data(c, p))
 {
 }
 
 int QPndman::Device::Data::nextIdentifier = 1;
 
-QPndman::Device::Data::Data(pndman_device* p) : identifier(nextIdentifier++),
-  pndmanDevice(p), mount(p->mount), device(p->device), 
+QPndman::Device::Data::Data(Context& c, pndman_device* p) : identifier(nextIdentifier++), 
+  context(c), pndmanDevice(p), mount(p->mount), device(p->device), 
   size(p->size), free(p->free), available(p->available), appdata(p->appdata)
 {
 }
 
 QPndman::Device::Data::~Data()
 {
-  pndman_device_free(pndmanDevice);
+  context.removePndmanDevice(pndmanDevice);
 }
 
 QPndman::Handle* QPndman::Device::install(Package package, InstallLocation location)

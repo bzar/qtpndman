@@ -1,10 +1,10 @@
 #include "qtpndman.h"
 
-class Test : public QObject
+class DeviceTest : public QObject
 {
   Q_OBJECT
 public:
-  Test();
+  DeviceTest();
 public slots:
   void run();  
 private:
