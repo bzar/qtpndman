@@ -8,50 +8,37 @@ namespace
   int counter = 0;
 }
 
-QPndman::Context::Context() : QObject(0), d(new Data)
+QPndman::Context::Context(QObject* parent) : QObject(parent), d(new Data)
 {  
-}
+  if(counter == 0)
+    pndman_init();
+  ++counter;
 
-
-QPndman::Context::Context(Context const& other) : d(other.d)
-{
-}
-
-QPndman::Context& QPndman::Context::operator=(Context const& other)
-{
-  if(&other != this) 
-  {
-    d = other.d;
-  }
-  
-  return *this;
-  
+  d->localPndmanRepository = pndman_repository_init();
+  d->pndmanRepositories = d->localPndmanRepository;
 }
 
 QPndman::Context::~Context()
 {
-  emit destroyed();
+  pndman_repository_free_all(d->pndmanRepositories);
+  d->pndmanRepositories = 0;
+  d->localPndmanRepository = 0;
+  
+  pndman_device_free_all(d->pndmanDevices);
+  d->pndmanDevices = 0;
+  d.clear();
+  --counter;
+  if(counter == 0)
+    pndman_quit();
 }
 
 QPndman::Context::Data::Data() : 
   localPndmanRepository(0), pndmanRepositories(0), pndmanDevices(0)
 {
-  if(counter == 0)
-    pndman_init();
-  ++counter;
-
-  localPndmanRepository = pndman_repository_init();
-  pndmanRepositories = localPndmanRepository;
 }
 
 QPndman::Context::Data::~Data()
 {
-  pndman_repository_free_all(pndmanRepositories);
-  pndman_device_free_all(pndmanDevices);
-  
-  --counter;
-  if(counter == 0)
-    pndman_quit();
 }
 
 pndman_repository* QPndman::Context::addPndmanRepository(QString const& url)
@@ -61,7 +48,17 @@ pndman_repository* QPndman::Context::addPndmanRepository(QString const& url)
 
 void QPndman::Context::removePndmanRepository(pndman_repository* repository)
 {
-  d->pndmanRepositories = pndman_repository_free(repository);
+  if(d)
+  {
+    for(pndman_repository* r = d->pndmanRepositories; r; r = r->next)
+    {
+      if(r == repository)
+      {
+        d->pndmanRepositories = pndman_repository_free(repository);
+        break;
+      }
+    }
+  }
 }
 
 pndman_repository* QPndman::Context::getPndmanRepositories()
@@ -92,7 +89,17 @@ pndman_device* QPndman::Context::addPndmanDevice(QString const& path)
 
 void QPndman::Context::removePndmanDevice(pndman_device* device)
 {
-  d->pndmanDevices = pndman_device_free(device);
+  if(d)
+  {
+    for(pndman_device* dev = d->pndmanDevices; dev; dev = dev->next)
+    {
+      if(dev == device)
+      {
+        d->pndmanDevices = pndman_device_free(device);
+        break;
+      }
+    }  
+  }
 }
 
 pndman_device* QPndman::Context::getPndmanDevices()
@@ -122,5 +129,5 @@ bool QPndman::Context::saveRepositories(pndman_device* device)
 
 bool QPndman::Context::loadRepository(pndman_repository* repository, pndman_device* device)
 {
-  return pndman_read_from_device(repository, device);
+  return pndman_read_from_device(repository, device) == 0;
 }

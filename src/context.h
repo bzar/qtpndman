@@ -13,9 +13,7 @@ namespace QPndman
     Q_OBJECT
     
   public:
-    Context();
-    Context& operator=(const Context& other);
-    Context(const Context& other);
+    Context(QObject* parent = 0);
     ~Context();
     
     pndman_repository* addPndmanRepository(QString const& url);

@@ -26,7 +26,7 @@ namespace QPndman
     Q_PROPERTY(QList<Package> packages READ getPackages NOTIFY packagesChanged);
 
   public:
-    Repository(Context& c, QString const& url, QObject* parent = 0);
+    Repository(Context*  c, QString const& url, QObject* parent = 0);
     
     SyncHandle* sync();
     bool loadFrom(Device* device);
@@ -54,7 +54,7 @@ namespace QPndman
     void packagesChanged(QList<Package> newPackages);
     
   protected:
-    Repository(Context& c, pndman_repository* p, QObject* parent = 0);
+    Repository(Context*  c, pndman_repository* p, QObject* parent = 0);
 
   private:
     void setUrl(QString const& url);
@@ -66,11 +66,11 @@ namespace QPndman
 
     struct Data
     {
-      Data(Context& c, pndman_repository* p);
+      Data(Context*  c, pndman_repository* p);
       ~Data();
       
       int identifier;
-      Context context;
+      Context* context;
 
       pndman_repository* pndmanRepository;
       QString url;
@@ -90,7 +90,7 @@ namespace QPndman
   {
     Q_OBJECT
   public:
-    LocalRepository(Context& c, QObject* parent = 0);
+    LocalRepository(Context*  c, QObject* parent = 0);
 
   };
 }

@@ -31,7 +31,7 @@ namespace QPndman
   
   
   public:
-    Handle(Context& context, Operation operation, Package package, Device* device, bool force = false);
+    Handle(Context*  context, Operation operation, Package package, Device* device, bool force = false);
     pndman_handle* getPndmanHandle();
     
     static int download();
@@ -79,9 +79,9 @@ namespace QPndman
 
     struct Data
     {
-      Data(Context& context, Operation operation, Package package, Device* device, bool force);
+      Data(Context*  context, Operation operation, Package package, Device* device, bool force);
       ~Data();
-      Context context;
+      Context* context;
       pndman_handle handle;
       QString name;
       QString error;

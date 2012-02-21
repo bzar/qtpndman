@@ -6,7 +6,8 @@ int main(int argc, char** argv)
 {
   QCoreApplication application(argc, argv);
   
-  QPndman::Context context;
+  QPndman::Context* context = new QPndman::Context(&application);
+  
   QPndman::Device* device = new QPndman::Device(context, "/tmp");
   QPndman::Repository* repo = new QPndman::Repository(context, "http://repo.openpandora.org/includes/get_data.php");
   
@@ -27,7 +28,7 @@ int main(int argc, char** argv)
   QPndman::Package toInstall = packages.at(qrand() % packages.size());
   
   qDebug() << "Installing:" << toInstall.getTitle();  
-  QPndman::Handle* handle = toInstall.install(device, QPndman::Menu, true);
+  QPndman::Handle* handle = toInstall.install(device, QPndman::Menu);
 
   if(!handle)
   {

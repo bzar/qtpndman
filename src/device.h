@@ -26,10 +26,10 @@ namespace QPndman
     Q_PROPERTY(QString appdata READ getAppdata NOTIFY appdataChanged);
 
   public:
-    static QList<Device*> detectDevices(Context& c, QObject* parent = 0);
+    static QList<Device*> detectDevices(Context* c, QObject* parent = 0);
     
-    Device(Context& c, QString const& path, QObject* parent = 0);
-    Device(Context& c, pndman_device* p, QObject* parent = 0);
+    Device(Context* c, QString const& path, QObject* parent = 0);
+    Device(Context* c, pndman_device* p, QObject* parent = 0);
     
     Handle* install(Package package, InstallLocation location, bool force = false);
     Handle* remove(Package package);
@@ -69,11 +69,11 @@ namespace QPndman
 
     struct Data
     {
-      Data(Context& c, pndman_device* p);
+      Data(Context* c, pndman_device* p);
       ~Data();
       
       int identifier;
-      Context context;
+      Context* context;
 
       pndman_device* pndmanDevice;
       QString mount;

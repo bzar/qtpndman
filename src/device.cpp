@@ -2,33 +2,33 @@
 #include <QDebug>
 #include "repository.h"
 
-QList<QPndman::Device*> QPndman::Device::detectDevices(Context& c, QObject* parent)
+QList<QPndman::Device*> QPndman::Device::detectDevices(Context*  c, QObject* parent)
 {
   QList<Device*> detectedDevices;
-  for(pndman_device* dev = c.detectPndmanDevices(); dev != 0; dev = dev->next)
+  for(pndman_device* dev = c->detectPndmanDevices(); dev != 0; dev = dev->next)
   {
-    detectedDevices << new Device(c, dev);
+    detectedDevices << new Device(c, dev, parent);
   }
   
   return detectedDevices;
 }
 
-QPndman::Device::Device(Context& c, QString const& path, QObject* parent) : QObject(parent ? parent : &c), d()
+QPndman::Device::Device(Context*  c, QString const& path, QObject* parent) : QObject(parent ? parent : c), d()
 {
-  pndman_device* dev = c.addPndmanDevice(path);
+  pndman_device* dev = c->addPndmanDevice(path);
   if(dev)
   {
     d = QSharedPointer<Data>(new Data(c, dev));
   }
 }
 
-QPndman::Device::Device(Context& c, pndman_device* p, QObject* parent) : QObject(parent ? parent : &c), d(new Data(c, p))
+QPndman::Device::Device(Context*  c, pndman_device* p, QObject* parent) : QObject(parent ? parent : c), d(new Data(c, p))
 {
 }
 
 int QPndman::Device::Data::nextIdentifier = 1;
 
-QPndman::Device::Data::Data(Context& c, pndman_device* p) : identifier(nextIdentifier++), 
+QPndman::Device::Data::Data(Context*  c, pndman_device* p) : identifier(nextIdentifier++), 
   context(c), pndmanDevice(p), mount(p->mount), device(p->device), 
   size(p->size), free(p->free), available(p->available), appdata(p->appdata)
 {
@@ -36,7 +36,7 @@ QPndman::Device::Data::Data(Context& c, pndman_device* p) : identifier(nextIdent
 
 QPndman::Device::Data::~Data()
 {
-  context.removePndmanDevice(pndmanDevice);
+  context->removePndmanDevice(pndmanDevice);
 }
 
 QPndman::Handle* QPndman::Device::install(Package package, InstallLocation location, bool force)
@@ -66,17 +66,23 @@ QPndman::Handle* QPndman::Device::remove(Package package)
 
 bool QPndman::Device::crawl()
 {
-  return d->context.crawlPndmanDevice(d->pndmanDevice);
+  return d->context->crawlPndmanDevice(d->pndmanDevice);
 }
 
 bool QPndman::Device::saveRepositories()
 {
-  return d->context.saveRepositories(d->pndmanDevice);
+  return d->context->saveRepositories(d->pndmanDevice);
 }
 
 bool QPndman::Device::loadRepository(Repository* repository)
 {
-  return d->context.loadRepository(repository->getPndmanRepository(), d->pndmanDevice);
+  if(!d->context->loadRepository(repository->getPndmanRepository(), d->pndmanDevice))
+  {
+    return false;
+  }
+  
+  repository->update();
+  return true;
 }
 
 pndman_device* QPndman::Device::getPndmanDevice() const

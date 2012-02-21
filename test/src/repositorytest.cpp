@@ -1,4 +1,4 @@
-#include "repositorytest.h"
+#include "qtpndman.h"
 
 #include <QDebug>
 #include <QDateTime>
@@ -12,22 +12,18 @@ qint64 time()
   return d;
 }
 
-RepositoryTest::RepositoryTest() : QObject(0) 
+int main(int argc, char** argv)
 {
-  
-}
+  QCoreApplication application(argc, argv);
+  QPndman::Context* context = new QPndman::Context(&application);
 
-void RepositoryTest::run()
-{
-  QPndman::Context context;
-  
   QList<QPndman::Repository*> repositories;
   
   QPndman::Repository* localRepo = new QPndman::LocalRepository(context);
   if(localRepo->isNull())
   {
     qDebug() << "Error adding local repository!";
-    QCoreApplication::exit(1); return;
+    return 1;
   }
   repositories << localRepo;
   
@@ -35,7 +31,7 @@ void RepositoryTest::run()
   if(repo->isNull())
   {
     qDebug() << "Error adding remote repository!";
-    QCoreApplication::exit(1); return;
+    return 1;
   }
   repositories << repo;
   
@@ -43,7 +39,7 @@ void RepositoryTest::run()
   if(!repo2->isNull())
   {
     qDebug() << "Duplicate repository add succeeded!";
-    QCoreApplication::exit(1); return;
+    return 1;
   }
   
   time();
@@ -53,10 +49,10 @@ void RepositoryTest::run()
   
   while(!handle->getDone())
   {
-    if(QPndman::SyncHandle::sync() < 0)
+    if(handle->sync() < 0)
     {
       qDebug() << "Error syncing repository!";
-      QCoreApplication::exit(1); return;
+      return 1;
     }
     
     handle->update();
@@ -87,24 +83,9 @@ void RepositoryTest::run()
   
   qDebug() << "Loading repositories from /tmp";
   repo = new QPndman::Repository(context, "http://repo.openpandora.org/includes/get_data.php");
-  tmpDevice->loadRepository(repo);
+  repo->loadFrom(tmpDevice);
   
-  for(pndman_repository* r = context.getPndmanRepositories(); r; r = r->next)
-  {
-    qDebug() << "Found repository" << r->name;
-  }
+  qDebug() << "name:" << repo->getName() << " packages:" << repo->getPackages().size();
   
-  
-  QCoreApplication::exit(0);
-}
-
-int main(int argc, char** argv)
-{
-  QCoreApplication application(argc, argv);
-  RepositoryTest test;
-  QTimer t;
-  t.setSingleShot(true);
-  t.connect(&t, SIGNAL(timeout()), &test, SLOT(run()));
-  t.start();
-  return application.exec();
+  return 0;
 }

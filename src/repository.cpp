@@ -4,24 +4,24 @@
 #include <QDebug>
 #include "device.h"
 
-QPndman::LocalRepository::LocalRepository(Context& c, QObject* parent) : Repository(c, c.getLocalPndmanRepository()) {}
+QPndman::LocalRepository::LocalRepository(Context*  c, QObject* parent) : Repository(c, c->getLocalPndmanRepository(), parent ? parent : c) {}
 
-QPndman::Repository::Repository(Context& c, QString const& url, QObject* parent) : 
-  QObject(parent ? parent : &c), d()
+QPndman::Repository::Repository(Context* c, QString const& url, QObject* parent) : 
+  QObject(parent ? parent : c), d()
 {
-  pndman_repository* repo = c.addPndmanRepository(url);
+  pndman_repository* repo = c->addPndmanRepository(url);
   if(repo)
   {
     d = QSharedPointer<Data>(new Data(c, repo));
   }
 }
-QPndman::Repository::Repository(Context& c, pndman_repository* p, QObject* parent) : QObject(parent), d(new Data(c, p))
+QPndman::Repository::Repository(Context*  c, pndman_repository* p, QObject* parent) : QObject(parent), d(new Data(c, p))
 {  
 }
 
 int QPndman::Repository::Data::nextIdentifier = 1;
 
-QPndman::Repository::Data::Data(Context& c, pndman_repository* p) : identifier(nextIdentifier++),
+QPndman::Repository::Data::Data(Context*  c, pndman_repository* p) : identifier(nextIdentifier++),
   context(c), pndmanRepository(p),
   url(p->url), name(p->name), updates(p->updates), 
   timestamp(QDateTime::fromTime_t(p->timestamp)), version(p->version), 
@@ -30,7 +30,7 @@ QPndman::Repository::Data::Data(Context& c, pndman_repository* p) : identifier(n
 }
 QPndman::Repository::Data::~Data()
 {
-  context.removePndmanRepository(pndmanRepository);
+  context->removePndmanRepository(pndmanRepository);
 }
 
 QPndman::SyncHandle* QPndman::Repository::sync()

@@ -1,4 +1,4 @@
-#include "packageinfotest.h"
+#include "qtpndman.h"
 
 #include <QDebug>
 #include <QDateTime>
@@ -12,10 +12,11 @@ qint64 time()
   return d;
 }
 
-PackageInfoTest::PackageInfoTest() : QObject(0), context() {}
-
-void PackageInfoTest::run()
+int main(int argc, char** argv)
 {
+  QCoreApplication application(argc, argv);
+  QPndman::Context* context = new QPndman::Context(&application);
+
   QPndman::Repository* repo = new QPndman::Repository(context, "http://repo.openpandora.org/includes/get_data.php");
   
   QPndman::SyncHandle* handle = repo->sync();
@@ -26,7 +27,7 @@ void PackageInfoTest::run()
     if(QPndman::SyncHandle::sync() < 0)
     {
       qDebug() << "Error syncing repository!";
-      QCoreApplication::exit(1); return;
+      return 1;
     }
     
     handle->update();
@@ -40,16 +41,5 @@ void PackageInfoTest::run()
     qDebug() << p.getTitle() << "-" << p.getDescription();
   }
 
-  QCoreApplication::exit(0);
-}
-
-int main(int argc, char** argv)
-{
-  QCoreApplication application(argc, argv);
-  PackageInfoTest test;
-  QTimer t;
-  t.setSingleShot(true);
-  t.connect(&t, SIGNAL(timeout()), &test, SLOT(run()));
-  t.start();
-  return application.exec();
+  return 0;
 }

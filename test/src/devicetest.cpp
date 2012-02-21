@@ -1,4 +1,4 @@
-#include "devicetest.h"
+#include "qtpndman.h"
 
 #include <QDebug>
 #include <QDateTime>
@@ -13,16 +13,18 @@ qint64 time()
   return d;
 }
 
-DeviceTest::DeviceTest() : QObject(0), context() {}
-void DeviceTest::run()
+int main(int argc, char** argv)
 {
+  QCoreApplication application(argc, argv);
+  QPndman::Context* context = new QPndman::Context(&application);
+  
   QList<QPndman::Device*> devices;
   
   QPndman::Device* tmpDevice = new QPndman::Device(context, "/tmp");
   if(tmpDevice->isNull())
   {
     qDebug() << "Error adding device!";
-    QCoreApplication::exit(1); return;
+    return 1;
   }
   devices << tmpDevice;
   
@@ -30,7 +32,7 @@ void DeviceTest::run()
   if(!tmpDevice2->isNull())
   {
     qDebug() << "Duplicate device add succeeded!";
-    QCoreApplication::exit(1); return;
+    return 1;
   }
 
   foreach(QPndman::Device* device, QPndman::Device::detectDevices(context))
@@ -49,16 +51,5 @@ void DeviceTest::run()
     qDebug() << "";
   }
 
-  QCoreApplication::exit(0);
-}
-
-int main(int argc, char** argv)
-{
-  QCoreApplication application(argc, argv);
-  DeviceTest test;
-  QTimer t;
-  t.setSingleShot(true);
-  t.connect(&t, SIGNAL(timeout()), &test, SLOT(run()));
-  t.start();
-  return application.exec();
+  return 0;
 }
