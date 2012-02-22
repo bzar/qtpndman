@@ -2,20 +2,21 @@
 #include "device.h"
 #include <QDebug>
 
-QPndman::Handle::Handle(Context*  context, Operation operation, Package package, Device* device, bool force) : QObject(0), 
+QPndman::Handle::Handle(Context*  context, Operation operation, Package package, Device* device, bool force) : QObject(device), 
   d(new Data(context, operation, package, device, force))
 {
   pndman_handle_init(d->name.toLocal8Bit().data(), &d->handle);
   d->handle.device = device->getPndmanDevice();
   d->handle.pnd = package.getPndmanPackage();
   updateHandleFlags();
+  update();
 }
 
 QPndman::Handle::Data::Data(Context*  context, Operation operation, Package package, Device* device, bool force) :
   context(context), handle(), name(QString::number(QDateTime::currentMSecsSinceEpoch())), 
   error(""), force(force), package(package), 
   device(device), operation(operation), installLocation(Desktop), done(false), 
-  cancelled(false)
+  cancelled(false), bytesDownloaded(0), bytesToDownload(0)
 {
 }
 QPndman::Handle::Data::~Data()
@@ -67,7 +68,9 @@ bool QPndman::Handle::cancel()
 void QPndman::Handle::update()
 {
   setError(d->handle.error);
-  setDone(d->handle.done);
+  setDone(d->handle.progress.done);
+  setBytesDownloaded(static_cast<qint64>(d->handle.progress.download));
+  setBytesToDownload(static_cast<qint64>(d->handle.progress.total_to_download));
 }
 
 QString QPndman::Handle::getName() const
@@ -108,6 +111,14 @@ bool QPndman::Handle::getCancelled() const
   return d->cancelled;
 }
 
+qint64 QPndman::Handle::getBytesDownloaded() const
+{
+  return d->bytesDownloaded;
+}
+qint64 QPndman::Handle::getBytesToDownload() const
+{
+  return d->bytesToDownload;
+}
 
 void QPndman::Handle::setForce(bool const& force)
 {
@@ -168,5 +179,23 @@ void QPndman::Handle::setDone(bool const& done)
       emit Handle::done();
     }
     emit doneChanged(d->done);
+  }
+}
+
+void QPndman::Handle::setBytesDownloaded(qint64 const value)
+{
+  if(value != d->bytesDownloaded) 
+  {
+    d->bytesDownloaded = value; 
+    emit bytesDownloadedChanged(d->bytesDownloaded);
+  }
+}
+
+void QPndman::Handle::setBytesToDownload(qint64 const value)
+{
+  if(value != d->bytesToDownload) 
+  {
+    d->bytesToDownload = value; 
+    emit bytesToDownloadChanged(d->bytesToDownload);
   }
 }

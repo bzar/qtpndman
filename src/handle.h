@@ -27,6 +27,8 @@ namespace QPndman
     Q_PROPERTY(InstallLocation installLocation READ getInstallLocation WRITE setInstallLocation NOTIFY installLocationChanged);
     Q_PROPERTY(bool done READ getDone NOTIFY doneChanged);
     Q_PROPERTY(bool cancelled READ getCancelled NOTIFY cancelledChanged);
+    Q_PROPERTY(qint64 bytesDownloaded READ getBytesDownloaded NOTIFY bytesDownloadedChanged);
+    Q_PROPERTY(qint64 bytesToDownload READ getBytesToDownload NOTIFY bytesToDownloadChanged);
 
   
   
@@ -45,6 +47,8 @@ namespace QPndman
     InstallLocation getInstallLocation() const;
     bool getDone() const;
     bool getCancelled() const;
+    qint64 getBytesDownloaded() const;
+    qint64 getBytesToDownload() const;
 
   public slots:
     bool execute();
@@ -64,6 +68,8 @@ namespace QPndman
     void installLocationChanged(InstallLocation newInstallLocation);
     void doneChanged(bool newDone);
     void cancelledChanged(bool newCancelled);
+    void bytesDownloadedChanged(qint64 newBytesDownloaded);
+    void bytesToDownloadChanged(qint64 newBytesToDownload);
     
     void error(QString error);
     void done();
@@ -76,7 +82,9 @@ namespace QPndman
     void setName(QString const& name);
     void setError(QString const& error);
     void setDone(bool const& done);
-
+    void setBytesDownloaded(qint64 const value);
+    void setBytesToDownload(qint64 const value);
+    
     struct Data
     {
       Data(Context*  context, Operation operation, Package package, Device* device, bool force);
@@ -92,6 +100,8 @@ namespace QPndman
       InstallLocation installLocation;
       bool done;
       bool cancelled;
+      qint64 bytesDownloaded;
+      qint64 bytesToDownload;
     };
 
     QSharedPointer<Data> d;

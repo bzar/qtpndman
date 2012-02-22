@@ -36,6 +36,7 @@ int main(int argc, char** argv)
     return 1;    
   }
   qDebug() << "Downloading...";
+  int counter = 0;
   while(!handle->getDone())
   {
     if(handle->download() < 0)
@@ -44,6 +45,25 @@ int main(int argc, char** argv)
       return 1;      
     }
     handle->update();
+    
+    if(handle->getBytesToDownload() != 0)
+    {
+      int percentage = 100 * handle->getBytesDownloaded() / handle->getBytesToDownload();
+      if(counter + 10 <= percentage)
+      {
+        counter += 10;
+        qDebug() << percentage << "%";
+      }
+    }
+    else
+    {
+      if(counter + 1024*100 <= handle->getBytesDownloaded())
+      {
+        counter += 1024*100;
+        qDebug() << handle->getBytesDownloaded() / 1024 << "KiB";
+      }
+    }
+
   }
   device->saveRepositories();
   qDebug() << "Done";

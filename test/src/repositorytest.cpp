@@ -47,6 +47,7 @@ int main(int argc, char** argv)
   QPndman::SyncHandle* handle = repo->sync();
   qDebug() << "Starting sync for repository" << handle->getRepository()->getUrl();
   
+  int counter = 0;
   while(!handle->getDone())
   {
     if(handle->sync() < 0)
@@ -56,6 +57,24 @@ int main(int argc, char** argv)
     }
     
     handle->update();
+    
+    if(handle->getBytesToDownload() != 0)
+    {
+      int percentage = 100 * handle->getBytesDownloaded() / handle->getBytesToDownload();
+      if(counter + 10 <= percentage)
+      {
+        counter += 10;
+        qDebug() << percentage << "%";
+      }
+    }
+    else
+    {
+      if(counter + 1024*100 <= handle->getBytesDownloaded())
+      {
+        counter += 1024*100;
+        qDebug() << handle->getBytesDownloaded() / 1024 << "KiB";
+      }
+    }
   }
   
   qDebug() << "Synced in" << time() << "msec";
