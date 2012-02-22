@@ -40,7 +40,7 @@ namespace QPndman
     QString getUpdates() const;
     QDateTime getTimestamp() const;
     QString getVersion() const;
-    QList<Package> getPackages();
+    QList<Package> getPackages() const;
 
   public slots:
     void update();

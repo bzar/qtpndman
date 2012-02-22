@@ -81,7 +81,7 @@ QString QPndman::Repository::getVersion() const
 {
   return isNull() ? "" : d->version;
 }
-QList<QPndman::Package> QPndman::Repository::getPackages()
+QList<QPndman::Package> QPndman::Repository::getPackages() const
 {
   return isNull() ? QList<Package>() : d->packages;
 }

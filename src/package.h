@@ -69,13 +69,13 @@ namespace QPndman
     int getRating() const;
     Author getAuthor() const;
     Version getVersion() const;
-    QList<Application> getApplications();
-    QList<TranslatedString> getTitles();
-    QString getTitle();
-    QList<TranslatedString> getDescriptions();
-    QString getDescription();
-    QList<Category> getCategories();
-    QList<Package> getInstallinstances();
+    QList<Application> getApplications() const;
+    QList<TranslatedString> getTitles() const;
+    QString getTitle() const;
+    QList<TranslatedString> getDescriptions() const;
+    QString getDescription() const;
+    QList<Category> getCategories() const;
+    QList<Package> getInstallinstances() const;
     unsigned int getFlags() const;
 
   signals:

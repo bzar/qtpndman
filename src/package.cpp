@@ -15,8 +15,16 @@ QPndman::Package::Data::Data(pndman_package* p) : package(p),
   path(p->path), id(p->id), icon(p->icon), info(p->info), md5(p->md5), url(p->url), vendor(p->vendor), 
   size(p->size), modified(QDateTime::fromTime_t(p->modified_time)), rating(p->rating), 
   author(&(p->author)), version(&(p->version)), 
-  applications(), titles(), descriptions(), categories(), installInstances(), flags(p->flags)
+  applications(makeQList<pndman_application const, Application>(p->app)), 
+  titles(makeQList<pndman_translated const, TranslatedString>(p->title)), 
+  descriptions(makeQList<pndman_translated const, TranslatedString>(p->description)), 
+  categories(makeQList<pndman_category const, Category>(p->category)), 
+  installInstances(), flags(p->flags)
 {
+  for(pndman_package* x = p->next_installed; x != 0; x = x->next_installed)
+  {
+    installInstances << Package(x);
+  }
 }
 
 QPndman::Package::Package(Package const& other) : QObject(0), d(other.d)
@@ -96,69 +104,37 @@ QPndman::Version QPndman::Package::getVersion() const
 {
   return d->version;
 }
-QList<QPndman::Application> QPndman::Package::getApplications()
+QList<QPndman::Application> QPndman::Package::getApplications() const
 {
-  if(d->applications.size() == 0)
-  {
-    d->applications = makeQList<pndman_application const, Application>(d->package->app);
-  }
   return d->applications;
 }
-QList<QPndman::TranslatedString> QPndman::Package::getTitles()
+QList<QPndman::TranslatedString> QPndman::Package::getTitles() const
 {
-  if(d->titles.size() == 0)
-  {
-    d->titles = makeQList<pndman_translated const, TranslatedString>(d->package->title);
-  }
   return d->titles;
 }
 
-QString QPndman::Package::getTitle()
+QString QPndman::Package::getTitle() const
 {
-  getTitles();
-  if(d->titles.size() == 0)
-  {
-    return "";
-  }
-  
   return d->titles.at(0).getContent();
 }
 
-QList<QPndman::TranslatedString> QPndman::Package::getDescriptions()
+QList<QPndman::TranslatedString> QPndman::Package::getDescriptions() const
 {
-  if(d->descriptions.size() == 0)
-  {
-    d->descriptions = makeQList<pndman_translated const, TranslatedString>(d->package->description);
-  }
   return d->descriptions;
 }
-QString QPndman::Package::getDescription()
+QString QPndman::Package::getDescription() const
 {
-  getDescriptions();
-  if(d->descriptions.size() == 0)
-  {
-    return "";
-  }
-  
   return d->descriptions.at(0).getContent();
 }
 
-QList<QPndman::Category> QPndman::Package::getCategories()
+QList<QPndman::Category> QPndman::Package::getCategories() const
 {
-  if(d->categories.size() == 0)
-  {
-    d->categories = makeQList<pndman_category const, Category>(d->package->category);
-  }
   return d->categories;
 }
-QList<QPndman::Package> QPndman::Package::getInstallinstances()
+QList<QPndman::Package> QPndman::Package::getInstallinstances() const
 {
   if(d->installInstances.size() == 0)
   {
-    for(pndman_package* x = d->package->next_installed; x != 0; x = x->next_installed)
-    {
-      d->installInstances << Package(x);
-    }
   }
   return d->installInstances;
 }
