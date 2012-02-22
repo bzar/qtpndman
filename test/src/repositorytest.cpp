@@ -79,7 +79,7 @@ int main(int argc, char** argv)
   
   qDebug() << "Synced in" << time() << "msec";
 
-  foreach(const QPndman::Repository* r, repositories)
+  foreach(QPndman::Repository* r, repositories)
   {
     qDebug() << "url:       " << r->getUrl();
     qDebug() << "name:      " << r->getName();
