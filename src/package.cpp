@@ -131,11 +131,8 @@ QList<QPndman::Category> QPndman::Package::getCategories() const
 {
   return d->categories;
 }
-QList<QPndman::Package> QPndman::Package::getInstallinstances() const
+QList<QPndman::Package> QPndman::Package::getInstallInstances() const
 {
-  if(d->installInstances.size() == 0)
-  {
-  }
   return d->installInstances;
 }
 

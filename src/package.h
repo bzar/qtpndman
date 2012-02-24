@@ -41,7 +41,7 @@ namespace QPndman
     Q_PROPERTY(QList<TranslatedString> descriptions READ getDescriptions NOTIFY descriptionsChanged);
     Q_PROPERTY(QString description READ getDescription NOTIFY descriptionsChanged);
     Q_PROPERTY(QList<Category> categories READ getCategories NOTIFY categoriesChanged);
-    Q_PROPERTY(QList<Package> installInstances READ getInstallinstances NOTIFY installInstancesChanged);
+    Q_PROPERTY(QList<Package> installInstances READ getInstallInstances NOTIFY installInstancesChanged);
     Q_PROPERTY(unsigned int flags READ getFlags NOTIFY flagsChanged);
 
   public:
@@ -75,7 +75,7 @@ namespace QPndman
     QList<TranslatedString> getDescriptions() const;
     QString getDescription() const;
     QList<Category> getCategories() const;
-    QList<Package> getInstallinstances() const;
+    QList<Package> getInstallInstances() const;
     unsigned int getFlags() const;
 
   signals:

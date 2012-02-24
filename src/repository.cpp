@@ -6,6 +6,19 @@
 
 QPndman::LocalRepository::LocalRepository(Context*  c, QObject* parent) : Repository(c, c->getLocalPndmanRepository(), parent ? parent : c) {}
 
+bool QPndman::LocalRepository::hasPackageInstalled(Package package)
+{
+  foreach(Package installed, d->packages)
+  {
+    if(installed.getId() == package.getId())
+    {
+      return true;
+    }
+  }
+  
+  return false;
+}
+
 QPndman::Repository::Repository(Context* c, QString const& url, QObject* parent) : 
   QObject(parent ? parent : c), d()
 {

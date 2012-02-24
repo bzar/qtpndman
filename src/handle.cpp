@@ -2,6 +2,11 @@
 #include "device.h"
 #include <QDebug>
 
+namespace
+{
+  int nextId = 0;
+}
+
 QPndman::Handle::Handle(Context*  context, Operation operation, Package package, Device* device, bool force) : QObject(device), 
   d(new Data(context, operation, package, device, force))
 {
@@ -13,7 +18,8 @@ QPndman::Handle::Handle(Context*  context, Operation operation, Package package,
 }
 
 QPndman::Handle::Data::Data(Context*  context, Operation operation, Package package, Device* device, bool force) :
-  context(context), handle(), name(QString::number(QDateTime::currentMSecsSinceEpoch())), 
+  context(context), handle(), 
+  name(QString::number(++nextId)), 
   error(""), force(force), package(package), 
   device(device), operation(operation), installLocation(Desktop), done(false), 
   cancelled(false), bytesDownloaded(0), bytesToDownload(0)

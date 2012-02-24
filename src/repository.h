@@ -56,7 +56,7 @@ namespace QPndman
   protected:
     Repository(Context*  c, pndman_repository* p, QObject* parent = 0);
 
-  private:
+  protected:
     void setUrl(QString const& url);
     void setName(QString const& name);
     void setUpdates(QString const& updates);
@@ -91,6 +91,7 @@ namespace QPndman
     Q_OBJECT
   public:
     LocalRepository(Context*  c, QObject* parent = 0);
+    bool hasPackageInstalled(Package package);
 
   };
 }
