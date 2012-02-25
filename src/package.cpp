@@ -119,7 +119,7 @@ QList<QPndman::TranslatedString> QPndman::Package::getTitles() const
 
 QString QPndman::Package::getTitle() const
 {
-  return d->titles.at(0).getContent();
+  return isNull() || d->titles.size() == 0 ? "" : d->titles.at(0).getContent();
 }
 
 QList<QPndman::TranslatedString> QPndman::Package::getDescriptions() const
@@ -128,7 +128,7 @@ QList<QPndman::TranslatedString> QPndman::Package::getDescriptions() const
 }
 QString QPndman::Package::getDescription() const
 {
-  return d->descriptions.at(0).getContent();
+  return isNull() || d->descriptions.size() == 0 ? "" : d->descriptions.at(0).getContent();
 }
 
 QList<QPndman::Category> QPndman::Package::getCategories() const
