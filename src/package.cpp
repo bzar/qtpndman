@@ -12,14 +12,14 @@ QPndman::Package::Package(pndman_package* p) : QObject(0), d(new Data(p))
   
 }
 QPndman::Package::Data::Data(pndman_package* p) : package(p),
-  path(p->path), id(p->id), icon(p->icon), info(p->info), md5(p->md5), url(p->url), vendor(p->vendor), 
+  path(p->path), id(p->id), icon(p->icon), info(p->info), md5(p->md5), url(p->url), vendor(p->vendor), device(p->device), 
   size(p->size), modified(QDateTime::fromTime_t(p->modified_time)), rating(p->rating), 
   author(&(p->author)), version(&(p->version)), 
   applications(makeQList<pndman_application const, Application>(p->app)), 
   titles(makeQList<pndman_translated const, TranslatedString>(p->title)), 
   descriptions(makeQList<pndman_translated const, TranslatedString>(p->description)), 
   categories(makeQList<pndman_category const, Category>(p->category)), 
-  installInstances(), flags(p->flags)
+  installInstances()
 {
   for(pndman_package* x = p->next_installed; x != 0; x = x->next_installed)
   {
@@ -84,6 +84,10 @@ QString QPndman::Package::getVendor() const
 {
   return isNull() ? "" : d->vendor;
 }
+QString QPndman::Package::getDevice() const
+{
+  return isNull() ? "" : d->device;
+}
 qint64 QPndman::Package::getSize() const
 {
   return isNull() ? 0 : d->size;
@@ -136,7 +140,3 @@ QList<QPndman::Package> QPndman::Package::getInstallInstances() const
   return d->installInstances;
 }
 
-unsigned int QPndman::Package::getFlags() const
-{
-  return d->flags;
-}

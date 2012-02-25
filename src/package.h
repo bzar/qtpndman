@@ -30,6 +30,7 @@ namespace QPndman
     Q_PROPERTY(QString md5 READ getMd5 NOTIFY md5Changed);
     Q_PROPERTY(QString url READ getUrl NOTIFY urlChanged);
     Q_PROPERTY(QString vendor READ getVendor NOTIFY vendorChanged);
+    Q_PROPERTY(QString device READ getDevice NOTIFY deviceChanged);
     Q_PROPERTY(qint64 size READ getSize NOTIFY sizeChanged);
     Q_PROPERTY(QDateTime modified READ getModified NOTIFY modifiedChanged);
     Q_PROPERTY(int rating READ getRating NOTIFY ratingChanged);
@@ -42,7 +43,6 @@ namespace QPndman
     Q_PROPERTY(QString description READ getDescription NOTIFY descriptionsChanged);
     Q_PROPERTY(QList<Category> categories READ getCategories NOTIFY categoriesChanged);
     Q_PROPERTY(QList<Package> installInstances READ getInstallInstances NOTIFY installInstancesChanged);
-    Q_PROPERTY(unsigned int flags READ getFlags NOTIFY flagsChanged);
 
   public:
     Package();
@@ -64,6 +64,7 @@ namespace QPndman
     QString getMd5() const;
     QString getUrl() const;
     QString getVendor() const;
+    QString getDevice() const;
     qint64 getSize() const;
     QDateTime getModified() const;
     int getRating() const;
@@ -76,7 +77,6 @@ namespace QPndman
     QString getDescription() const;
     QList<Category> getCategories() const;
     QList<Package> getInstallInstances() const;
-    unsigned int getFlags() const;
 
   signals:
     void pathChanged(QString newPath);
@@ -86,6 +86,7 @@ namespace QPndman
     void md5Changed(QString newMd5);
     void urlChanged(QString newUrl);
     void vendorChanged(QString newVendor);
+    void deviceChanged(QString newDevice);
     void sizeChanged(qint64 newSize);
     void modifiedChanged(QDateTime newModified);
     void ratingChanged(int newRating);
@@ -96,7 +97,6 @@ namespace QPndman
     void descriptionsChanged(QList<TranslatedString> newDescriptions);
     void categoriesChanged(QList<Category> newCategories);
     void installInstancesChanged(QList<Package> newInstallinstances);
-    void flagsChanged(unsigned int newFlags);
 
   private:
     struct Data
@@ -111,6 +111,7 @@ namespace QPndman
       QString md5;
       QString url;
       QString vendor;
+      QString device;
       qint64 size;
       QDateTime modified;
       int rating;
@@ -121,7 +122,6 @@ namespace QPndman
       QList<TranslatedString> descriptions;
       QList<Category> categories;
       QList<Package> installInstances;
-      unsigned int flags;
     };
 
     QSharedPointer<Data> d;
