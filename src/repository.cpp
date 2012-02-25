@@ -59,6 +59,12 @@ bool QPndman::Repository::loadFrom(Device* device)
   return device->loadRepository(this);
 }
 
+void QPndman::Repository::clear()
+{
+  d->context->clearPndmanRepository(d->pndmanRepository);
+  update();
+}
+
 pndman_repository* QPndman::Repository::getPndmanRepository() const
 {
   return d->pndmanRepository;

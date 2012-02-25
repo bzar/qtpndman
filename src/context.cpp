@@ -76,6 +76,11 @@ pndman_repository* QPndman::Context::getLocalPndmanRepository()
   return d->localPndmanRepository;
 }
 
+void QPndman::Context::clearPndmanRepository(pndman_repository* repository)
+{
+  pndman_repository_clear(repository);
+}
+
 pndman_device* QPndman::Context::addPndmanDevice(QString const& path)
 {
   pndman_device* device = pndman_device_add(path.toLocal8Bit().data(), d->pndmanDevices);

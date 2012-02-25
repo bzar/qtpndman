@@ -30,6 +30,7 @@ namespace QPndman
     
     SyncHandle* sync();
     bool loadFrom(Device* device);
+    void clear();
     
     pndman_repository* getPndmanRepository() const;
     bool isNull() const;
