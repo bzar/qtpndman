@@ -142,3 +142,8 @@ bool QPndman::Context::loadRepository(pndman_repository* repository, pndman_devi
 {
   return pndman_read_from_device(repository, device) == 0;
 }
+
+void QPndman::Context::commitHandle(pndman_handle* handle)
+{
+  pndman_handle_commit(handle, d->localPndmanRepository);
+}

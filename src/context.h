@@ -35,6 +35,8 @@ namespace QPndman
     bool saveRepositories(pndman_device* device);
     bool loadRepository(pndman_repository* repository, pndman_device* device);
     
+    void commitHandle(pndman_handle* handle);
+    
   private:
     struct Data
     {

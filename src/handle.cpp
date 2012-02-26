@@ -181,7 +181,7 @@ void QPndman::Handle::setDone(bool const& done)
     d->done = done; 
     if(done)
     {
-      pndman_handle_commit(&d->handle, d->context->getLocalPndmanRepository());
+      d->context->commitHandle(&d->handle);
       emit Handle::done();
     }
     emit doneChanged(d->done);
