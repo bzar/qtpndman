@@ -99,6 +99,7 @@ namespace QPndman
     void installInstancesChanged(QList<Package> newInstallinstances);
 
   protected:
+    void setPndmanPackage(pndman_package* package);
     void setPath(QString const& path);
     void setId(QString const& id);
     void setIcon(QString const& icon);

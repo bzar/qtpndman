@@ -140,6 +140,10 @@ QList<QPndman::Package> QPndman::Package::getInstallInstances() const
   return d->installInstances;
 }
 
+void QPndman::Package::setPndmanPackage(pndman_package* package)
+{
+  d->package = package;
+}
 void QPndman::Package::setPath(QString const& path)
 {
   if(path != d->path) 
