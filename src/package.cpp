@@ -140,3 +140,126 @@ QList<QPndman::Package> QPndman::Package::getInstallInstances() const
   return d->installInstances;
 }
 
+void QPndman::Package::setPath(QString const& path)
+{
+  if(path != d->path) 
+  {
+    d->path = path; 
+    emit pathChanged(d->path);
+  }
+}
+void QPndman::Package::setId(QString const& id)
+{
+  if(id != d->id) 
+  {
+    d->id = id; 
+    emit idChanged(d->id);
+  }
+}
+void QPndman::Package::setIcon(QString const& icon)
+{
+  if(icon != d->icon) 
+  {
+    d->icon = icon; 
+    emit iconChanged(d->icon);
+  }
+}
+void QPndman::Package::setInfo(QString const& info)
+{
+  if(info != d->info) 
+  {
+    d->info = info; 
+    emit infoChanged(d->info);
+  }
+}
+void QPndman::Package::setMd5(QString const& md5)
+{
+  if(md5 != d->md5) 
+  {
+    d->md5 = md5; 
+    emit md5Changed(d->md5);
+  }
+}
+void QPndman::Package::setUrl(QString const& url)
+{
+  if(url != d->url) 
+  {
+    d->url = url; 
+    emit urlChanged(d->url);
+  }
+}
+void QPndman::Package::setVendor(QString const& vendor)
+{
+  if(vendor != d->vendor) 
+  {
+    d->vendor = vendor; 
+    emit vendorChanged(d->vendor);
+  }
+}
+void QPndman::Package::setDevice(QString const& device)
+{
+  if(device != d->device) 
+  {
+    d->device = device; 
+    emit deviceChanged(d->device);
+  }
+}
+void QPndman::Package::setSize(qint64 const& size)
+{
+  if(size != d->size) 
+  {
+    d->size = size; 
+    emit sizeChanged(d->size);
+  }
+}
+void QPndman::Package::setModified(QDateTime const& modified)
+{
+  if(modified != d->modified) 
+  {
+    d->modified = modified; 
+    emit modifiedChanged(d->modified);
+  }
+}
+void QPndman::Package::setRating(int const& rating)
+{
+  if(rating != d->rating) 
+  {
+    d->rating = rating; 
+    emit ratingChanged(d->rating);
+  }
+}
+void QPndman::Package::setAuthor(Author const& author)
+{
+  d->author = author; 
+  emit authorChanged(d->author);
+}
+void QPndman::Package::setVersion(Version const& version)
+{
+  d->version = version; 
+  emit versionChanged(d->version);
+}
+void QPndman::Package::setApplications(QList<Application> const& applications)
+{
+  d->applications = applications; 
+  emit applicationsChanged(d->applications);
+}
+void QPndman::Package::setTitles(QList<TranslatedString> const& titles)
+{
+  d->titles = titles; 
+  emit titlesChanged(d->titles);
+}
+void QPndman::Package::setDescriptions(QList<TranslatedString> const& descriptions)
+{
+  d->descriptions = descriptions; 
+  emit descriptionsChanged(d->descriptions);
+}
+void QPndman::Package::setCategories(QList<Category> const& categories)
+{
+  d->categories = categories; 
+  emit categoriesChanged(d->categories);
+}
+void QPndman::Package::setInstallinstances(QList<Package> const& installInstances)
+{
+  d->installInstances = installInstances; 
+  emit installInstancesChanged(d->installInstances);
+}

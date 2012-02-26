@@ -98,6 +98,26 @@ namespace QPndman
     void categoriesChanged(QList<Category> newCategories);
     void installInstancesChanged(QList<Package> newInstallinstances);
 
+  protected:
+    void setPath(QString const& path);
+    void setId(QString const& id);
+    void setIcon(QString const& icon);
+    void setInfo(QString const& info);
+    void setMd5(QString const& md5);
+    void setUrl(QString const& url);
+    void setVendor(QString const& vendor);
+    void setDevice(QString const& device);
+    void setSize(qint64 const& size);
+    void setModified(QDateTime const& modified);
+    void setRating(int const& rating);
+    void setAuthor(Author const& author);
+    void setVersion(Version const& version);
+    void setApplications(QList<Application> const& applications);
+    void setTitles(QList<TranslatedString> const& titles);
+    void setDescriptions(QList<TranslatedString> const& descriptions);
+    void setCategories(QList<Category> const& categories);
+    void setInstallinstances(QList<Package> const& installInstances);
+    
   private:
     struct Data
     {
