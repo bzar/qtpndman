@@ -51,7 +51,7 @@ namespace QPndman
     qint64 getBytesToDownload() const;
 
   public slots:
-    bool execute();
+    virtual bool execute() = 0;
     void update();
     bool cancel();
 
@@ -76,7 +76,7 @@ namespace QPndman
     void executed();
     void cancelled();
     
-  private:
+  protected:
     void updateHandleFlags();
 
     void setName(QString const& name);
@@ -106,6 +106,25 @@ namespace QPndman
 
     QSharedPointer<Data> d;
   };
+  
+  class InstallHandle : public Handle
+  {
+    Q_OBJECT
+  public:
+    InstallHandle(Context* context, Package package, Device* device, InstallLocation const installLocation, bool force = false);
+  public slots:
+    virtual bool execute();
+  };
+  
+  class RemoveHandle : public Handle
+  {
+    Q_OBJECT
+  public:
+    RemoveHandle(Context* context, Package package, Device* device, bool force = false);
+  public slots:
+    virtual bool execute();
+  };
+
 }
 
 #endif

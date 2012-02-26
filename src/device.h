@@ -31,8 +31,8 @@ namespace QPndman
     Device(Context* c, QString const& path, QObject* parent = 0);
     Device(Context* c, pndman_device* p, QObject* parent = 0);
     
-    Handle* install(Package package, InstallLocation location, bool force = false);
-    Handle* remove(Package package);
+    InstallHandle* install(Package package, InstallLocation location, bool force = false);
+    bool remove(Package package);
     bool crawl();
     bool saveRepositories();
     bool loadRepository(Repository* repository);

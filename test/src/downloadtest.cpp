@@ -28,7 +28,7 @@ int main(int argc, char** argv)
   QPndman::Package toInstall = packages.at(qrand() % packages.size());
   
   qDebug() << "Installing:" << toInstall.getTitle();  
-  QPndman::Handle* handle = toInstall.install(device, QPndman::Menu);
+  QPndman::InstallHandle* handle = toInstall.install(device, QPndman::Menu);
 
   if(!handle)
   {

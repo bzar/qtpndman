@@ -7,6 +7,44 @@ namespace
   int nextId = 0;
 }
 
+QPndman::InstallHandle::InstallHandle(QPndman::Context* context, QPndman::Package package, QPndman::Device* device, InstallLocation const installLocation, bool force): Handle(context, QPndman::Install, package, device, force)
+{
+  setInstallLocation(installLocation);
+}
+
+bool QPndman::InstallHandle::execute()
+{
+  if(pndman_handle_perform(&d->handle) == 0)
+  {
+    emit executed();
+    return true;
+  }
+  else
+  {
+    emit error(d->error);
+    return false;
+  }
+}
+
+QPndman::RemoveHandle::RemoveHandle(QPndman::Context* context, QPndman::Package package, QPndman::Device* device, bool force): Handle(context, QPndman::Remove, package, device, force)
+{
+}
+
+bool QPndman::RemoveHandle::execute()
+{
+  if(!d->context->commitHandle(&d->handle))
+  {
+    emit error(d->handle.error);
+    return false;
+  }
+  
+  emit executed();
+  d->done = true;
+  emit done();
+  emit doneChanged(true);
+  return true;
+}
+
 QPndman::Handle::Handle(Context*  context, Operation operation, Package package, Device* device, bool force) : QObject(device), 
   d(new Data(context, operation, package, device, force))
 {
@@ -39,20 +77,6 @@ pndman_handle* QPndman::Handle::getPndmanHandle()
 int QPndman::Handle::download()
 {
   return pndman_download();
-}
-
-bool QPndman::Handle::execute()
-{
-  if(pndman_handle_perform(&d->handle) == 0)
-  {
-    emit executed();
-    return true;
-  }
-  else
-  {
-    emit error(d->error);
-    return false;
-  }
 }
 
 bool QPndman::Handle::cancel()
@@ -181,8 +205,14 @@ void QPndman::Handle::setDone(bool const& done)
     d->done = done; 
     if(done)
     {
-      d->context->commitHandle(&d->handle);
-      emit Handle::done();
+      if(d->context->commitHandle(&d->handle))
+      {
+        emit Handle::done();
+      }
+      else
+      {
+        emit error(d->handle.error);
+      }
     }
     emit doneChanged(d->done);
   }
