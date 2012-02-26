@@ -93,6 +93,9 @@ namespace QPndman
   public:
     LocalRepository(Context*  c, QObject* parent = 0);
     bool hasPackageInstalled(Package package);
+    
+  public slots:
+    void update();
 
   };
 }

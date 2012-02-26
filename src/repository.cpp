@@ -19,6 +19,12 @@ bool QPndman::LocalRepository::hasPackageInstalled(Package package)
   return false;
 }
 
+void QPndman::LocalRepository::update()
+{
+  d->context->checkLocalPndmanRepository();
+  Repository::update();
+}
+
 QPndman::Repository::Repository(Context* c, QString const& url, QObject* parent) : 
   QObject(parent ? parent : c), d()
 {

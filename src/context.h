@@ -22,7 +22,8 @@ namespace QPndman
     pndman_repository* getLastPndmanRepository();
     pndman_repository* getLocalPndmanRepository();
     void clearPndmanRepository(pndman_repository* repository);
-
+    void checkLocalPndmanRepository();
+    
     pndman_device* addPndmanDevice(QString const& path);
     void removePndmanDevice(pndman_device* device);
     pndman_device* getPndmanDevices();
