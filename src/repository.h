@@ -44,7 +44,7 @@ namespace QPndman
     QList<Package> getPackages() const;
 
   public slots:
-    void update();
+    virtual void update();
     
   signals:
     void urlChanged(QString newUrl);

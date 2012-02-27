@@ -9,12 +9,18 @@ int main(int argc, char** argv)
   QPndman::Device* device = new QPndman::Device(context, "/tmp");
   
   QPndman::Repository* repo = new QPndman::Repository(context, "http://repo.openpandora.org/includes/get_data.php");
-  repo->loadFrom(device);
-  repo->update();
+  if(!repo->loadFrom(device))
+  {
+    qDebug() << "Error loading remote repository information from device!";
+    return 1;
+  }
 
   QPndman::LocalRepository* local = new QPndman::LocalRepository(context);
-  local->loadFrom(device);
-  local->update();
+  if(!local->loadFrom(device))
+  {
+    qDebug() << "Error loading local repository information from device!";
+    return 1;
+  }
   
   bool noUpgradablePackages = true;
   
