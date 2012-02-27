@@ -25,6 +25,8 @@ namespace QPndman
     Version(Version const& other);
     Version& operator=(Version const& other);
 
+    QString toString() const;
+    
   public slots:
     QString getMajor() const;
     QString getMinor() const;

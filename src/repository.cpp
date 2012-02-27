@@ -22,6 +22,7 @@ bool QPndman::LocalRepository::hasPackageInstalled(Package package)
 void QPndman::LocalRepository::update()
 {
   d->context->checkLocalPndmanRepository();
+  d->context->checkUpgrades();
   Repository::update();
 }
 

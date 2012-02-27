@@ -25,6 +25,21 @@ QPndman::Version& QPndman::Version::operator=(Version const& other)
   return *this;
 }
 
+QString QPndman::Version::toString() const
+{
+  QString format = "%1.%2.%3.%4";
+  if(d->type == AlphaVersion)
+  {
+    format.append(" alpha");
+  }
+  else if(d->type == BetaVersion)
+  {
+    format.append(" beta");
+  }
+  
+  return format.arg(d->_major).arg(d->_minor).arg(d->release).arg(d->build);
+}
+
 QString QPndman::Version::getMajor() const
 {
   return d->_major;

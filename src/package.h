@@ -46,7 +46,7 @@ namespace QPndman
 
   public:
     Package();
-    Package(pndman_package* p);
+    Package(pndman_package* p, bool initUpgradeCandidate = true);
     Package(Package const& other);
     
     Package& operator=(Package const& other);
@@ -77,6 +77,7 @@ namespace QPndman
     QString getDescription() const;
     QList<Category> getCategories() const;
     QList<Package> getInstallInstances() const;
+    Package getUpgradeCandidate() const;
 
   signals:
     void pathChanged(QString newPath);
@@ -97,6 +98,7 @@ namespace QPndman
     void descriptionsChanged(QList<TranslatedString> newDescriptions);
     void categoriesChanged(QList<Category> newCategories);
     void installInstancesChanged(QList<Package> newInstallinstances);
+    void upgradeCandidateChanged(Package newUpgradeCandidate);
 
   protected:
     void setPndmanPackage(pndman_package* package);
@@ -118,35 +120,12 @@ namespace QPndman
     void setDescriptions(QList<TranslatedString> const& descriptions);
     void setCategories(QList<Category> const& categories);
     void setInstallinstances(QList<Package> const& installInstances);
+    void setUpgradeCandidate(Package upgradeCandidate);
     
   private:
-    struct Data
-    {
-      Data(pndman_package* p);
-      pndman_package* package;
-    
-      QString path;
-      QString id;
-      QString icon;
-      QString info;
-      QString md5;
-      QString url;
-      QString vendor;
-      QString device;
-      qint64 size;
-      QDateTime modified;
-      int rating;
-      Author author;
-      Version version;
-      QList<Application> applications;
-      QList<TranslatedString> titles;
-      QList<TranslatedString> descriptions;
-      QList<Category> categories;
-      QList<Package> installInstances;
-    };
+    struct Data;
 
     QSharedPointer<Data> d;
-
   };
 }
 

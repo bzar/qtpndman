@@ -3,13 +3,42 @@
 #include "device.h"
 #include "util.h"
 
+struct QPndman::Package::Data
+{
+  Data(pndman_package* p);
+  pndman_package* package;
+
+  QString path;
+  QString id;
+  QString icon;
+  QString info;
+  QString md5;
+  QString url;
+  QString vendor;
+  QString device;
+  qint64 size;
+  QDateTime modified;
+  int rating;
+  Author author;
+  Version version;
+  QList<Application> applications;
+  QList<TranslatedString> titles;
+  QList<TranslatedString> descriptions;
+  QList<Category> categories;
+  QList<Package> installInstances;
+  QPndman::Package upgradeCandidate;
+};
+
 QPndman::Package::Package() : QObject(0), d()
 {
   
 }
-QPndman::Package::Package(pndman_package* p) : QObject(0), d(new Data(p))
+QPndman::Package::Package(pndman_package* p, bool initUpgradeCandidate) : QObject(0), d(new Data(p))
 {
-  
+  if(initUpgradeCandidate && p->update)
+  {
+    d->upgradeCandidate = Package(p->update, false);
+  }
 }
 QPndman::Package::Data::Data(pndman_package* p) : package(p),
   path(p->path), id(p->id), icon(p->icon), info(p->info), md5(p->md5), url(p->url), vendor(p->vendor), device(p->device), 
@@ -19,7 +48,7 @@ QPndman::Package::Data::Data(pndman_package* p) : package(p),
   titles(makeQList<pndman_translated const, TranslatedString>(p->title)), 
   descriptions(makeQList<pndman_translated const, TranslatedString>(p->description)), 
   categories(makeQList<pndman_category const, Category>(p->category)), 
-  installInstances()
+  installInstances(), upgradeCandidate()
 {
   for(pndman_package* x = p->next_installed; x != 0; x = x->next_installed)
   {
@@ -138,6 +167,11 @@ QList<QPndman::Category> QPndman::Package::getCategories() const
 QList<QPndman::Package> QPndman::Package::getInstallInstances() const
 {
   return d->installInstances;
+}
+
+QPndman::Package QPndman::Package::getUpgradeCandidate() const
+{
+  return d->upgradeCandidate;
 }
 
 void QPndman::Package::setPndmanPackage(pndman_package* package)
@@ -266,4 +300,9 @@ void QPndman::Package::setInstallinstances(QList<Package> const& installInstance
 {
   d->installInstances = installInstances; 
   emit installInstancesChanged(d->installInstances);
+}
+
+void QPndman::Package::setUpgradeCandidate(QPndman::Package upgradeCandidate)
+{
+  d->upgradeCandidate = upgradeCandidate;
 }

@@ -147,3 +147,8 @@ bool QPndman::Context::commitHandle(pndman_handle* handle)
 {
   return pndman_handle_commit(handle, d->localPndmanRepository) == 0;
 }
+
+void QPndman::Context::checkUpgrades()
+{
+  pndman_check_updates(d->pndmanRepositories);
+}
