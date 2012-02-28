@@ -17,7 +17,9 @@
 namespace QPndman
 {
   class InstallHandle;
+  class UpgradeHandle;
   class Device;
+  class Context;
   
   class Package : public QObject
   {
@@ -46,7 +48,7 @@ namespace QPndman
 
   public:
     Package();
-    Package(pndman_package* p, bool initUpgradeCandidate = true);
+    Package(Context* context, pndman_package* p, bool initUpgradeCandidate = true);
     Package(Package const& other);
     
     Package& operator=(Package const& other);
@@ -55,6 +57,7 @@ namespace QPndman
     bool isNull() const;
     
     InstallHandle* install(Device* device, InstallLocation location, bool force = false);
+    UpgradeHandle* upgrade(bool force = false);
     
   public slots:
     QString getPath() const;

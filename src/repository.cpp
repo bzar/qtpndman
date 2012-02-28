@@ -45,8 +45,12 @@ QPndman::Repository::Data::Data(Context*  c, pndman_repository* p) : identifier(
   context(c), pndmanRepository(p),
   url(p->url), name(p->name), updates(p->updates), 
   timestamp(QDateTime::fromTime_t(p->timestamp)), version(p->version), 
-  packages(makeQList<pndman_package, Package>(p->pnd))
+  packages()
 {
+  for(pndman_package* x = p->pnd; x != 0; x = x->next)
+  {
+    packages << Package(context, x);
+  }
 }
 QPndman::Repository::Data::~Data()
 {
@@ -119,8 +123,16 @@ void QPndman::Repository::update()
   setUpdates(d->pndmanRepository->updates);
   setTimestamp(QDateTime::fromTime_t(d->pndmanRepository->timestamp));
   setVersion(d->pndmanRepository->version);
-  setPackages(makeQList<pndman_package, Package>(d->pndmanRepository->pnd));
+  
+  QList<Package> newPackages;
+  for(pndman_package* x = d->pndmanRepository->pnd; x != 0; x = x->next)
+  {
+    newPackages << Package(d->context, x);
+  }
+
+  setPackages(newPackages);
 }
+
 void QPndman::Repository::setUrl(QString const& url)
 {
   if(!isNull() && url != d->url) 

@@ -3,7 +3,7 @@
 
 namespace QPndman
 {
-  enum Operation { Install, Remove };
+  enum Operation { Install, Remove, Upgrade };
   enum InstallLocation { Desktop, Menu, DesktopAndMenu };
 }
 

@@ -2,12 +2,14 @@
 #include "handle.h"
 #include "device.h"
 #include "util.h"
+#include "context.h"
 
 struct QPndman::Package::Data
 {
-  Data(pndman_package* p);
+  Data(Context* context, pndman_package* p);
   pndman_package* package;
-
+  Context* context;
+  
   QString path;
   QString id;
   QString icon;
@@ -33,14 +35,14 @@ QPndman::Package::Package() : QObject(0), d()
 {
   
 }
-QPndman::Package::Package(pndman_package* p, bool initUpgradeCandidate) : QObject(0), d(new Data(p))
+QPndman::Package::Package(Context* context, pndman_package* p, bool initUpgradeCandidate) : QObject(0), d(new Data(context, p))
 {
   if(initUpgradeCandidate && p->update)
   {
-    d->upgradeCandidate = Package(p->update, false);
+    d->upgradeCandidate = Package(context, p->update, false);
   }
 }
-QPndman::Package::Data::Data(pndman_package* p) : package(p),
+QPndman::Package::Data::Data(Context* context, pndman_package* p) : package(p), context(context),
   path(p->path), id(p->id), icon(p->icon), info(p->info), md5(p->md5), url(p->url), vendor(p->vendor), device(p->device), 
   size(p->size), modified(QDateTime::fromTime_t(p->modified_time)), rating(p->rating), 
   author(&(p->author)), version(&(p->version)), 
@@ -52,7 +54,7 @@ QPndman::Package::Data::Data(pndman_package* p) : package(p),
 {
   for(pndman_package* x = p->next_installed; x != 0; x = x->next_installed)
   {
-    installInstances << Package(x);
+    installInstances << Package(context, x);
   }
 }
 
@@ -83,6 +85,18 @@ bool QPndman::Package::isNull() const
 QPndman::InstallHandle* QPndman::Package::install(Device* device, InstallLocation location, bool force)
 {
   return device->install(*this, location, force);
+}
+
+QPndman::UpgradeHandle* QPndman::Package::upgrade(bool force)
+{
+  UpgradeHandle* handle = new UpgradeHandle(d->context, *this, force);
+  handle->setParent(this);
+  if(!handle->execute())
+  {
+    delete handle;
+    handle = 0;
+  }
+  return handle;
 }
 
 QString QPndman::Package::getPath() const

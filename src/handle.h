@@ -116,6 +116,15 @@ namespace QPndman
     virtual bool execute();
   };
   
+  class UpgradeHandle : public Handle
+  {
+    Q_OBJECT
+  public:
+    UpgradeHandle(Context* context, Package package, bool force = false);
+  public slots:
+    virtual bool execute();
+  };
+  
   class RemoveHandle : public Handle
   {
     Q_OBJECT

@@ -26,6 +26,24 @@ bool QPndman::InstallHandle::execute()
   }
 }
 
+QPndman::UpgradeHandle::UpgradeHandle(QPndman::Context* context, QPndman::Package package, bool force): Handle(context, QPndman::Upgrade, package, 0, force)
+{
+}
+
+bool QPndman::UpgradeHandle::execute()
+{
+  if(pndman_handle_perform(&d->handle) == 0)
+  {
+    emit executed();
+    return true;
+  }
+  else
+  {
+    emit error(d->error);
+    return false;
+  }
+}
+
 QPndman::RemoveHandle::RemoveHandle(QPndman::Context* context, QPndman::Package package, QPndman::Device* device, bool force): Handle(context, QPndman::Remove, package, device, force)
 {
 }
@@ -49,7 +67,7 @@ QPndman::Handle::Handle(Context*  context, Operation operation, Package package,
   d(new Data(context, operation, package, device, force))
 {
   pndman_handle_init(d->name.toLocal8Bit().data(), &d->handle);
-  d->handle.device = device->getPndmanDevice();
+  d->handle.device = device ? device->getPndmanDevice() : 0;
   d->handle.pnd = package.getPndmanPackage();
   updateHandleFlags();
   update();
@@ -176,6 +194,7 @@ void QPndman::Handle::updateHandleFlags()
   
   if(d->operation == Install) d->handle.flags |= PNDMAN_HANDLE_INSTALL;
   else if(d->operation == Remove) d->handle.flags |= PNDMAN_HANDLE_REMOVE;
+  else if(d->operation == Upgrade) d->handle.flags |= PNDMAN_HANDLE_INSTALL; // Upgrade done with install flag
 
   if(d->installLocation == Desktop) d->handle.flags |= PNDMAN_HANDLE_INSTALL_DESKTOP;
   else if(d->installLocation == Menu) d->handle.flags |= PNDMAN_HANDLE_INSTALL_MENU;
