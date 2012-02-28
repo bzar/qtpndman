@@ -28,6 +28,7 @@ bool QPndman::InstallHandle::execute()
 
 QPndman::UpgradeHandle::UpgradeHandle(QPndman::Context* context, QPndman::Package package, bool force): Handle(context, QPndman::Upgrade, package, 0, force)
 {
+  d->handle.device = context->getPndmanDevices();
 }
 
 bool QPndman::UpgradeHandle::execute()
