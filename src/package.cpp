@@ -89,7 +89,7 @@ QPndman::InstallHandle* QPndman::Package::install(Device* device, InstallLocatio
 
 QPndman::UpgradeHandle* QPndman::Package::upgrade(bool force)
 {
-  UpgradeHandle* handle = new UpgradeHandle(d->context, *this, force);
+  UpgradeHandle* handle = new UpgradeHandle(d->context, d->upgradeCandidate, force);
   handle->setParent(this);
   if(!handle->execute())
   {
