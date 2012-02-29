@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QSharedPointer>
+#include <QMetaType>
 
 #include "executioninfo.h"
 #include "documentationinfo.h"
@@ -39,6 +40,7 @@ namespace QPndman
     Q_PROPERTY(QList<Association> associations READ getAssociations WRITE setAssociations NOTIFY associationsChanged);
 
   public:
+    explicit Application(QObject* parent = 0);
     Application(pndman_application const* p);
     Application(Application const& other);
     Application& operator=(Application const& other);
@@ -119,5 +121,7 @@ namespace QPndman
 
   };
 }
+
+Q_DECLARE_METATYPE(QPndman::Application);
 
 #endif

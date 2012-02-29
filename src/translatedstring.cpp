@@ -1,5 +1,10 @@
 #include "translatedstring.h"
 
+QPndman::TranslatedString::TranslatedString(QObject* parent): QObject(parent)
+{
+
+}
+
 QPndman::TranslatedString::TranslatedString(pndman_translated const* p) : QObject(0), d(new Data(p))
 {
   

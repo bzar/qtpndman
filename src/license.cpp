@@ -1,5 +1,10 @@
 #include "license.h"
 
+QPndman::License::License(QObject* parent): QObject(parent)
+{
+
+}
+
 QPndman::License::License(pndman_license const* p) : QObject(0), d(new Data(p))
 {
   

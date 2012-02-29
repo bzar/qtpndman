@@ -1,5 +1,10 @@
 #include "author.h"
 
+QPndman::Author::Author(QObject* parent): QObject(parent)
+{
+
+}
+
 QPndman::Author::Author(pndman_author const* p) : QObject(0), d(new Data(p))
 {
   

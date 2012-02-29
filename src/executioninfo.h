@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QSharedPointer>
+#include <QMetaType>
 
 #include "pndman.h"
 
@@ -22,6 +23,7 @@ namespace QPndman
   public:
     enum ExecX11 { ExecReq, ExecStop, ExecIgnore};
 
+    explicit ExecutionInfo(QObject* parent = 0);
     ExecutionInfo(pndman_exec const* p);
     ExecutionInfo(ExecutionInfo const& other);
     ExecutionInfo& operator=(ExecutionInfo const& other);
@@ -64,5 +66,7 @@ namespace QPndman
     QSharedPointer<Data> d;
   };
 }
+
+Q_DECLARE_METATYPE(QPndman::ExecutionInfo);
 
 #endif

@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QDateTime>
 #include <QSharedPointer>
+#include <QMetaType>
 
 #include "author.h"
 #include "version.h"
@@ -47,7 +48,7 @@ namespace QPndman
     Q_PROPERTY(QList<Package> installInstances READ getInstallInstances NOTIFY installInstancesChanged);
 
   public:
-    Package();
+    explicit Package(QObject* parent = 0);
     Package(Context* context, pndman_package* p, bool initUpgradeCandidate = true);
     Package(Package const& other);
     
@@ -131,5 +132,7 @@ namespace QPndman
     QSharedPointer<Data> d;
   };
 }
+
+Q_DECLARE_METATYPE(QPndman::Package);
 
 #endif

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QSharedPointer>
+#include <QMetaType>
 
 #include "pndman.h"
 
@@ -16,6 +17,7 @@ namespace QPndman
     Q_PROPERTY(QString sub READ getSub WRITE setSub NOTIFY subChanged);
 
   public:
+    explicit Category(QObject* parent = 0);
     Category(pndman_category const* p);
     Category(Category const& other);
     Category& operator=(Category const& other);
@@ -42,5 +44,7 @@ namespace QPndman
     QSharedPointer<Data> d;
   };
 }
+
+Q_DECLARE_METATYPE(QPndman::Category);
 
 #endif

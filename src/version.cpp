@@ -1,5 +1,10 @@
 #include "version.h"
 
+QPndman::Version::Version(QObject* parent): QObject(parent)
+{
+
+}
+
 QPndman::Version::Version(pndman_version const* p) : QObject(0), d(new Data(p))
 {
 }

@@ -1,5 +1,10 @@
 #include "executioninfo.h"
 
+QPndman::ExecutionInfo::ExecutionInfo(QObject* parent): QObject(parent)
+{
+
+}
+
 QPndman::ExecutionInfo::ExecutionInfo(pndman_exec const* p) : QObject(0), d(new Data(p))
 {
   

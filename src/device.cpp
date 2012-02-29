@@ -13,6 +13,15 @@ QList<QPndman::Device*> QPndman::Device::detectDevices(Context*  c, QObject* par
   return detectedDevices;
 }
 
+QPndman::Device::Device(QObject* parent): QObject(parent)
+{
+
+}
+
+QPndman::Device::Device(Device const& other) : QObject(0), d(other.d)
+{
+  
+}
 QPndman::Device::Device(Context*  c, QString const& path, QObject* parent) : QObject(parent ? parent : c), d()
 {
   pndman_device* dev = c->addPndmanDevice(path);

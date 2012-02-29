@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QSharedPointer>
+#include <QMetaType>
 
 #include "pndman.h"
 
@@ -21,6 +22,7 @@ namespace QPndman
   public:
     enum Type { ReleaseVersion, BetaVersion, AlphaVersion };
 
+    explicit Version(QObject* parent = 0);
     Version(pndman_version const* p);
     Version(Version const& other);
     Version& operator=(Version const& other);
@@ -62,5 +64,7 @@ namespace QPndman
 
   };
 }
+
+Q_DECLARE_METATYPE(QPndman::Version);
 
 #endif

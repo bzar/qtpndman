@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QDateTime>
 #include <QSharedPointer>
+#include <QMetaType>
 
 #include "context.h"
 #include "package.h"
@@ -26,6 +27,8 @@ namespace QPndman
     Q_PROPERTY(QList<Package> packages READ getPackages NOTIFY packagesChanged);
 
   public:
+    explicit Repository(QObject* parent = 0);
+    Repository(Repository const& other);
     Repository(Context*  c, QString const& url, QObject* parent = 0);
     
     SyncHandle* sync();
@@ -91,6 +94,7 @@ namespace QPndman
   {
     Q_OBJECT
   public:
+    explicit LocalRepository(QObject* parent = 0);
     LocalRepository(Context*  c, QObject* parent = 0);
     bool hasPackageInstalled(Package package);
     
@@ -99,5 +103,8 @@ namespace QPndman
 
   };
 }
+
+Q_DECLARE_METATYPE(QPndman::Repository);
+Q_DECLARE_METATYPE(QPndman::LocalRepository);
 
 #endif

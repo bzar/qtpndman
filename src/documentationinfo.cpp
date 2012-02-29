@@ -1,5 +1,10 @@
 #include "documentationinfo.h"
 
+QPndman::DocumentationInfo::DocumentationInfo(QObject* parent): QObject(parent)
+{
+
+}
+
 QPndman::DocumentationInfo::DocumentationInfo(pndman_info const* p) : QObject(0), d(new Data(p))
 {
 }

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QSharedPointer>
+#include <QMetaType>
 
 #include "pndman.h"
 #include "context.h"
@@ -28,6 +29,8 @@ namespace QPndman
   public:
     static QList<Device*> detectDevices(Context* c, QObject* parent = 0);
     
+    explicit Device(QObject* parent = 0);
+    Device(Device const& other);
     Device(Context* c, QString const& path, QObject* parent = 0);
     Device(Context* c, pndman_device* p, QObject* parent = 0);
     
@@ -89,5 +92,7 @@ namespace QPndman
     QSharedPointer<Data> d;
   };
 }
+
+Q_DECLARE_METATYPE(QPndman::Device);
 
 #endif

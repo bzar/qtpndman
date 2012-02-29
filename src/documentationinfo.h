@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QSharedPointer>
+#include <QMetaType>
 
 #include "pndman.h"
 
@@ -17,6 +18,7 @@ namespace QPndman
     Q_PROPERTY(QString src READ getSrc WRITE setSrc NOTIFY srcChanged);
 
   public:
+    explicit DocumentationInfo(QObject* parent = 0);
     DocumentationInfo(pndman_info const* p);
     DocumentationInfo(DocumentationInfo const& other);
     DocumentationInfo& operator=(DocumentationInfo const& other);
@@ -47,5 +49,7 @@ namespace QPndman
     QSharedPointer<Data> d;
   };
 }
+
+Q_DECLARE_METATYPE(QPndman::DocumentationInfo);
 
 #endif

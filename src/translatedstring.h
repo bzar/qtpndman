@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QSharedPointer>
+#include <QMetaType>
 
 #include "pndman.h"
 
@@ -16,6 +17,7 @@ namespace QPndman
     Q_PROPERTY(QString content READ getContent WRITE setContent NOTIFY contentChanged);
 
   public:
+    explicit TranslatedString(QObject* parent = 0);
     TranslatedString(pndman_translated const* p);
     TranslatedString(TranslatedString const& other);
     TranslatedString& operator=(TranslatedString const& other);
@@ -42,5 +44,7 @@ namespace QPndman
     QSharedPointer<Data> d;
   };
 }
+
+Q_DECLARE_METATYPE(QPndman::TranslatedString);
 
 #endif

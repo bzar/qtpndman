@@ -50,7 +50,6 @@ namespace QPndman
         
     QSharedPointer<Data> d;
   };
-    
 }
 
 #endif

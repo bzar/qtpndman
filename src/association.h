@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QSharedPointer>
+#include <QMetaType>
 
 #include "pndman.h"
 
@@ -17,6 +18,7 @@ namespace QPndman
     Q_PROPERTY(QString exec READ getExec WRITE setExec NOTIFY execChanged);
 
   public:
+    explicit Association(QObject* parent = 0);
     Association(pndman_association const* p);
     Association(Association const& other);
     Association& operator=(Association const& other);
@@ -47,5 +49,7 @@ namespace QPndman
     QSharedPointer<Data> d;
   };
 }
+
+Q_DECLARE_METATYPE(QPndman::Association);
 
 #endif

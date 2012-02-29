@@ -1,6 +1,11 @@
 #include "application.h"
 #include "util.h"
 
+QPndman::Application::Application(QObject* parent): QObject(parent)
+{
+
+}
+
 QPndman::Application::Application(pndman_application const* p) : QObject(0), d(new Data(p))
 {
 }

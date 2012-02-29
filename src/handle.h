@@ -133,7 +133,6 @@ namespace QPndman
   public slots:
     virtual bool execute();
   };
-
 }
 
 #endif

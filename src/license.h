@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QSharedPointer>
+#include <QMetaType>
 
 #include "pndman.h"
 
@@ -17,6 +18,7 @@ namespace QPndman
     Q_PROPERTY(QString sourceCodeUrl READ getSourcecodeurl WRITE setSourcecodeurl NOTIFY sourceCodeUrlChanged);
 
   public:
+    explicit License(QObject* parent = 0);
     License(pndman_license const* p);
     License(License const& other);
     License& operator=(License const& other);
@@ -48,5 +50,7 @@ namespace QPndman
 
   };
 }
+
+Q_DECLARE_METATYPE(QPndman::License);
 
 #endif

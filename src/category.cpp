@@ -1,5 +1,10 @@
 #include "category.h"
 
+QPndman::Category::Category(QObject* parent): QObject(parent)
+{
+
+}
+
 QPndman::Category::Category(pndman_category const* p) : QObject(0), d(new Data(p))
 {
 }

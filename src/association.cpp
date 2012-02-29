@@ -1,5 +1,10 @@
 #include "association.h"
 
+QPndman::Association::Association(QObject* parent): QObject(parent)
+{
+
+}
+
 QPndman::Association::Association(pndman_association const* p) : QObject(0), d(new Data(p))
 {
 }

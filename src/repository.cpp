@@ -4,6 +4,11 @@
 #include <QDebug>
 #include "device.h"
 
+QPndman::LocalRepository::LocalRepository(QObject* parent): Repository(parent)
+{
+
+}
+
 QPndman::LocalRepository::LocalRepository(Context*  c, QObject* parent) : Repository(c, c->getLocalPndmanRepository(), parent ? parent : c) {}
 
 bool QPndman::LocalRepository::hasPackageInstalled(Package package)
@@ -26,6 +31,15 @@ void QPndman::LocalRepository::update()
   Repository::update();
 }
 
+QPndman::Repository::Repository(QObject* parent): QObject(parent)
+{
+
+}
+
+QPndman::Repository::Repository(Repository const& other) : QObject(0), d(other.d)
+{
+  
+}
 QPndman::Repository::Repository(Context* c, QString const& url, QObject* parent) : 
   QObject(parent ? parent : c), d()
 {

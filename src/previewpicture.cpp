@@ -1,5 +1,10 @@
 #include "previewpicture.h"
 
+QPndman::PreviewPicture::PreviewPicture(QObject* parent): QObject(parent)
+{
+
+}
+
 QPndman::PreviewPicture::PreviewPicture(pndman_previewpic const* p) : QObject(0), d(new Data(p))
 {
 }

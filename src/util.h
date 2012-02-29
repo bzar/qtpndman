@@ -2,6 +2,7 @@
 #define QPNDMAN_UTIL_H
 
 #include <QList>
+#include <QObject>
 
 namespace QPndman
 {
@@ -15,7 +16,18 @@ namespace QPndman
     }
     return result;
   }
-  
+
+  template<typename Src, typename Dst>
+  QList<Dst*> makeQListPtr(Src* s, QObject* parent)
+  {
+    QList<Dst*> result;
+    for(Src* x = s; x != 0; x = x->next)
+    {
+      result << new Dst(x, parent);
+    }
+    return result;
+  }
+
   template<typename T>
   T* getLast(T* s)
   {

@@ -31,10 +31,11 @@ struct QPndman::Package::Data
   QPndman::Package upgradeCandidate;
 };
 
-QPndman::Package::Package() : QObject(0), d()
+QPndman::Package::Package(QObject* parent): QObject(parent)
 {
-  
+
 }
+
 QPndman::Package::Package(Context* context, pndman_package* p, bool initUpgradeCandidate) : QObject(0), d(new Data(context, p))
 {
   if(initUpgradeCandidate && p->update)
