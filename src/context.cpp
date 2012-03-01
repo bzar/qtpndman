@@ -130,7 +130,7 @@ pndman_device* QPndman::Context::detectPndmanDevices()
 
 bool QPndman::Context::crawlPndmanDevice(pndman_device* device)
 {
-  return pndman_crawl(device, d->localPndmanRepository);
+  return pndman_crawl(device, d->localPndmanRepository) == 0;
 }
 
 bool QPndman::Context::saveRepositories(pndman_device* device)
