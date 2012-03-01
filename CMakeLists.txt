@@ -8,10 +8,10 @@ add_definitions(${QT_DEFINITIONS})
 set(CMAKE_CXX_FLAGS "-g -Wall")
 #set(CMAKE_CXX_FLAGS "-Wall")
 
-file (GLOB_RECURSE HEADERS src/*.h)
+file (GLOB_RECURSE HEADERS include/*.h)
 QT4_WRAP_CPP(SRC_MOC ${HEADERS})
 
-include_directories(lib/libpndman/src/include)
+include_directories(include lib/libpndman/src/include)
 
 add_subdirectory(lib)
 

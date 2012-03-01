@@ -1,3 +1,3 @@
-#include "../src/context.h"
-#include "../src/device.h"
-#include "../src/repository.h"
+#include "context.h"
+#include "device.h"
+#include "repository.h"
