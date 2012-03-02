@@ -36,7 +36,7 @@ namespace QPndman
     
     InstallHandle* install(Package package, InstallLocation location, bool force = false);
     bool remove(Package package);
-    bool crawl();
+    bool crawl(bool full = false);
     bool saveRepositories();
     bool loadRepository(Repository* repository);
     

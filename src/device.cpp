@@ -69,9 +69,9 @@ bool QPndman::Device::remove(Package package)
   return result;
 }
 
-bool QPndman::Device::crawl()
+bool QPndman::Device::crawl(bool full)
 {
-  return d->context->crawlPndmanDevice(d->pndmanDevice);
+  return d->context->crawlPndmanDevice(d->pndmanDevice, full);
 }
 
 bool QPndman::Device::saveRepositories()

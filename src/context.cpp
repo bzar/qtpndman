@@ -128,9 +128,9 @@ pndman_device* QPndman::Context::detectPndmanDevices()
   return pndman_device_detect(d->pndmanDevices);
 }
 
-bool QPndman::Context::crawlPndmanDevice(pndman_device* device)
+bool QPndman::Context::crawlPndmanDevice(pndman_device* device, bool full)
 {
-  return pndman_crawl(device, d->localPndmanRepository) == 0;
+  return pndman_crawl(full ? 1 : 0, device, d->localPndmanRepository) == 0;
 }
 
 bool QPndman::Context::saveRepositories(pndman_device* device)
