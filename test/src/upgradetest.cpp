@@ -26,12 +26,12 @@ int main(int argc, char** argv)
   
   foreach(QPndman::Package package, local->getPackages())
   {
-    if(!package.getUpgradeCandidate().isNull())
+    if(!package.getUpgradeCandidate()->isNull())
     {
       noUpgradablePackages = false;
       qDebug() << "Found upgradable package" << package.getId() << "(" 
                << package.getVersion().toString() << "->" 
-               << package.getUpgradeCandidate().getVersion().toString() << ")";
+               << package.getUpgradeCandidate()->getVersion().toString() << ")";
     }
   }
   
