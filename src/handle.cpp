@@ -7,7 +7,8 @@ namespace
   int nextId = 0;
 }
 
-QPndman::InstallHandle::InstallHandle(QPndman::Context* context, QPndman::Package package, QPndman::Device* device, InstallLocation const installLocation, bool force): Handle(context, QPndman::Install, package, device, force)
+QPndman::InstallHandle::InstallHandle(QPndman::Context* context, QPndman::Package package, QPndman::Device* device, Enum::InstallLocation const installLocation, bool force):
+  Handle(context, Enum::Install, package, device, force)
 {
   setInstallLocation(installLocation);
 }
@@ -26,7 +27,8 @@ bool QPndman::InstallHandle::execute()
   }
 }
 
-QPndman::UpgradeHandle::UpgradeHandle(QPndman::Context* context, QPndman::Package package, bool force): Handle(context, QPndman::Upgrade, package, 0, force)
+QPndman::UpgradeHandle::UpgradeHandle(QPndman::Context* context, QPndman::Package package, bool force):
+  Handle(context, Enum::Upgrade, package, 0, force)
 {
   d->handle.device = context->getPndmanDevices();
 }
@@ -45,7 +47,8 @@ bool QPndman::UpgradeHandle::execute()
   }
 }
 
-QPndman::RemoveHandle::RemoveHandle(QPndman::Context* context, QPndman::Package package, QPndman::Device* device, bool force): Handle(context, QPndman::Remove, package, device, force)
+QPndman::RemoveHandle::RemoveHandle(QPndman::Context* context, QPndman::Package package, QPndman::Device* device, bool force):
+  Handle(context, Enum::Remove, package, device, force)
 {
 }
 
@@ -64,7 +67,7 @@ bool QPndman::RemoveHandle::execute()
   return true;
 }
 
-QPndman::Handle::Handle(Context*  context, Operation operation, Package package, Device* device, bool force) : QObject(device), 
+QPndman::Handle::Handle(Context*  context, Enum::Operation operation, Package package, Device* device, bool force) : QObject(device),
   d(new Data(context, operation, package, device, force))
 {
   pndman_handle_init(d->name.toLocal8Bit().data(), &d->handle);
@@ -74,11 +77,11 @@ QPndman::Handle::Handle(Context*  context, Operation operation, Package package,
   update();
 }
 
-QPndman::Handle::Data::Data(Context*  context, Operation operation, Package package, Device* device, bool force) :
+QPndman::Handle::Data::Data(Context*  context, Enum::Operation operation, Package package, Device* device, bool force) :
   context(context), handle(), 
   name(QString::number(++nextId)), 
   error(""), force(force), package(package), 
-  device(device), operation(operation), installLocation(Desktop), done(false), 
+  device(device), operation(operation), installLocation(Enum::Desktop), done(false),
   cancelled(false), bytesDownloaded(0), bytesToDownload(0)
 {
 }
@@ -142,11 +145,11 @@ QPndman::Device* QPndman::Handle::getDevice() const
 {
   return d->device;
 }
-QPndman::Operation QPndman::Handle::getOperation() const
+QPndman::Enum::Operation QPndman::Handle::getOperation() const
 {
   return d->operation;
 }
-QPndman::InstallLocation QPndman::Handle::getInstallLocation() const
+QPndman::Enum::InstallLocation QPndman::Handle::getInstallLocation() const
 {
   return d->installLocation;
 }
@@ -178,7 +181,7 @@ void QPndman::Handle::setForce(bool const& force)
     emit forceChanged(d->force);
   }
 }
-void QPndman::Handle::setInstallLocation(InstallLocation const installLocation)
+void QPndman::Handle::setInstallLocation(Enum::InstallLocation const installLocation)
 {
   if(installLocation != d->installLocation) 
   {
@@ -193,13 +196,13 @@ void QPndman::Handle::updateHandleFlags()
   d->handle.flags = 0;
   if(d->force) d->handle.flags |= PNDMAN_HANDLE_FORCE;
   
-  if(d->operation == Install) d->handle.flags |= PNDMAN_HANDLE_INSTALL;
-  else if(d->operation == Remove) d->handle.flags |= PNDMAN_HANDLE_REMOVE;
-  else if(d->operation == Upgrade) d->handle.flags |= PNDMAN_HANDLE_INSTALL; // Upgrade done with install flag
+  if(d->operation == Enum::Install) d->handle.flags |= PNDMAN_HANDLE_INSTALL;
+  else if(d->operation == Enum::Remove) d->handle.flags |= PNDMAN_HANDLE_REMOVE;
+  else if(d->operation == Enum::Upgrade) d->handle.flags |= PNDMAN_HANDLE_INSTALL; // Upgrade done with install flag
 
-  if(d->installLocation == Desktop) d->handle.flags |= PNDMAN_HANDLE_INSTALL_DESKTOP;
-  else if(d->installLocation == Menu) d->handle.flags |= PNDMAN_HANDLE_INSTALL_MENU;
-  else if(d->installLocation == DesktopAndMenu) d->handle.flags |= PNDMAN_HANDLE_INSTALL_APPS;
+  if(d->installLocation == Enum::Desktop) d->handle.flags |= PNDMAN_HANDLE_INSTALL_DESKTOP;
+  else if(d->installLocation == Enum::Menu) d->handle.flags |= PNDMAN_HANDLE_INSTALL_MENU;
+  else if(d->installLocation == Enum::DesktopAndMenu) d->handle.flags |= PNDMAN_HANDLE_INSTALL_APPS;
 }
 
 void QPndman::Handle::setName(QString const& name)

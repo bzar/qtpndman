@@ -57,7 +57,7 @@ bool QPndman::Package::isNull() const
   return !d;
 }
 
-QPndman::InstallHandle* QPndman::Package::install(Device* device, InstallLocation location, bool force)
+QPndman::InstallHandle* QPndman::Package::install(Device* device, Enum::InstallLocation location, bool force)
 {
   return device->install(*this, location, force);
 }

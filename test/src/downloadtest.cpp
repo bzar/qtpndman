@@ -28,7 +28,7 @@ int main(int argc, char** argv)
   QPndman::Package toInstall = packages.at(qrand() % packages.size());
   
   qDebug() << "Installing:" << toInstall.getTitle();  
-  QPndman::InstallHandle* handle = toInstall.install(device, QPndman::Menu);
+  QPndman::InstallHandle* handle = toInstall.install(device, QPndman::Enum::Menu);
 
   if(!handle)
   {
@@ -68,8 +68,13 @@ int main(int argc, char** argv)
   device->saveRepositories();
   qDebug() << "Done";
   
-  qDebug() << "Crawling:";
+  qDebug() << "Crawling";
   device->crawl();
+  qDebug() << "Checking for removed packages";
+  context->checkLocalPndmanRepository();
+  qDebug() << "Checking for upgrades";
+  context->checkUpgrades();
+
   QPndman::Repository* localRepo = new QPndman::LocalRepository(context);
   
   qDebug() << "Installed packages:";

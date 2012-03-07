@@ -48,7 +48,7 @@ QPndman::Device::Data::~Data()
   context->removePndmanDevice(pndmanDevice);
 }
 
-QPndman::InstallHandle* QPndman::Device::install(Package package, InstallLocation location, bool force)
+QPndman::InstallHandle* QPndman::Device::install(Package package, Enum::InstallLocation location, bool force)
 {
   InstallHandle* handle = new InstallHandle(d->context, package, this, location, force);
   handle->setParent(this);

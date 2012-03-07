@@ -17,14 +17,14 @@ namespace QPndman
   class Device : public QObject
   {
   Q_OBJECT
-  Q_ENUMS(Operation InstallLocation)
+  Q_ENUMS(QPndman::Enum::InstallLocation)
 
-    Q_PROPERTY(QString mount READ getMount NOTIFY mountChanged);
-    Q_PROPERTY(QString device READ getDevice NOTIFY deviceChanged);
-    Q_PROPERTY(qint64 size READ getSize NOTIFY sizeChanged);
-    Q_PROPERTY(qint64 free READ getFree NOTIFY freeChanged);
-    Q_PROPERTY(qint64 available READ getAvailable NOTIFY availableChanged);
-    Q_PROPERTY(QString appdata READ getAppdata NOTIFY appdataChanged);
+    Q_PROPERTY(QString mount READ getMount NOTIFY mountChanged)
+    Q_PROPERTY(QString device READ getDevice NOTIFY deviceChanged)
+    Q_PROPERTY(qint64 size READ getSize NOTIFY sizeChanged)
+    Q_PROPERTY(qint64 free READ getFree NOTIFY freeChanged)
+    Q_PROPERTY(qint64 available READ getAvailable NOTIFY availableChanged)
+    Q_PROPERTY(QString appdata READ getAppdata NOTIFY appdataChanged)
 
   public:
     static QList<Device*> detectDevices(Context* c, QObject* parent = 0);
@@ -34,7 +34,7 @@ namespace QPndman
     Device(Context* c, QString const& path, QObject* parent = 0);
     Device(Context* c, pndman_device* p, QObject* parent = 0);
     
-    InstallHandle* install(Package package, InstallLocation location, bool force = false);
+    InstallHandle* install(Package package, Enum::InstallLocation location, bool force = false);
     bool remove(Package package);
     bool crawl(bool full = false);
     bool saveRepositories();
@@ -93,6 +93,6 @@ namespace QPndman
   };
 }
 
-Q_DECLARE_METATYPE(QPndman::Device);
+Q_DECLARE_METATYPE(QPndman::Device)
 
 #endif
