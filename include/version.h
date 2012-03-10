@@ -27,7 +27,7 @@ namespace QPndman
     Version(Version const& other);
     Version& operator=(Version const& other);
 
-    QString toString() const;
+    Q_INVOKABLE QString toString() const;
     
   public slots:
     QString getMajor() const;
