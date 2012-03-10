@@ -16,7 +16,7 @@ include_directories(include lib/libpndman/src/include)
 add_subdirectory(lib)
 
 file (GLOB_RECURSE SRCS src/*.cpp)
-add_library(qtpndman ${SRCS} ${SRC_MOC})
+add_library(qtpndman ${SRCS} ${SRC_MOC} ${HEADERS})
 target_link_libraries(qtpndman ${QT_LIBRARIES} pndman)
 
 add_subdirectory(test)

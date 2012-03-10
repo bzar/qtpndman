@@ -46,6 +46,7 @@ namespace QPndman
     Q_PROPERTY(QString description READ getDescription NOTIFY descriptionsChanged)
     Q_PROPERTY(QList<Category> categories READ getCategories NOTIFY categoriesChanged)
     Q_PROPERTY(QList<Package> installInstances READ getInstallInstances NOTIFY installInstancesChanged)
+    Q_PROPERTY(Package* upgradeCandidate READ getUpgradeCandidate NOTIFY upgradeCandidateChanged)
 
     Q_ENUMS(QPndman::Enum::InstallLocation)
 
