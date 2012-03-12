@@ -3,17 +3,8 @@
 
 #include <QDebug>
 
-namespace
-{
-  int counter = 0;
-}
-
 QPndman::Context::Context(QObject* parent) : QObject(parent), d(new Data)
 {  
-  if(counter == 0)
-    pndman_init();
-  ++counter;
-
   d->localPndmanRepository = pndman_repository_init();
   d->pndmanRepositories = d->localPndmanRepository;
 }
@@ -27,9 +18,6 @@ QPndman::Context::~Context()
   pndman_device_free_all(d->pndmanDevices);
   d->pndmanDevices = 0;
   d.clear();
-  --counter;
-  if(counter == 0)
-    pndman_quit();
 }
 
 QPndman::Context::Data::Data() : 
