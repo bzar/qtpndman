@@ -78,7 +78,7 @@ namespace QPndman
     QList<Package*> getInstallInstances() const;
     Package* getUpgradeCandidate() const;
 
-  private:
+  protected:
     pndman_package* package;
     Context* context;
 
