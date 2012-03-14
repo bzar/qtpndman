@@ -2,26 +2,23 @@
 #include "repository.h"
 #include <QDebug>
 
-QPndman::SyncHandle::SyncHandle(Repository* repository, bool fullSync) : QObject(repository), d(new Data(repository))
+QPndman::SyncHandle::SyncHandle(Repository* repository, bool fullSync, QObject* parent) : QObject(parent ? parent : repository),
+  handle(), error(""), repository(repository), _done(false), bytesDownloaded(0), bytesToDownload(0)
 {
   unsigned int flags = 0;
   if(fullSync) flags |= PNDMAN_SYNC_FULL;
-  pndman_sync_request(&d->handle, flags, repository->getPndmanRepository());
+  pndman_sync_request(&handle, flags, repository->getPndmanRepository());
   update();
 }
-QPndman::SyncHandle::Data::Data(Repository* repository) : 
-  handle(), error(""), repository(repository), done(false), bytesDownloaded(0), bytesToDownload(0)
-{
-}
-QPndman::SyncHandle::Data::~Data()
+
+QPndman::SyncHandle::~SyncHandle()
 {
   pndman_sync_request_free(&handle);
 }
 
-
 pndman_sync_handle* QPndman::SyncHandle::getPndmanSyncHandle()
 {
-  return &d->handle;
+  return &handle;
 }
 
 int QPndman::SyncHandle::sync()
@@ -31,51 +28,51 @@ int QPndman::SyncHandle::sync()
 
 QPndman::Repository* QPndman::SyncHandle::getRepository() const
 {
-  return d->repository;
+  return repository;
 }
 QString QPndman::SyncHandle::getError() const
 {
-  return d->error;
+  return error;
 }
 bool QPndman::SyncHandle::getDone() const
 {
-  return d->done;
+  return _done;
 }
 
 qint64 QPndman::SyncHandle::getBytesDownloaded() const
 {
-  return d->bytesDownloaded;
+  return bytesDownloaded;
 }
 
 qint64 QPndman::SyncHandle::getBytesToDownload() const
 {
-  return d->bytesToDownload;
+  return bytesToDownload;
 }
 
 void QPndman::SyncHandle::update()
 {
-  setError(d->handle.error);
-  setDone(d->handle.progress.done);
-  setBytesDownloaded(static_cast<qint64>(d->handle.progress.download));
-  setBytesToDownload(static_cast<qint64>(d->handle.progress.total_to_download));
+  setError(handle.error);
+  setDone(handle.progress.done);
+  setBytesDownloaded(static_cast<qint64>(handle.progress.download));
+  setBytesToDownload(static_cast<qint64>(handle.progress.total_to_download));
 }
 
 
-void QPndman::SyncHandle::setError(QString const& error)
+void QPndman::SyncHandle::setError(QString const& newError)
 {
-  if(error != d->error) 
+  if(error != error)
   {
-    d->error = error; 
-    emit errorChanged(d->error);
+    error = error;
+    emit errorChanged(error);
   }
 }
 void QPndman::SyncHandle::setDone(bool const& done)
 {
-  if(done != d->done) 
+  if(_done != done)
   {
-    d->done = done; 
-    emit doneChanged(d->done);
-    if(done)
+    _done = done;
+    emit doneChanged(_done);
+    if(_done)
     {
       emit SyncHandle::done();
     }
@@ -84,18 +81,18 @@ void QPndman::SyncHandle::setDone(bool const& done)
 
 void QPndman::SyncHandle::setBytesDownloaded(qint64 const value)
 {
-  if(value != d->bytesDownloaded) 
+  if(value != bytesDownloaded)
   {
-    d->bytesDownloaded = value; 
-    emit bytesDownloadedChanged(d->bytesDownloaded);
+    bytesDownloaded = value;
+    emit bytesDownloadedChanged(bytesDownloaded);
   }
 }
 
 void QPndman::SyncHandle::setBytesToDownload(qint64 const value)
 {
-  if(value != d->bytesToDownload) 
+  if(value != bytesToDownload)
   {
-    d->bytesToDownload = value; 
-    emit bytesDownloadedChanged(d->bytesToDownload);
+    bytesToDownload = value;
+    emit bytesDownloadedChanged(bytesToDownload);
   }
 }

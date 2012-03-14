@@ -16,7 +16,7 @@ int main(int argc, char** argv)
   while(synchandle->sync()) synchandle->update();
   device->saveRepositories();
   
-  QList<QPndman::Package> packages = repo->getPackages();
+  QList<QPndman::Package*> packages = repo->getPackages();
   
   if(packages.size() == 0)
   {
@@ -25,10 +25,10 @@ int main(int argc, char** argv)
   }
   
   qsrand(QDateTime::currentMSecsSinceEpoch());
-  QPndman::Package toInstall = packages.at(qrand() % packages.size());
+  QPndman::Package* toInstall = packages.at(qrand() % packages.size());
   
-  qDebug() << "Installing:" << toInstall.getTitle();  
-  QPndman::InstallHandle* handle = toInstall.install(device, QPndman::Enum::Menu);
+  qDebug() << "Installing:" << toInstall->getTitle();
+  QPndman::InstallHandle* handle = toInstall->install(device, QPndman::Enum::Menu);
 
   if(!handle)
   {
@@ -78,9 +78,9 @@ int main(int argc, char** argv)
   QPndman::Repository* localRepo = new QPndman::LocalRepository(context);
   
   qDebug() << "Installed packages:";
-  foreach(QPndman::Package installed, localRepo->getPackages())
+  foreach(QPndman::Package* installed, localRepo->getPackages())
   {
-    qDebug() << installed.getTitle();
+    qDebug() << installed->getTitle();
   }
   
   device->saveRepositories();

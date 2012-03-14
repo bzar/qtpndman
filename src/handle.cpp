@@ -2,98 +2,87 @@
 #include "device.h"
 #include <QDebug>
 
-namespace
+QPndman::InstallHandle::InstallHandle(QPndman::Context* context, QPndman::Package* package, QPndman::Device* device, Enum::InstallLocation const installLocation, bool force, QObject* parent):
+  Handle(context, Enum::Install, package, device, force, parent)
 {
-  int nextId = 0;
-}
-
-QPndman::InstallHandle::InstallHandle(QPndman::Context* context, QPndman::Package package, QPndman::Device* device, Enum::InstallLocation const installLocation, bool force):
-  Handle(context, Enum::Install, package, device, force)
-{
-  setInstallLocation(installLocation);
+  this->installLocation = installLocation;
 }
 
 bool QPndman::InstallHandle::execute()
 {
-  if(pndman_handle_perform(&d->handle) == 0)
+  if(pndman_handle_perform(&handle) == 0)
   {
     emit executed();
     return true;
   }
   else
   {
-    emit error(d->error);
+    setError(handle.error);
     return false;
   }
 }
 
-QPndman::UpgradeHandle::UpgradeHandle(QPndman::Context* context, QPndman::Package package, bool force):
-  Handle(context, Enum::Upgrade, package, 0, force)
+QPndman::UpgradeHandle::UpgradeHandle(QPndman::Context* context, QPndman::Package* package, bool force, QObject* parent):
+  Handle(context, Enum::Upgrade, package, 0, force, parent)
 {
-  d->handle.device = context->getPndmanDevices();
+  handle.device = context->getPndmanDevices();
 }
 
 bool QPndman::UpgradeHandle::execute()
 {
-  if(pndman_handle_perform(&d->handle) == 0)
+  if(pndman_handle_perform(&handle) == 0)
   {
     emit executed();
     return true;
   }
   else
   {
-    emit error(d->error);
+    setError(handle.error);
     return false;
   }
 }
 
-QPndman::RemoveHandle::RemoveHandle(QPndman::Context* context, QPndman::Package package, QPndman::Device* device, bool force):
-  Handle(context, Enum::Remove, package, device, force)
+QPndman::RemoveHandle::RemoveHandle(QPndman::Context* context, QPndman::Package* package, QPndman::Device* device, bool force, QObject* parent):
+  Handle(context, Enum::Remove, package, device, force, parent)
 {
 }
 
 bool QPndman::RemoveHandle::execute()
 {
-  if(!d->context->commitHandle(&d->handle))
+  if(!context->commitHandle(&handle))
   {
-    emit error(d->handle.error);
+    setError(handle.error);
     return false;
   }
   
   emit executed();
-  d->done = true;
+  _done = true;
   emit done();
   emit doneChanged(true);
   return true;
 }
 
-QPndman::Handle::Handle(Context*  context, Enum::Operation operation, Package package, Device* device, bool force) : QObject(device),
-  d(new Data(context, operation, package, device, force))
+QPndman::Handle::Handle(Context*  context, Enum::Operation operation, Package* package, Device* device, bool force, QObject* parent) : QObject(parent ? parent : device),
+  context(context), handle(),
+  name("."), _error(""), force(force), package(package),
+  device(device), operation(operation), installLocation(Enum::Desktop), _done(false),
+  _cancelled(false), bytesDownloaded(0), bytesToDownload(0)
 {
-  pndman_handle_init(d->name.toLocal8Bit().data(), &d->handle);
-  d->handle.device = device ? device->getPndmanDevice() : 0;
-  d->handle.pnd = package.getPndmanPackage();
+  pndman_handle_init(name.toLocal8Bit().data(), &handle);
+  handle.device = device ? device->getPndmanDevice() : 0;
+  handle.pnd = package->getPndmanPackage();
   updateHandleFlags();
   update();
 }
 
-QPndman::Handle::Data::Data(Context*  context, Enum::Operation operation, Package package, Device* device, bool force) :
-  context(context), handle(), 
-  name(QString::number(++nextId)), 
-  error(""), force(force), package(package), 
-  device(device), operation(operation), installLocation(Enum::Desktop), done(false),
-  cancelled(false), bytesDownloaded(0), bytesToDownload(0)
-{
-}
-QPndman::Handle::Data::~Data()
+QPndman::Handle::~Handle()
 {
   pndman_handle_free(&handle);
 }
 
-
 pndman_handle* QPndman::Handle::getPndmanHandle()
 {
-  return &(d->handle);
+  return &handle;
 }
 
 int QPndman::Handle::download()
@@ -103,158 +92,131 @@ int QPndman::Handle::download()
 
 bool QPndman::Handle::cancel()
 {
-  if(pndman_handle_free(&d->handle) == 0)
+  if(pndman_handle_free(&handle) == 0)
   {
-    d->cancelled = true;
+    _cancelled = true;
     emit cancelledChanged(true);
     emit cancelled();
     return true;
   }
   else
   {
-    emit error(d->error);
+    emit error(_error);
     return false;      
   }
 }
 
 void QPndman::Handle::update()
 {
-  setError(d->handle.error);
-  setDone(d->handle.progress.done);
-  setBytesDownloaded(static_cast<qint64>(d->handle.progress.download));
-  setBytesToDownload(static_cast<qint64>(d->handle.progress.total_to_download));
+  setError(handle.error);
+  setDone(handle.progress.done);
+  setBytesDownloaded(static_cast<qint64>(handle.progress.download));
+  setBytesToDownload(static_cast<qint64>(handle.progress.total_to_download));
 }
 
 QString QPndman::Handle::getName() const
 {
-  return d->name;
+  return name;
 }
 QString QPndman::Handle::getError() const
 {
-  return d->error;
+  return _error;
 }
 bool QPndman::Handle::getForce() const
 {
-  return d->force;
+  return force;
 }
-QPndman::Package QPndman::Handle::getPackage() const
+QPndman::Package* QPndman::Handle::getPackage() const
 {
-  return d->package;
+  return package;
 }
 QPndman::Device* QPndman::Handle::getDevice() const
 {
-  return d->device;
+  return device;
 }
 QPndman::Enum::Operation QPndman::Handle::getOperation() const
 {
-  return d->operation;
+  return operation;
 }
 QPndman::Enum::InstallLocation QPndman::Handle::getInstallLocation() const
 {
-  return d->installLocation;
+  return installLocation;
 }
 bool QPndman::Handle::getDone() const
 {
-  return d->done;
+  return _done;
 }
 
 bool QPndman::Handle::getCancelled() const
 {
-  return d->cancelled;
+  return _cancelled;
 }
 
 qint64 QPndman::Handle::getBytesDownloaded() const
 {
-  return d->bytesDownloaded;
+  return bytesDownloaded;
 }
 qint64 QPndman::Handle::getBytesToDownload() const
 {
-  return d->bytesToDownload;
-}
-
-void QPndman::Handle::setForce(bool const& force)
-{
-  if(force != d->force) 
-  {
-    d->force = force;
-    updateHandleFlags();
-    emit forceChanged(d->force);
-  }
-}
-void QPndman::Handle::setInstallLocation(Enum::InstallLocation const installLocation)
-{
-  if(installLocation != d->installLocation) 
-  {
-    d->installLocation = installLocation; 
-    updateHandleFlags();
-    emit installLocationChanged(d->installLocation);
-  }
+  return bytesToDownload;
 }
 
 void QPndman::Handle::updateHandleFlags()
 {
-  d->handle.flags = 0;
-  if(d->force) d->handle.flags |= PNDMAN_HANDLE_FORCE;
+  handle.flags = 0;
+  if(force) handle.flags |= PNDMAN_HANDLE_FORCE;
   
-  if(d->operation == Enum::Install) d->handle.flags |= PNDMAN_HANDLE_INSTALL;
-  else if(d->operation == Enum::Remove) d->handle.flags |= PNDMAN_HANDLE_REMOVE;
-  else if(d->operation == Enum::Upgrade) d->handle.flags |= PNDMAN_HANDLE_INSTALL; // Upgrade done with install flag
+  if(operation == Enum::Install) handle.flags |= PNDMAN_HANDLE_INSTALL;
+  else if(operation == Enum::Remove) handle.flags |= PNDMAN_HANDLE_REMOVE;
+  else if(operation == Enum::Upgrade) handle.flags |= PNDMAN_HANDLE_INSTALL; // Upgrade done with install flag
 
-  if(d->installLocation == Enum::Desktop) d->handle.flags |= PNDMAN_HANDLE_INSTALL_DESKTOP;
-  else if(d->installLocation == Enum::Menu) d->handle.flags |= PNDMAN_HANDLE_INSTALL_MENU;
-  else if(d->installLocation == Enum::DesktopAndMenu) d->handle.flags |= PNDMAN_HANDLE_INSTALL_APPS;
+  if(installLocation == Enum::Desktop) handle.flags |= PNDMAN_HANDLE_INSTALL_DESKTOP;
+  else if(installLocation == Enum::Menu) handle.flags |= PNDMAN_HANDLE_INSTALL_MENU;
+  else if(installLocation == Enum::DesktopAndMenu) handle.flags |= PNDMAN_HANDLE_INSTALL_APPS;
 }
 
-void QPndman::Handle::setName(QString const& name)
-{
-  if(name != d->name) 
-  {
-    d->name = name;
-    emit nameChanged(d->name);
-  }
-}
 void QPndman::Handle::setError(QString const& error)
 {
-  if(error != d->error) 
+  if(_error != error)
   {
-    d->error = error; 
-    emit errorChanged(d->error);
+    _error = error;
+    emit errorChanged(_error);
   }
 }
 void QPndman::Handle::setDone(bool const& done)
 {
-  if(done != d->done) 
+  if(_done != done)
   {
-    d->done = done; 
-    if(done)
+    _done = done;
+    if(_done)
     {
-      if(d->context->commitHandle(&d->handle))
+      if(context->commitHandle(&handle))
       {
         emit Handle::done();
       }
       else
       {
-        emit error(d->handle.error);
+        setError(handle.error);
       }
     }
-    emit doneChanged(d->done);
+    emit doneChanged(_done);
   }
 }
 
 void QPndman::Handle::setBytesDownloaded(qint64 const value)
 {
-  if(value != d->bytesDownloaded) 
+  if(value != bytesDownloaded)
   {
-    d->bytesDownloaded = value; 
-    emit bytesDownloadedChanged(d->bytesDownloaded);
+    bytesDownloaded = value;
+    emit bytesDownloadedChanged(bytesDownloaded);
   }
 }
 
 void QPndman::Handle::setBytesToDownload(qint64 const value)
 {
-  if(value != d->bytesToDownload) 
+  if(value != bytesToDownload)
   {
-    d->bytesToDownload = value; 
-    emit bytesToDownloadChanged(d->bytesToDownload);
+    bytesToDownload = value;
+    emit bytesToDownloadChanged(bytesToDownload);
   }
 }

@@ -2,8 +2,6 @@
 #define QT_PNDMAN_H
 
 #include <QObject>
-#include <QSharedPointer>
-#include <QTimer>
 #include "pndman.h"
 
 namespace QPndman
@@ -39,16 +37,9 @@ namespace QPndman
     bool commitHandle(pndman_handle* handle);
     
   private:
-    struct Data
-    {
-      Data();
-      ~Data();
-      pndman_repository* localPndmanRepository;
-      pndman_repository* pndmanRepositories;
-      pndman_device* pndmanDevices;
-    };
-        
-    QSharedPointer<Data> d;
+    pndman_repository* localPndmanRepository;
+    pndman_repository* pndmanRepositories;
+    pndman_device* pndmanDevices;
   };
 }
 

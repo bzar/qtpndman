@@ -2,8 +2,6 @@
 #define AUTHOR_H
 
 #include <QObject>
-#include <QSharedPointer>
-#include <QMetaType>
 #include "pndman.h"
 
 namespace QPndman
@@ -12,38 +10,19 @@ namespace QPndman
   {
   Q_OBJECT
 
-    Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged);
-    Q_PROPERTY(QString website READ getWebsite WRITE setWebsite NOTIFY websiteChanged);
+    Q_PROPERTY(QString name READ getName CONSTANT)
+    Q_PROPERTY(QString website READ getWebsite CONSTANT)
 
   public:
-    explicit Author(QObject* parent = 0);
-    Author(pndman_author const* p);
-    Author(Author const& other);
-    Author& operator=(Author const& other);
+    Author(pndman_author const* p, QObject* parent = 0);
 
-  public slots:
     QString getName() const;
     QString getWebsite() const;
 
-    void setName(QString const& name);
-    void setWebsite(QString const& website);
-
-  signals:
-    void nameChanged(QString newName);
-    void websiteChanged(QString newWebsite);
-
   private:
-    struct Data
-    {
-      Data(pndman_author const* p);
-      QString name;
-      QString website;
-    };
-    
-    QSharedPointer<Data> d;
+    QString name;
+    QString website;
   };
 }
-
-Q_DECLARE_METATYPE(QPndman::Author);
 
 #endif

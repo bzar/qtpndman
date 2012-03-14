@@ -4,18 +4,13 @@
 #include <QDebug>
 #include "device.h"
 
-QPndman::LocalRepository::LocalRepository(QObject* parent): Repository(parent)
-{
-
-}
-
 QPndman::LocalRepository::LocalRepository(Context*  c, QObject* parent) : Repository(c, c->getLocalPndmanRepository(), parent ? parent : c) {}
 
-bool QPndman::LocalRepository::hasPackageInstalled(Package package)
+bool QPndman::LocalRepository::hasPackageInstalled(Package* package)
 {
-  foreach(Package installed, d->packages)
+  foreach(Package const* installed, packages)
   {
-    if(installed.getId() == package.getId())
+    if(installed->getId() == package->getId())
     {
       return true;
     }
@@ -26,49 +21,33 @@ bool QPndman::LocalRepository::hasPackageInstalled(Package package)
 
 void QPndman::LocalRepository::update()
 {
-  d->context->checkLocalPndmanRepository();
-  d->context->checkUpgrades();
+  context->checkLocalPndmanRepository();
+  context->checkUpgrades();
   Repository::update();
 }
 
-QPndman::Repository::Repository(QObject* parent): QObject(parent)
-{
+int QPndman::Repository::nextIdentifier = 1;
 
-}
-
-QPndman::Repository::Repository(Repository const& other) : QObject(0), d(other.d)
-{
-  
-}
 QPndman::Repository::Repository(Context* c, QString const& url, QObject* parent) : 
-  QObject(parent ? parent : c), d()
+  QObject(parent ? parent : c), identifier(nextIdentifier++), context(c), pndmanRepository(c->addPndmanRepository(url)),
+  url(), name(), updates(), timestamp(), version(), packages()
 {
-  pndman_repository* repo = c->addPndmanRepository(url);
-  if(repo)
+  if(pndmanRepository)
   {
-    d = QSharedPointer<Data>(new Data(c, repo));
+    update();
   }
 }
-QPndman::Repository::Repository(Context*  c, pndman_repository* p, QObject* parent) : QObject(parent), d(new Data(c, p))
-{  
-}
 
-int QPndman::Repository::Data::nextIdentifier = 1;
-
-QPndman::Repository::Data::Data(Context*  c, pndman_repository* p) : identifier(nextIdentifier++),
-  context(c), pndmanRepository(p),
-  url(p->url), name(p->name), updates(p->updates), 
-  timestamp(QDateTime::fromTime_t(p->timestamp)), version(p->version), 
-  packages()
-{
-  for(pndman_package* x = p->pnd; x != 0; x = x->next)
-  {
-    packages << Package(context, x);
-  }
-}
-QPndman::Repository::Data::~Data()
+QPndman::Repository::~Repository()
 {
   context->removePndmanRepository(pndmanRepository);
+}
+
+QPndman::Repository::Repository(Context*  c, pndman_repository* p, QObject* parent) :
+  QObject(parent ? parent : c), identifier(nextIdentifier++), context(c), pndmanRepository(p),
+  url(), name(), updates(), timestamp(), version(), packages()
+{
+  update();
 }
 
 QPndman::SyncHandle* QPndman::Repository::sync()
@@ -86,112 +65,113 @@ bool QPndman::Repository::loadFrom(Device* device)
 
 void QPndman::Repository::clear()
 {
-  d->context->clearPndmanRepository(d->pndmanRepository);
+  context->clearPndmanRepository(pndmanRepository);
   update();
 }
 
 pndman_repository* QPndman::Repository::getPndmanRepository() const
 {
-  return d->pndmanRepository;
+  return pndmanRepository;
 }
 
 bool QPndman::Repository::isNull() const
 {
-  return !d;
+  return pndmanRepository == 0;
 }
 
 int QPndman::Repository::getIdentifier() const
 {
-  return isNull() ? 0 : d->identifier;
+  return identifier;
 }
 
 QString QPndman::Repository::getUrl() const
 {
-  return isNull() ? "" : d->url;
+  return url;
 }
 QString QPndman::Repository::getName() const
 {
-  return isNull() ? "" : d->name;
+  return name;
 }
 QString QPndman::Repository::getUpdates() const
 {
-  return isNull() ? "" : d->updates;
+  return updates;
 }
 QDateTime QPndman::Repository::getTimestamp() const
 {
-  return isNull() ? QDateTime() : d->timestamp;
+  return timestamp;
 }
 QString QPndman::Repository::getVersion() const
 {
-  return isNull() ? "" : d->version;
+  return version;
 }
-QList<QPndman::Package> QPndman::Repository::getPackages() const
+QList<QPndman::Package*> QPndman::Repository::getPackages() const
 {
-  return isNull() ? QList<Package>() : d->packages;
+  return packages;
 }
 
 void QPndman::Repository::update()
 {
-  setUrl(d->pndmanRepository->url);
-  setName(d->pndmanRepository->name);
-  setUpdates(d->pndmanRepository->updates);
-  setTimestamp(QDateTime::fromTime_t(d->pndmanRepository->timestamp));
-  setVersion(d->pndmanRepository->version);
+  setUrl(pndmanRepository->url);
+  setName(pndmanRepository->name);
+  setUpdates(pndmanRepository->updates);
+  setTimestamp(QDateTime::fromTime_t(pndmanRepository->timestamp));
+  setVersion(pndmanRepository->version);
   
-  QList<Package> newPackages;
-  for(pndman_package* x = d->pndmanRepository->pnd; x != 0; x = x->next)
+  QList<Package*> newPackages;
+  for(pndman_package* x = pndmanRepository->pnd; x != 0; x = x->next)
   {
-    newPackages << Package(d->context, x);
+    newPackages << new Package(context, x, this);
   }
 
   setPackages(newPackages);
 }
 
-void QPndman::Repository::setUrl(QString const& url)
+void QPndman::Repository::setUrl(QString const& newUrl)
 {
-  if(!isNull() && url != d->url) 
+  if(url != newUrl)
   {
-    d->url = url; 
-    emit urlChanged(d->url);
+    url = newUrl;
+    emit urlChanged(url);
   }
 }
-void QPndman::Repository::setName(QString const& name)
+void QPndman::Repository::setName(QString const& newName)
 {
-  if(!isNull() && name != d->name) 
+  if(name != newName)
   {
-    d->name = name; 
-    emit nameChanged(d->name);
+    name = newName;
+    emit nameChanged(name);
   }
 }
-void QPndman::Repository::setUpdates(QString const& updates)
+void QPndman::Repository::setUpdates(QString const& newUpdates)
 {
-  if(!isNull() && updates != d->updates) 
+  if(updates != newUpdates)
   {
-    d->updates = updates; 
-    emit updatesChanged(d->updates);
+    updates = newUpdates;
+    emit updatesChanged(updates);
   }
 }
-void QPndman::Repository::setTimestamp(QDateTime const& timestamp)
+void QPndman::Repository::setTimestamp(QDateTime const& newTimestamp)
 {
-  if(!isNull() && timestamp != d->timestamp) 
+  if(timestamp != newTimestamp)
   {
-    d->timestamp = timestamp; 
-    emit timestampChanged(d->timestamp);
+    timestamp = newTimestamp;
+    emit timestampChanged(timestamp);
   }
 }
-void QPndman::Repository::setVersion(QString const& version)
+void QPndman::Repository::setVersion(QString const& newVersion)
 {
-  if(!isNull() && version != d->version) 
+  if(version != newVersion)
   {
-    d->version = version; 
-    emit versionChanged(d->version);
+    version = newVersion;
+    emit versionChanged(version);
   }
 }
-void QPndman::Repository::setPackages(QList<Package> const& packages)
+void QPndman::Repository::setPackages(QList<Package*> const& newPackages)
 {
-  if(!isNull())
+  foreach(Package const* package, packages)
   {
-    d->packages = packages; 
-    emit packagesChanged(d->packages);
+    delete package;
   }
+  packages = newPackages;
+  emit packagesChanged(packages);
 }

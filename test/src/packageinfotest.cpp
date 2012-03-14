@@ -35,10 +35,10 @@ int main(int argc, char** argv)
   
   qDebug() << "Synced.";
 
-  QList<QPndman::Package> packages = repo->getPackages();
-  foreach(QPndman::Package p, packages)
+  QList<QPndman::Package*> packages = repo->getPackages();
+  foreach(QPndman::Package* p, packages)
   {
-    qDebug() << p.getTitle() << "-" << p.getDescription();
+    qDebug() << p->getTitle() << "-" << p->getDescription();
   }
 
   return 0;
