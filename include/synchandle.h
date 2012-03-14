@@ -13,7 +13,7 @@ namespace QPndman
   Q_OBJECT
   
     Q_PROPERTY(QString error READ getError NOTIFY errorChanged)
-    Q_PROPERTY(Repository* repository READ getRepository CONSTANT)
+    Q_PROPERTY(QPndman::Repository* repository READ getRepository CONSTANT)
     Q_PROPERTY(bool done READ getDone NOTIFY doneChanged)
     Q_PROPERTY(qint64 bytesDownloaded READ getBytesDownloaded NOTIFY bytesDownloadedChanged)
     Q_PROPERTY(qint64 bytesToDownload READ getBytesToDownload NOTIFY bytesToDownloadChanged)

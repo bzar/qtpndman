@@ -22,7 +22,7 @@ namespace QPndman
     Q_PROPERTY(QString updates READ getUpdates NOTIFY updatesChanged)
     Q_PROPERTY(QDateTime timestamp READ getTimestamp NOTIFY timestampChanged)
     Q_PROPERTY(QString version READ getVersion NOTIFY versionChanged)
-    Q_PROPERTY(QList<Package*> packages READ getPackages NOTIFY packagesChanged)
+    Q_PROPERTY(QList<QPndman::Package*> packages READ getPackages NOTIFY packagesChanged)
 
   public:
     Repository(Context*  c, QString const& url, QObject* parent = 0);
