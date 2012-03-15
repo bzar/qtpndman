@@ -33,7 +33,7 @@ namespace QPndman
     Q_PROPERTY(QList<QPndman::TranslatedString*> titles READ getTitles CONSTANT)
     Q_PROPERTY(QList<QPndman::TranslatedString*> descriptions READ getDescriptions CONSTANT)
     Q_PROPERTY(QList<QPndman::License*> licenses READ getLicenses CONSTANT)
-    Q_PROPERTY(QList<QPndman::PreviewPicture*> previewPictures CONSTANT)
+    Q_PROPERTY(QList<QPndman::PreviewPicture*> previewPictures READ getPreviewpictures CONSTANT)
     Q_PROPERTY(QList<QPndman::Category*> categories READ getCategories CONSTANT)
     Q_PROPERTY(QList<QPndman::Association*> associations READ getAssociations CONSTANT)
 
