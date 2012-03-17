@@ -6,6 +6,7 @@ QPndman::InstallHandle::InstallHandle(QPndman::Context* context, QPndman::Packag
   Handle(context, Enum::Install, package, device, force, parent)
 {
   this->installLocation = installLocation;
+  updateHandleFlags();
 }
 
 bool QPndman::InstallHandle::execute()
