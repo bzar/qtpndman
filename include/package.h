@@ -44,7 +44,7 @@ namespace QPndman
     Q_PROPERTY(QList<QPndman::TranslatedString*> descriptions READ getDescriptions CONSTANT)
     Q_PROPERTY(QString description READ getDescription CONSTANT)
     Q_PROPERTY(QList<QPndman::Category*> categories READ getCategories CONSTANT)
-    Q_PROPERTY(QList<QPndman::PreviewPicture*> previewPictures READ getPreviewpictures CONSTANT)
+    Q_PROPERTY(QList<QPndman::PreviewPicture*> previewPictures READ getPreviewPictures CONSTANT)
     Q_PROPERTY(QList<QPndman::Package*> installInstances READ getInstallInstances CONSTANT)
     Q_PROPERTY(QPndman::Package* upgradeCandidate READ getUpgradeCandidate CONSTANT)
 
@@ -76,7 +76,7 @@ namespace QPndman
     QList<TranslatedString*> getDescriptions() const;
     QString getDescription() const;
     QList<Category*> getCategories() const;
-    QList<PreviewPicture*> getPreviewpictures() const;
+    QList<PreviewPicture*> getPreviewPictures() const;
     QList<Package*> getInstallInstances() const;
     Package* getUpgradeCandidate() const;
 

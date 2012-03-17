@@ -127,7 +127,7 @@ QList<QPndman::Category*> QPndman::Package::getCategories() const
 {
   return categories;
 }
-QList<QPndman::PreviewPicture*> QPndman::Package::getPreviewpictures() const
+QList<QPndman::PreviewPicture*> QPndman::Package::getPreviewPictures() const
 {
   return previewPictures;
 }
