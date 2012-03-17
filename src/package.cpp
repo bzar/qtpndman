@@ -14,6 +14,7 @@ QPndman::Package::Package(Context* context, pndman_package* p, QObject* parent, 
   titles(makeQListPtr<pndman_translated const, TranslatedString>(p->title, this)),
   descriptions(makeQListPtr<pndman_translated const, TranslatedString>(p->description, this)),
   categories(makeQListPtr<pndman_category const, Category>(p->category, this)),
+  previewPictures(makeQListPtr<pndman_previewpic const, PreviewPicture>(p->previewpic, this)),
     installInstances(), upgradeCandidate(0)
 {
   for(pndman_package* x = p->next_installed; x != 0; x = x->next_installed)
@@ -125,6 +126,10 @@ QString QPndman::Package::getDescription() const
 QList<QPndman::Category*> QPndman::Package::getCategories() const
 {
   return categories;
+}
+QList<QPndman::PreviewPicture*> QPndman::Package::getPreviewpictures() const
+{
+  return previewPictures;
 }
 QList<QPndman::Package*> QPndman::Package::getInstallInstances() const
 {
