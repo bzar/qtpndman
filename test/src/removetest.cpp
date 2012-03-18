@@ -50,7 +50,7 @@ int main(int argc, char** argv)
   QPndman::Device* packageDevice = 0;
   foreach(QPndman::Device* d, devices)
   {
-    if(d->getDevice() == toRemove->getDevice())
+    if(d->getMount() == toRemove->getMount())
     {
       packageDevice = d;
       break;

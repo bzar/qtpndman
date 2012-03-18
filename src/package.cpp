@@ -6,7 +6,7 @@
 
 
 QPndman::Package::Package(Context* context, pndman_package* p, QObject* parent, bool initUpgradeCandidate) : QObject(parent), package(p), context(context),
-  path(p->path), id(p->id), icon(p->icon), info(p->info), md5(p->md5), url(p->url), vendor(p->vendor), device(p->device),
+  path(p->path), id(p->id), icon(p->icon), info(p->info), md5(p->md5), url(p->url), vendor(p->vendor), mount(p->mount),
   size(p->size), modified(QDateTime::fromTime_t(p->modified_time)), rating(p->rating),
   author(new Author(&p->author, this)),
   version(new Version(&p->version, this)),
@@ -76,9 +76,9 @@ QString QPndman::Package::getVendor() const
 {
   return vendor;
 }
-QString QPndman::Package::getDevice() const
+QString QPndman::Package::getMount() const
 {
-  return device;
+  return mount;
 }
 qint64 QPndman::Package::getSize() const
 {

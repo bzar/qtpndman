@@ -18,7 +18,6 @@ namespace QPndman
   Q_ENUMS(QPndman::Enum::InstallLocation)
 
     Q_PROPERTY(QString mount READ getMount CONSTANT)
-    Q_PROPERTY(QString device READ getDevice CONSTANT)
     Q_PROPERTY(qint64 size READ getSize CONSTANT)
     Q_PROPERTY(qint64 free READ getFree NOTIFY freeChanged)
     Q_PROPERTY(qint64 available READ getAvailable NOTIFY availableChanged)
@@ -42,7 +41,6 @@ namespace QPndman
     int getIdentifier() const;
     
     QString getMount() const;
-    QString getDevice() const;
     qint64 getSize() const;
     qint64 getFree() const;
     qint64 getAvailable() const;
@@ -66,7 +64,6 @@ namespace QPndman
 
     pndman_device* pndmanDevice;
     QString mount;
-    QString device;
     qint64 size;
     qint64 free;
     qint64 available;

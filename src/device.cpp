@@ -17,12 +17,11 @@ int QPndman::Device::nextIdentifier = 1;
 
 QPndman::Device::Device(Context*  c, QString const& path, QObject* parent) : QObject(parent ? parent : c),
   identifier(nextIdentifier++), context(c), pndmanDevice(c->addPndmanDevice(path)),
-  mount(), device(), size(0), free(0), available(0), appdata()
+  mount(), size(0), free(0), available(0), appdata()
 {
   if(pndmanDevice)
   {
     mount = pndmanDevice->mount;
-    device = pndmanDevice->device;
     size = pndmanDevice->size;
     free = pndmanDevice->free;
     available = pndmanDevice->available;
@@ -31,7 +30,7 @@ QPndman::Device::Device(Context*  c, QString const& path, QObject* parent) : QOb
 }
 
 QPndman::Device::Device(Context*  c, pndman_device* p, QObject* parent) : QObject(parent ? parent : c), identifier(nextIdentifier++),
-  context(c), pndmanDevice(p), mount(p->mount), device(p->device),
+  context(c), pndmanDevice(p), mount(p->mount),
   size(p->size), free(p->free), available(p->available), appdata(p->appdata)
 {
 }
@@ -101,10 +100,6 @@ int QPndman::Device::getIdentifier() const
 QString QPndman::Device::getMount() const
 {
   return mount;
-}
-QString QPndman::Device::getDevice() const
-{
-  return device;
 }
 qint64 QPndman::Device::getSize() const
 {

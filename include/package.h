@@ -32,7 +32,7 @@ namespace QPndman
     Q_PROPERTY(QString md5 READ getMd5 CONSTANT)
     Q_PROPERTY(QString url READ getUrl CONSTANT)
     Q_PROPERTY(QString vendor READ getVendor CONSTANT)
-    Q_PROPERTY(QString device READ getDevice CONSTANT)
+    Q_PROPERTY(QString mount READ getMount CONSTANT)
     Q_PROPERTY(qint64 size READ getSize CONSTANT)
     Q_PROPERTY(QDateTime modified READ getModified CONSTANT)
     Q_PROPERTY(int rating READ getRating CONSTANT)
@@ -64,7 +64,7 @@ namespace QPndman
     QString getMd5() const;
     QString getUrl() const;
     QString getVendor() const;
-    QString getDevice() const;
+    QString getMount() const;
     qint64 getSize() const;
     QDateTime getModified() const;
     int getRating() const;
@@ -91,7 +91,7 @@ namespace QPndman
     QString md5;
     QString url;
     QString vendor;
-    QString device;
+    QString mount;
     qint64 size;
     QDateTime modified;
     int rating;

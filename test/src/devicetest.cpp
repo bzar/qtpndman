@@ -38,13 +38,12 @@ int main(int argc, char** argv)
   foreach(QPndman::Device* device, QPndman::Device::detectDevices(context))
   {
     devices << device;
-    qDebug() << "Detected device" << device->getDevice();
+    qDebug() << "Detected device" << device->getMount();
   }
   
   foreach(const QPndman::Device* d, devices)
   {
     qDebug() << "mount:    " << d->getMount();
-    qDebug() << "device:   " << d->getDevice();
     qDebug() << "size:     " << d->getSize();
     qDebug() << "free:     " << d->getFree();
     qDebug() << "available:" << d->getAvailable();
