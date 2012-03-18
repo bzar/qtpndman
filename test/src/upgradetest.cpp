@@ -103,7 +103,6 @@ int main(int argc, char** argv)
   context->checkLocalPndmanRepository();
   qDebug() << "Checking for upgrades";
   context->checkUpgrades();
-  
   qDebug() << "Done";
   device->saveRepositories();
 
