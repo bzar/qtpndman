@@ -95,8 +95,7 @@ int main(int argc, char** argv)
     }
 
   }
-  device->saveRepositories();
-  qDebug() << "Done";
+
 
   qDebug() << "Crawling";
   device->crawl();
@@ -105,6 +104,9 @@ int main(int argc, char** argv)
   qDebug() << "Checking for upgrades";
   context->checkUpgrades();
   
+  qDebug() << "Done";
+  device->saveRepositories();
+
   return 0;
 }
   
