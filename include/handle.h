@@ -25,7 +25,6 @@ namespace QPndman
     Q_PROPERTY(QPndman::Package* package READ getPackage CONSTANT)
     Q_PROPERTY(QPndman::Device* device READ getDevice CONSTANT)
     Q_PROPERTY(QPndman::Enum::Operation operation READ getOperation CONSTANT)
-    Q_PROPERTY(QPndman::Enum::InstallLocation installLocation READ getInstallLocation CONSTANT)
     Q_PROPERTY(bool done READ getDone NOTIFY doneChanged)
     Q_PROPERTY(bool cancelled READ getCancelled NOTIFY cancelledChanged)
     Q_PROPERTY(qint64 bytesDownloaded READ getBytesDownloaded NOTIFY bytesDownloadedChanged)
@@ -45,7 +44,6 @@ namespace QPndman
     Package* getPackage() const;
     Device* getDevice() const;
     Enum::Operation getOperation() const;
-    Enum::InstallLocation getInstallLocation() const;
     bool getDone() const;
     bool getCancelled() const;
     qint64 getBytesDownloaded() const;
@@ -84,7 +82,6 @@ namespace QPndman
     Package* package;
     Device* device;
     Enum::Operation operation;
-    Enum::InstallLocation installLocation;
     bool _done;
     bool _cancelled;
     qint64 bytesDownloaded;
@@ -94,10 +91,15 @@ namespace QPndman
   class InstallHandle : public Handle
   {
     Q_OBJECT
+    Q_PROPERTY(QPndman::Enum::InstallLocation installLocation READ getInstallLocation CONSTANT)
+
   public:
     InstallHandle(Context* context, Package* package, Device* device, Enum::InstallLocation const installLocation, bool force = false, QObject* parent = 0);
+    Enum::InstallLocation getInstallLocation() const;
   public slots:
-    virtual bool execute();
+    virtual bool execute();    
+  private:
+    Enum::InstallLocation installLocation;
   };
   
   class UpgradeHandle : public Handle
