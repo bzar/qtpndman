@@ -29,7 +29,8 @@ namespace QPndman
     
     pndman_device* detectPndmanDevices();
     bool crawlPndmanDevice(pndman_device* device, bool full = false);
-    
+    bool crawlPndmanPackage(pndman_package* package, bool full = false);
+
     bool saveRepositories(pndman_device* device);
     bool loadRepository(pndman_repository* repository, pndman_device* device);
     void checkUpgrades();

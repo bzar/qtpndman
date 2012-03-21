@@ -105,6 +105,11 @@ bool QPndman::Context::crawlPndmanDevice(pndman_device* device, bool full)
   return pndman_crawl(full ? 1 : 0, device, localPndmanRepository) == 0;
 }
 
+bool QPndman::Context::crawlPndmanPackage(pndman_package *package, bool full)
+{
+  return pndman_crawl_pnd(full ? 1 : 0, package) == 0;
+}
+
 bool QPndman::Context::saveRepositories(pndman_device* device)
 {
   return pndman_commit_all(pndmanRepositories, device) == 0;

@@ -56,7 +56,8 @@ namespace QPndman
     
     Q_INVOKABLE InstallHandle* install(Device* device, Enum::InstallLocation location, bool force = false);
     Q_INVOKABLE UpgradeHandle* upgrade(bool force = false);
-    
+    bool crawl(bool full = false);
+
     QString getPath() const;
     QString getId() const;
     QString getIcon() const;

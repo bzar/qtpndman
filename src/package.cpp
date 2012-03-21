@@ -48,6 +48,11 @@ QPndman::UpgradeHandle* QPndman::Package::upgrade(bool force)
   return handle;
 }
 
+bool QPndman::Package::crawl(bool full)
+{
+  return context->crawlPndmanPackage(package, full);
+}
+
 QString QPndman::Package::getPath() const
 {
   return path;
