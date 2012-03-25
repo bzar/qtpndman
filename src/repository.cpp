@@ -123,6 +123,11 @@ void QPndman::Repository::update()
     newPackages << new Package(context, x, this);
   }
 
+  foreach(Package* package, packages)
+  {
+    package->deleteLater();
+  }
+
   setPackages(newPackages);
 }
 
