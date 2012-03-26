@@ -117,10 +117,13 @@ bool QPndman::Handle::cancel()
 
 void QPndman::Handle::update()
 {
-  setError(handle.error);
-  setDone(handle.progress.done);
-  setBytesDownloaded(static_cast<qint64>(handle.progress.download));
-  setBytesToDownload(static_cast<qint64>(handle.progress.total_to_download));
+  if(!_cancelled)
+  {
+    setError(handle.error);
+    setDone(handle.progress.done);
+    setBytesDownloaded(static_cast<qint64>(handle.progress.download));
+    setBytesToDownload(static_cast<qint64>(handle.progress.total_to_download));
+  }
 }
 
 QString QPndman::Handle::getName() const
