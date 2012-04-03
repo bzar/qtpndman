@@ -5,7 +5,8 @@
 
 QPndman::Context::Context(QObject* parent) : QObject(parent),
   localPndmanRepository(0), pndmanRepositories(0), pndmanDevices(0)
-{  
+{
+  pndman_set_verbose(1);
   localPndmanRepository = pndman_repository_init();
   pndmanRepositories = localPndmanRepository;
 }
@@ -97,7 +98,12 @@ pndman_device* QPndman::Context::getLastPndmanDevice()
 
 pndman_device* QPndman::Context::detectPndmanDevices()
 {
-  return pndman_device_detect(pndmanDevices);
+  pndman_device* detected = pndman_device_detect(pndmanDevices);
+  if(!pndmanDevices)
+  {
+    pndmanDevices = detected;
+  }
+  return detected;
 }
 
 bool QPndman::Context::crawlPndmanDevice(pndman_device* device, bool full)
