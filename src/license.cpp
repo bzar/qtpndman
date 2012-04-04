@@ -1,7 +1,7 @@
 #include "license.h"
 
 QPndman::License::License(pndman_license const* p, QObject* parent) : QObject(parent),
-  name(p->name), url(p->url), sourceCodeUrl(p->sourcecodeurl)
+  name(QString::fromUtf8(p->name)), url(QString::fromUtf8(p->url)), sourceCodeUrl(QString::fromUtf8(p->sourcecodeurl))
 {
   
 }

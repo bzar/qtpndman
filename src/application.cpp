@@ -2,7 +2,7 @@
 #include "util.h"
 
 QPndman::Application::Application(pndman_application const* p, QObject *parent) : QObject(parent),
-  id(p->id), appdata(p->appdata), icon(p->icon), clockFrequency(p->frequency),
+  id(QString::fromUtf8(p->id)), appdata(QString::fromUtf8(p->appdata)), icon(QString::fromUtf8(p->icon)), clockFrequency(p->frequency),
   author(new Author(&p->author, this)),
   osVersion(new Version(&p->osversion, this)),
   version(new Version(&p->version, this)),

@@ -2,7 +2,7 @@
 
 
 QPndman::PreviewPicture::PreviewPicture(pndman_previewpic const* p, QObject* parent) : QObject(parent),
-  src(p->src)
+  src(QString::fromUtf8(p->src))
 {
 }
 

@@ -1,7 +1,7 @@
 #include "documentationinfo.h"
 
 QPndman::DocumentationInfo::DocumentationInfo(pndman_info const* p, QObject* parent) : QObject(parent),
-  name(p->name), type(p->type), src(p->src)
+  name(QString::fromUtf8(p->name)), type(QString::fromUtf8(p->type)), src(QString::fromUtf8(p->src))
 {
 }
 
