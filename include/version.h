@@ -32,6 +32,10 @@ namespace QPndman
 
     bool operator==(Version const& other) const;
     bool operator!=(Version const& other) const;
+    bool operator<(Version const& other) const;
+    bool operator>(Version const& other) const;
+    bool operator<=(Version const& other) const;
+    bool operator>=(Version const& other) const;
 
   private:
     QString _major;
