@@ -44,3 +44,17 @@ QPndman::Version::Type QPndman::Version::getType() const
 {
   return type;
 }
+
+bool QPndman::Version::operator ==(const QPndman::Version &other) const
+{
+  return _major == other._major
+      && _minor == other._minor
+      && release == other.release
+      && build == other.build
+      && type == other.type;
+}
+
+bool QPndman::Version::operator !=(const QPndman::Version &other) const
+{
+  return !operator==(other);
+}

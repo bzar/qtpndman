@@ -30,6 +30,9 @@ namespace QPndman
     QString getBuild() const;
     Type getType() const;
 
+    bool operator==(Version const& other) const;
+    bool operator!=(Version const& other) const;
+
   private:
     QString _major;
     QString _minor;
