@@ -18,7 +18,7 @@ namespace QPndman
     Q_PROPERTY(Type type READ getType CONSTANT)
 
   public:
-    enum Type { ReleaseVersion, BetaVersion, AlphaVersion };
+    enum Type { AlphaVersion, BetaVersion, ReleaseVersion };
 
     Version(pndman_version const* p, QObject* parent = 0);
 

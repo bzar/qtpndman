@@ -61,11 +61,15 @@ bool QPndman::Version::operator !=(const QPndman::Version &other) const
 
 bool QPndman::Version::operator <(const QPndman::Version &other) const
 {
-  return _major < other._major
-      && _minor < other._minor
-      && release < other.release
-      && build < other.build
-      && type < other.type;
+  if(_major == other._major)
+    if(_minor == other._minor)
+      if(release == other.release)
+        if(build == other.build)
+          return type < other.type;
+        else return build < other.build;
+      else return release < other.release;
+    else return _minor < other._minor;
+  else return _major < other._major;
 }
 
 bool QPndman::Version::operator >(const QPndman::Version &other) const
