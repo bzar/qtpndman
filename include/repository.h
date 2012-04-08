@@ -29,7 +29,7 @@ namespace QPndman
     ~Repository();
 
     SyncHandle* sync();
-    bool loadFrom(Device* device);
+    bool loadFrom(Device* device, bool autoUpdate = true);
     void clear();
     
     pndman_repository* getPndmanRepository() const;

@@ -59,9 +59,9 @@ QPndman::SyncHandle* QPndman::Repository::sync()
   return handle;
 }
 
-bool QPndman::Repository::loadFrom(Device* device)
+bool QPndman::Repository::loadFrom(Device* device, bool autoUpdate)
 {
-  return device->loadRepository(this);
+  return device->loadRepository(this, autoUpdate);
 }
 
 void QPndman::Repository::clear()

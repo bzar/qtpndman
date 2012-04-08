@@ -71,14 +71,17 @@ bool QPndman::Device::saveRepositories()
   return context->saveRepositories(pndmanDevice);
 }
 
-bool QPndman::Device::loadRepository(Repository* repository)
+bool QPndman::Device::loadRepository(Repository* repository, bool autoUpdate)
 {
   if(!context->loadRepository(repository->getPndmanRepository(), pndmanDevice))
   {
     return false;
   }
   
-  repository->update();
+  if(autoUpdate)
+  {
+    repository->update();
+  }
   return true;
 }
 

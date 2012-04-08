@@ -34,7 +34,7 @@ namespace QPndman
     bool remove(Package* package);
     bool crawl(bool full = false);
     bool saveRepositories();
-    bool loadRepository(Repository* repository);
+    bool loadRepository(Repository* repository, bool autoUpdate = true);
     
     pndman_device* getPndmanDevice() const;
     bool isNull() const;
