@@ -2,6 +2,7 @@
 #include "util.h"
 
 #include <QDebug>
+#include <QMap>
 #include "device.h"
 
 QPndman::LocalRepository::LocalRepository(Context*  c, QObject* parent) : Repository(c, c->getLocalPndmanRepository(), parent ? parent : c) {}
@@ -117,18 +118,51 @@ void QPndman::Repository::update()
   setTimestamp(QDateTime::fromTime_t(pndmanRepository->timestamp));
   setVersion(pndmanRepository->version);
   
+  QSet<QString> ids;
   QList<Package*> newPackages;
+
   for(pndman_package* x = pndmanRepository->pnd; x != 0; x = x->next)
   {
-    newPackages << new Package(context, x, this);
+    bool newPackage = true;
+    QString packageId = QString::fromUtf8(x->id);
+    ids.insert(packageId);
+
+    QMutableListIterator<Package*> i(packages);
+    while(i.hasNext())
+    {
+      Package* package = i.next();
+      if(package->getId() == packageId)
+      {
+        qDebug() << "Updating" << packageId;
+        newPackage = false;
+        if(package->getModified() != QDateTime::fromTime_t(x->modified_time))
+        {
+          i.setValue(new Package(context, x, this));
+          package->deleteLater();
+        }
+      }
+    }
+
+    if(newPackage)
+    {
+      qDebug() << "Inserting" << packageId;
+      newPackages << new Package(context, x, this);
+    }
   }
 
-  foreach(Package* package, packages)
+  QMutableListIterator<Package*> i(packages);
+  while(i.hasNext())
   {
-    package->deleteLater();
+    Package* package = i.next();
+    if(!ids.contains(package->getId()))
+    {
+      i.remove();
+      package->deleteLater();
+    }
   }
 
-  setPackages(newPackages);
+  packages.append(newPackages);
+  emit packagesChanged(packages);
 }
 
 void QPndman::Repository::setUrl(QString const& newUrl)
