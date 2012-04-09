@@ -51,9 +51,9 @@ QPndman::Repository::Repository(Context*  c, pndman_repository* p, QObject* pare
   update();
 }
 
-QPndman::SyncHandle* QPndman::Repository::sync()
+QPndman::SyncHandle* QPndman::Repository::sync(bool fullSync)
 {
-  SyncHandle* handle = new SyncHandle(this);
+  SyncHandle* handle = new SyncHandle(this, fullSync);
   handle->setParent(this);
   connect(handle, SIGNAL(done()), this, SLOT(update()));
   return handle;
@@ -133,7 +133,6 @@ void QPndman::Repository::update()
       Package* package = i.next();
       if(package->getId() == packageId)
       {
-        qDebug() << "Updating" << packageId;
         newPackage = false;
         if(package->getModified() != QDateTime::fromTime_t(x->modified_time))
         {
@@ -145,7 +144,6 @@ void QPndman::Repository::update()
 
     if(newPackage)
     {
-      qDebug() << "Inserting" << packageId;
       newPackages << new Package(context, x, this);
     }
   }

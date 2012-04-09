@@ -28,7 +28,7 @@ namespace QPndman
     Repository(Context*  c, QString const& url, QObject* parent = 0);
     ~Repository();
 
-    SyncHandle* sync();
+    SyncHandle* sync(bool fullSync = true);
     bool loadFrom(Device* device, bool autoUpdate = true);
     void clear();
     
