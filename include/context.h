@@ -37,6 +37,9 @@ namespace QPndman
     
     bool commitHandle(pndman_handle* handle);
     
+    void setLoggingVerbosity(int level);
+    int getLoggingVerbosity() const;
+
   private:
     pndman_repository* localPndmanRepository;
     pndman_repository* pndmanRepositories;

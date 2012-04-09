@@ -6,7 +6,7 @@
 QPndman::Context::Context(QObject* parent) : QObject(parent),
   localPndmanRepository(0), pndmanRepositories(0), pndmanDevices(0)
 {
-  pndman_set_verbose(1);
+  setLoggingVerbosity(1);
   localPndmanRepository = pndman_repository_init();
   pndmanRepositories = localPndmanRepository;
 }
@@ -129,6 +129,16 @@ bool QPndman::Context::loadRepository(pndman_repository* repository, pndman_devi
 bool QPndman::Context::commitHandle(pndman_handle* handle)
 {
   return pndman_handle_commit(handle, localPndmanRepository) == 0;
+}
+
+void QPndman::Context::setLoggingVerbosity(int level)
+{
+  pndman_set_verbose(level);
+}
+
+int QPndman::Context::getLoggingVerbosity() const
+{
+  return pndman_get_verbose();
 }
 
 void QPndman::Context::checkUpgrades()
