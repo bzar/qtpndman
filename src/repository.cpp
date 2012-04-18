@@ -134,7 +134,7 @@ void QPndman::Repository::update()
       if(package->getId() == packageId)
       {
         newPackage = false;
-        if(package->getModified() != QDateTime::fromTime_t(x->modified_time))
+        if(x->update || package->getModified() != QDateTime::fromTime_t(x->modified_time))
         {
           i.setValue(new Package(context, x, this));
           package->deleteLater();
