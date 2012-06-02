@@ -89,8 +89,18 @@ void QPndman::SyncHandle::setBytesDownloaded(qint64 const value)
 {
   if(value != bytesDownloaded)
   {
+    if(bytesDownloaded == 0)
+    {
+      emit downloadStarted();
+    }
+
     bytesDownloaded = value;
     emit bytesDownloadedChanged(bytesDownloaded);
+
+    if(bytesDownloaded == bytesToDownload)
+    {
+      emit downloadFinished();
+    }
   }
 }
 

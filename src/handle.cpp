@@ -196,8 +196,18 @@ void QPndman::Handle::setBytesDownloaded(qint64 const value)
 {
   if(value != bytesDownloaded)
   {
+    if(bytesDownloaded == 0)
+    {
+      emit downloadStarted();
+    }
+
     bytesDownloaded = value;
     emit bytesDownloadedChanged(bytesDownloaded);
+
+    if(bytesDownloaded == bytesToDownload)
+    {
+      emit downloadFinished();
+    }
   }
 }
 
@@ -209,6 +219,7 @@ void QPndman::Handle::setBytesToDownload(qint64 const value)
     emit bytesToDownloadChanged(bytesToDownload);
   }
 }
+
 QPndman::Enum::InstallLocation QPndman::InstallHandle::getInstallLocation() const
 {
   return installLocation;

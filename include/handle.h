@@ -60,6 +60,9 @@ namespace QPndman
     void cancelledChanged(bool newCancelled);
     void bytesDownloadedChanged(qint64 newBytesDownloaded);
     void bytesToDownloadChanged(qint64 newBytesToDownload);
+
+    void downloadStarted();
+    void downloadFinished();
     
     void error(QString const error);
     void done();
