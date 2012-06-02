@@ -196,13 +196,16 @@ void QPndman::Handle::setBytesDownloaded(qint64 const value)
 {
   if(value != bytesDownloaded)
   {
-    if(bytesDownloaded == 0)
+    bool justStarted = bytesDownloaded == 0;
+    bytesDownloaded = value;
+
+
+    emit bytesDownloadedChanged(bytesDownloaded);
+
+    if(justStarted)
     {
       emit downloadStarted();
     }
-
-    bytesDownloaded = value;
-    emit bytesDownloadedChanged(bytesDownloaded);
 
     if(bytesDownloaded == bytesToDownload)
     {
