@@ -116,7 +116,7 @@ int QPndman::Context::crawlPndmanDevice(pndman_device* device, bool full)
 int QPndman::Context::crawlAllPndmanDevices(bool full)
 {
   int packages = 0;
-  for(pndman_device* device = pndmanDevices; device = device->next; device)
+  for(pndman_device* device = pndmanDevices; device; device = device->next)
   {
     packages += pndman_package_crawl(full ? 1 : 0, device, localPndmanRepository);
   }
