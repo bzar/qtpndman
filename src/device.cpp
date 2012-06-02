@@ -63,7 +63,7 @@ bool QPndman::Device::remove(Package* package)
 
 bool QPndman::Device::crawl(bool full)
 {
-  return context->crawlPndmanDevice(pndmanDevice, full);
+  return context->crawlPndmanDevice(pndmanDevice, full) != 0;
 }
 
 bool QPndman::Device::saveRepositories()

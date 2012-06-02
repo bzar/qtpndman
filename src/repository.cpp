@@ -5,7 +5,10 @@
 #include <QMap>
 #include "device.h"
 
-QPndman::LocalRepository::LocalRepository(Context*  c, QObject* parent) : Repository(c, c->getLocalPndmanRepository(), parent ? parent : c) {}
+QPndman::LocalRepository::LocalRepository(Context*  c, QObject* parent) : Repository(c, c->getLocalPndmanRepository(), parent ? parent : c)
+{
+  connect(c, SIGNAL(crawlDone()), this, SLOT(update()));
+}
 
 bool QPndman::LocalRepository::hasPackageInstalled(Package* package)
 {

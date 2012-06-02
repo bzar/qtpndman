@@ -16,6 +16,9 @@ qint64 time()
 int main(int argc, char** argv)
 {
   QCoreApplication application(argc, argv);
+
+  pndman_set_verbose(PNDMAN_LEVEL_CRAP);
+
   QPndman::Context* context = new QPndman::Context(&application);
   
   QList<QPndman::Device*> devices;

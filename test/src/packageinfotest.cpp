@@ -15,23 +15,17 @@ qint64 time()
 int main(int argc, char** argv)
 {
   QCoreApplication application(argc, argv);
+
+  pndman_set_verbose(PNDMAN_LEVEL_CRAP);
+
   QPndman::Context* context = new QPndman::Context(&application);
 
-  QPndman::Repository* repo = new QPndman::Repository(context, "http://repo.openpandora.org/includes/get_data.php");
+  QPndman::Repository* repo = new QPndman::Repository(context, "http://repo.openpandora.org/client/masterlist");
   
   QPndman::SyncHandle* handle = repo->sync();
   qDebug() << "Starting sync for repository" << handle->getRepository()->getUrl();
   
-  while(!handle->getDone())
-  {
-    if(context->processDownload() < 0)
-    {
-      qDebug() << "Error syncing repository!";
-      return 1;
-    }
-    
-    handle->update();
-  }
+  while(context->processDownload() > 0);
   
   qDebug() << "Synced.";
 

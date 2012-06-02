@@ -106,14 +106,29 @@ pndman_device* QPndman::Context::detectPndmanDevices()
   return detected;
 }
 
-bool QPndman::Context::crawlPndmanDevice(pndman_device* device, bool full)
+int QPndman::Context::crawlPndmanDevice(pndman_device* device, bool full)
 {
-  return pndman_package_crawl(full ? 1 : 0, device, localPndmanRepository) == 0;
+  int packages = pndman_package_crawl(full ? 1 : 0, device, localPndmanRepository);
+  emit crawlDone();
+  return packages;
+}
+
+int QPndman::Context::crawlAllPndmanDevices(bool full)
+{
+  int packages = 0;
+  for(pndman_device* device = pndmanDevices; device = device->next; device)
+  {
+    packages += pndman_package_crawl(full ? 1 : 0, device, localPndmanRepository);
+  }
+  emit crawlDone();
+  return packages;
 }
 
 bool QPndman::Context::crawlPndmanPackage(pndman_package *package, bool full)
 {
-  return pndman_package_crawl_single_package(full ? 1 : 0, package) == 0;
+  bool success = pndman_package_crawl_single_package(full ? 1 : 0, package) == 0;
+  emit crawlDone(package);
+  return success;
 }
 
 bool QPndman::Context::saveRepositories(pndman_device* device)

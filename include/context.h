@@ -28,7 +28,8 @@ namespace QPndman
     pndman_device* getLastPndmanDevice();
     
     pndman_device* detectPndmanDevices();
-    bool crawlPndmanDevice(pndman_device* device, bool full = false);
+    int crawlPndmanDevice(pndman_device* device, bool full = false);
+    int crawlAllPndmanDevices(bool full = false);
     bool crawlPndmanPackage(pndman_package* package, bool full = false);
 
     bool saveRepositories(pndman_device* device);
@@ -41,6 +42,9 @@ namespace QPndman
     int getLoggingVerbosity() const;
 
     int processDownload();
+
+  signals:
+    void crawlDone(pndman_package *package = 0);
 
   private:
     pndman_repository* localPndmanRepository;

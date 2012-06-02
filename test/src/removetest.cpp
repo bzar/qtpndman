@@ -10,6 +10,8 @@ int main(int argc, char** argv)
     return 1;
   }
 
+  pndman_set_verbose(PNDMAN_LEVEL_CRAP);
+
   QString searchTerm = argv[1];
 
   QCoreApplication application(argc, argv);
@@ -24,10 +26,7 @@ int main(int argc, char** argv)
   device->loadRepository(local);
 
   qDebug() << "Crawling";
-  foreach(QPndman::Device* d, devices)
-  {
-    d->crawl();
-  }
+  context->crawlAllPndmanDevices();
 
   QPndman::Package* toRemove = 0;
   foreach(QPndman::Package* package, local->getPackages())
@@ -72,10 +71,7 @@ int main(int argc, char** argv)
   qDebug() << "Remove successful";
 
   qDebug() << "Crawling";
-  foreach(QPndman::Device* d, devices)
-  {
-    d->crawl();
-  }
+  context->crawlAllPndmanDevices();
 
   device->saveRepositories();
   

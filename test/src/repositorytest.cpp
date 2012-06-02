@@ -15,6 +15,9 @@ qint64 time()
 int main(int argc, char** argv)
 {
   QCoreApplication application(argc, argv);
+
+  pndman_set_verbose(PNDMAN_LEVEL_CRAP);
+
   QPndman::Context* context = new QPndman::Context(&application);
 
   QList<QPndman::Repository*> repositories;
@@ -27,7 +30,7 @@ int main(int argc, char** argv)
   }
   repositories << localRepo;
   
-  QPndman::Repository* repo = new QPndman::Repository(context, "http://repo.openpandora.org/includes/get_data.php");
+  QPndman::Repository* repo = new QPndman::Repository(context, "http://repo.openpandora.org/client/masterlist");
   if(repo->isNull())
   {
     qDebug() << "Error adding remote repository!";
@@ -35,7 +38,7 @@ int main(int argc, char** argv)
   }
   repositories << repo;
   
-  QPndman::Repository* repo2 = new QPndman::Repository(context, "http://repo.openpandora.org/includes/get_data.php");
+  QPndman::Repository* repo2 = new QPndman::Repository(context, "http://repo.openpandora.org/client/masterlist");
   if(!repo2->isNull())
   {
     qDebug() << "Duplicate repository add succeeded!";
@@ -48,14 +51,8 @@ int main(int argc, char** argv)
   qDebug() << "Starting sync for repository" << handle->getRepository()->getUrl();
   
   int counter = 0;
-  while(!handle->getDone())
+  while(context->processDownload() > 0)
   {
-    if(context->processDownload() < 0)
-    {
-      qDebug() << "Error syncing repository!";
-      return 1;
-    }
-
     if(handle->getBytesToDownload() != 0)
     {
       int percentage = 100 * handle->getBytesDownloaded() / handle->getBytesToDownload();
@@ -99,7 +96,7 @@ int main(int argc, char** argv)
   delete repo2;
   
   qDebug() << "Loading repositories from /tmp";
-  repo = new QPndman::Repository(context, "http://repo.openpandora.org/includes/get_data.php");
+  repo = new QPndman::Repository(context, "http://repo.openpandora.org/client/masterlist");
   repo->loadFrom(tmpDevice);
   
   qDebug() << "name:" << repo->getName() << " packages:" << repo->getPackages().size();

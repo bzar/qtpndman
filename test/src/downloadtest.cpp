@@ -6,10 +6,12 @@ int main(int argc, char** argv)
 {
   QCoreApplication application(argc, argv);
   
+  pndman_set_verbose(PNDMAN_LEVEL_CRAP);
+
   QPndman::Context* context = new QPndman::Context(&application);
   
   QPndman::Device* device = new QPndman::Device(context, "/tmp");
-  QPndman::Repository* repo = new QPndman::Repository(context, "http://repo.openpandora.org/includes/get_data.php");
+  QPndman::Repository* repo = new QPndman::Repository(context, "http://repo.openpandora.org/client/masterlist");
   
   repo->loadFrom(device);
   QPndman::SyncHandle* synchandle = repo->sync();
@@ -37,14 +39,8 @@ int main(int argc, char** argv)
   }
   qDebug() << "Downloading...";
   int counter = 0;
-  while(!handle->getDone())
+  while(context->processDownload() > 0)
   {
-    if(context->processDownload() < 0)
-    {
-      qDebug() << "ERROR: Could not download package!";
-      return 1;      
-    }
-    
     if(handle->getBytesToDownload() != 0)
     {
       int percentage = 100 * handle->getBytesDownloaded() / handle->getBytesToDownload();
@@ -64,6 +60,7 @@ int main(int argc, char** argv)
     }
 
   }
+
   device->saveRepositories();
   qDebug() << "Done";
   
