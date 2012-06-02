@@ -7,13 +7,18 @@ QPndman::SyncHandle::SyncHandle(Repository* repository, bool fullSync, QObject* 
 {
   unsigned int flags = 0;
   if(fullSync) flags |= PNDMAN_SYNC_FULL;
-  pndman_sync_request(&handle, flags, repository->getPndmanRepository());
+  pndman_sync_handle_init(&handle);
+  handle.flags = flags;
+  handle.repository = repository->getPndmanRepository();
+  handle.user_data = this;
+  handle.callback = handleCallback;
+  pndman_sync_handle_perform(&handle);
   update();
 }
 
 QPndman::SyncHandle::~SyncHandle()
 {
-  pndman_sync_request_free(&handle);
+  pndman_sync_handle_free(&handle);
 }
 
 pndman_sync_handle* QPndman::SyncHandle::getPndmanSyncHandle()
@@ -21,9 +26,10 @@ pndman_sync_handle* QPndman::SyncHandle::getPndmanSyncHandle()
   return &handle;
 }
 
-int QPndman::SyncHandle::sync()
+void QPndman::SyncHandle::handleCallback(pndman_curl_code code, pndman_sync_handle *handle)
 {
-  return pndman_sync();
+  SyncHandle* h = static_cast<SyncHandle*>(handle->user_data);
+  h->update();
 }
 
 QPndman::Repository* QPndman::SyncHandle::getRepository() const

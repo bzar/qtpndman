@@ -69,12 +69,11 @@ int main(int argc, char** argv)
   int counter = 0;
   while(!handle->getDone())
   {
-    if(handle->download() < 0)
+    if(context->processDownload() < 0)
     {
       qDebug() << "ERROR: Could not download package!";
       return 1;
     }
-    handle->update();
 
     if(handle->getBytesToDownload() != 0)
     {

@@ -5,14 +5,14 @@
 QPndman::InstallHandle::InstallHandle(QPndman::Context* context, QPndman::Package* package, QPndman::Device* device, Enum::InstallLocation const installLocation, bool force, QObject* parent):
   Handle(context, Enum::Install, package, device, force, parent), installLocation(installLocation)
 {
-  if(installLocation == Enum::Desktop) handle.flags |= PNDMAN_HANDLE_INSTALL_DESKTOP;
-  else if(installLocation == Enum::Menu) handle.flags |= PNDMAN_HANDLE_INSTALL_MENU;
-  else if(installLocation == Enum::DesktopAndMenu) handle.flags |= PNDMAN_HANDLE_INSTALL_APPS;
+  if(installLocation == Enum::Desktop) handle.flags |= PNDMAN_PACKAGE_INSTALL_DESKTOP;
+  else if(installLocation == Enum::Menu) handle.flags |= PNDMAN_PACKAGE_INSTALL_MENU;
+  else if(installLocation == Enum::DesktopAndMenu) handle.flags |= PNDMAN_PACKAGE_INSTALL_APPS;
 }
 
 bool QPndman::InstallHandle::execute()
 {
-  if(pndman_handle_perform(&handle) == 0)
+  if(pndman_package_handle_perform(&handle) == 0)
   {
     emit executed();
     return true;
@@ -32,7 +32,7 @@ QPndman::UpgradeHandle::UpgradeHandle(QPndman::Context* context, QPndman::Packag
 
 bool QPndman::UpgradeHandle::execute()
 {
-  if(pndman_handle_perform(&handle) == 0)
+  if(pndman_package_handle_perform(&handle) == 0)
   {
     emit executed();
     return true;
@@ -70,49 +70,43 @@ QPndman::Handle::Handle(Context*  context, Enum::Operation operation, Package* p
   device(device), operation(operation), _done(false),
   _cancelled(false), bytesDownloaded(0), bytesToDownload(0)
 {
-  pndman_handle_init(name.toLocal8Bit().data(), &handle);
+  pndman_package_handle_init(name.toLocal8Bit().data(), &handle);
   handle.device = device ? device->getPndmanDevice() : 0;
   handle.pnd = package->getPndmanPackage();  
+  handle.callback = handleCallback;
+  handle.user_data = this;
   handle.flags = 0;
 
-  if(force) handle.flags |= PNDMAN_HANDLE_FORCE;
+  if(force) handle.flags |= PNDMAN_PACKAGE_FORCE;
 
-  if(operation == Enum::Install) handle.flags |= PNDMAN_HANDLE_INSTALL;
-  else if(operation == Enum::Remove) handle.flags |= PNDMAN_HANDLE_REMOVE;
-  else if(operation == Enum::Upgrade) handle.flags |= PNDMAN_HANDLE_INSTALL; // Upgrade done with install flag
+  if(operation == Enum::Install) handle.flags |= PNDMAN_PACKAGE_INSTALL;
+  else if(operation == Enum::Remove) handle.flags |= PNDMAN_PACKAGE_REMOVE;
+  else if(operation == Enum::Upgrade) handle.flags |= PNDMAN_PACKAGE_INSTALL; // Upgrade done with install flag
 
   update();
 }
 
 QPndman::Handle::~Handle()
 {
-  pndman_handle_free(&handle);
+  pndman_package_handle_free(&handle);
 }
 
-pndman_handle* QPndman::Handle::getPndmanHandle()
+pndman_package_handle *QPndman::Handle::getPndmanHandle()
 {
   return &handle;
 }
 
-int QPndman::Handle::download()
+void QPndman::Handle::handleCallback(pndman_curl_code code, pndman_package_handle *handle)
 {
-  return pndman_download();
+  Handle* h = static_cast<Handle*>(handle->user_data);
+  h->update();
 }
 
-bool QPndman::Handle::cancel()
+void QPndman::Handle::cancel()
 {
-  if(pndman_handle_free(&handle) == 0)
-  {
-    _cancelled = true;
-    emit cancelledChanged(true);
-    emit cancelled();
-    return true;
-  }
-  else
-  {
-    emit error(_error);
-    return false;      
-  }
+  _cancelled = true;
+  emit cancelledChanged(true);
+  emit cancelled();
 }
 
 void QPndman::Handle::update()
@@ -169,12 +163,13 @@ qint64 QPndman::Handle::getBytesToDownload() const
   return bytesToDownload;
 }
 
-void QPndman::Handle::setError(QString const& error)
+void QPndman::Handle::setError(QString const& newError)
 {
-  if(_error != error)
+  if(_error != newError)
   {
-    _error = error;
+    _error = newError;
     emit errorChanged(_error);
+    emit error(_error);
   }
 }
 void QPndman::Handle::setDone(bool const& done)

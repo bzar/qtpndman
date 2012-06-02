@@ -34,9 +34,9 @@ namespace QPndman
   public:
     Handle(Context*  context, Enum::Operation operation, Package* package, Device* device, bool force = false, QObject* parent = 0);
     ~Handle();
-    pndman_handle* getPndmanHandle();
+    pndman_package_handle* getPndmanHandle();
     
-    static int download();
+    static void handleCallback(pndman_curl_code code, pndman_package_handle* handle);
     
     QString getName() const;
     QString getError() const;
@@ -52,7 +52,7 @@ namespace QPndman
   public slots:
     virtual bool execute() = 0;
     void update();
-    bool cancel();
+    void cancel();
 
   signals:
     void errorChanged(QString newError);
@@ -61,7 +61,7 @@ namespace QPndman
     void bytesDownloadedChanged(qint64 newBytesDownloaded);
     void bytesToDownloadChanged(qint64 newBytesToDownload);
     
-    void error(QString error);
+    void error(QString const error);
     void done();
     void executed();
     void cancelled();
@@ -75,7 +75,7 @@ namespace QPndman
     void setBytesToDownload(qint64 const value);
     
     Context* context;
-    pndman_handle handle;
+    pndman_package_handle handle;
     QString name;
     QString _error;
     bool force;

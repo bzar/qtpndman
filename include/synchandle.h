@@ -24,7 +24,7 @@ namespace QPndman
     
     pndman_sync_handle* getPndmanSyncHandle();
     
-    static int sync();
+    static void handleCallback(pndman_curl_code code, struct pndman_sync_handle *handle);
 
     QString getError() const;
     Repository* getRepository() const;

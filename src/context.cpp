@@ -108,27 +108,27 @@ pndman_device* QPndman::Context::detectPndmanDevices()
 
 bool QPndman::Context::crawlPndmanDevice(pndman_device* device, bool full)
 {
-  return pndman_crawl(full ? 1 : 0, device, localPndmanRepository) == 0;
+  return pndman_package_crawl(full ? 1 : 0, device, localPndmanRepository) == 0;
 }
 
 bool QPndman::Context::crawlPndmanPackage(pndman_package *package, bool full)
 {
-  return pndman_crawl_pnd(full ? 1 : 0, package) == 0;
+  return pndman_package_crawl_single_package(full ? 1 : 0, package) == 0;
 }
 
 bool QPndman::Context::saveRepositories(pndman_device* device)
 {
-  return pndman_commit_all(pndmanRepositories, device) == 0;
+  return pndman_repository_commit_all(pndmanRepositories, device) == 0;
 }
 
 bool QPndman::Context::loadRepository(pndman_repository* repository, pndman_device* device)
 {
-  return pndman_read_from_device(repository, device) == 0;
+  return pndman_device_read_repository(repository, device) == 0;
 }
 
-bool QPndman::Context::commitHandle(pndman_handle* handle)
+bool QPndman::Context::commitHandle(pndman_package_handle *handle)
 {
-  return pndman_handle_commit(handle, localPndmanRepository) == 0;
+  return pndman_package_handle_commit(handle, localPndmanRepository) == 0;
 }
 
 void QPndman::Context::setLoggingVerbosity(int level)
@@ -141,7 +141,12 @@ int QPndman::Context::getLoggingVerbosity() const
   return pndman_get_verbose();
 }
 
+int QPndman::Context::processDownload()
+{
+  return pndman_curl_process();
+}
+
 void QPndman::Context::checkUpgrades()
 {
-  pndman_check_updates(pndmanRepositories);
+  pndman_repository_check_updates(pndmanRepositories);
 }

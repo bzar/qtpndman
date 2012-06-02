@@ -35,10 +35,12 @@ namespace QPndman
     bool loadRepository(pndman_repository* repository, pndman_device* device);
     void checkUpgrades();
     
-    bool commitHandle(pndman_handle* handle);
+    bool commitHandle(pndman_package_handle* handle);
     
     void setLoggingVerbosity(int level);
     int getLoggingVerbosity() const;
+
+    int processDownload();
 
   private:
     pndman_repository* localPndmanRepository;

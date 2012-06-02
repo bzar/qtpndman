@@ -50,14 +50,12 @@ int main(int argc, char** argv)
   int counter = 0;
   while(!handle->getDone())
   {
-    if(handle->sync() < 0)
+    if(context->processDownload() < 0)
     {
       qDebug() << "Error syncing repository!";
       return 1;
     }
-    
-    handle->update();
-    
+
     if(handle->getBytesToDownload() != 0)
     {
       int percentage = 100 * handle->getBytesDownloaded() / handle->getBytesToDownload();

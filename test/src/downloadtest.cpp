@@ -13,7 +13,7 @@ int main(int argc, char** argv)
   
   repo->loadFrom(device);
   QPndman::SyncHandle* synchandle = repo->sync();
-  while(synchandle->sync()) synchandle->update();
+  while(context->processDownload()) synchandle->update();
   device->saveRepositories();
   
   QList<QPndman::Package*> packages = repo->getPackages();
@@ -39,12 +39,11 @@ int main(int argc, char** argv)
   int counter = 0;
   while(!handle->getDone())
   {
-    if(handle->download() < 0)
+    if(context->processDownload() < 0)
     {
       qDebug() << "ERROR: Could not download package!";
       return 1;      
     }
-    handle->update();
     
     if(handle->getBytesToDownload() != 0)
     {

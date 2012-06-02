@@ -24,7 +24,7 @@ int main(int argc, char** argv)
   
   while(!handle->getDone())
   {
-    if(QPndman::SyncHandle::sync() < 0)
+    if(context->processDownload() < 0)
     {
       qDebug() << "Error syncing repository!";
       return 1;
