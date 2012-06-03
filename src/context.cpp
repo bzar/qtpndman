@@ -4,7 +4,7 @@
 #include <QDebug>
 
 QPndman::Context::Context(QObject* parent) : QObject(parent),
-  localPndmanRepository(0), pndmanRepositories(0), pndmanDevices(0)
+  localPndmanRepository(0), pndmanRepositories(0), pndmanDevices(0), mutex()
 {
   setLoggingVerbosity(1);
   localPndmanRepository = pndman_repository_init();
@@ -141,9 +141,27 @@ bool QPndman::Context::loadRepository(pndman_repository* repository, pndman_devi
   return pndman_device_read_repository(repository, device) == 0;
 }
 
+bool QPndman::Context::performHandle(pndman_package_handle *handle)
+{
+  mutex.lock();
+  bool result = pndman_package_handle_perform(handle) == 0;
+  mutex.unlock();
+  return result;
+}
+
 bool QPndman::Context::commitHandle(pndman_package_handle *handle)
 {
-  return pndman_package_handle_commit(handle, localPndmanRepository) == 0;
+  mutex.lock();
+  bool result = pndman_package_handle_commit(handle, localPndmanRepository) == 0;
+  mutex.unlock();
+  return result;
+}
+
+void QPndman::Context::freeHandle(pndman_package_handle *handle)
+{
+  mutex.lock();
+  pndman_package_handle_free(handle);
+  mutex.unlock();
 }
 
 void QPndman::Context::setLoggingVerbosity(int level)
@@ -158,10 +176,14 @@ int QPndman::Context::getLoggingVerbosity() const
 
 int QPndman::Context::processDownload()
 {
-  return pndman_curl_process();
+  mutex.lock();
+  int pending = pndman_curl_process();
+  mutex.unlock();
+  return pending;
 }
 
 void QPndman::Context::checkUpgrades()
 {
   pndman_repository_check_updates(pndmanRepositories);
 }
+

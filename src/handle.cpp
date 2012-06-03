@@ -12,7 +12,7 @@ QPndman::InstallHandle::InstallHandle(QPndman::Context* context, QPndman::Packag
 
 bool QPndman::InstallHandle::execute()
 {
-  if(pndman_package_handle_perform(&handle) == 0)
+  if(context->performHandle(&handle))
   {
     emit executed();
     return true;
@@ -32,7 +32,7 @@ QPndman::UpgradeHandle::UpgradeHandle(QPndman::Context* context, QPndman::Packag
 
 bool QPndman::UpgradeHandle::execute()
 {
-  if(pndman_package_handle_perform(&handle) == 0)
+  if(context->performHandle(&handle))
   {
     emit executed();
     return true;
@@ -88,7 +88,7 @@ QPndman::Handle::Handle(Context*  context, Enum::Operation operation, Package* p
 
 QPndman::Handle::~Handle()
 {
-  pndman_package_handle_free(&handle);
+  context->freeHandle(&handle);
 }
 
 pndman_package_handle *QPndman::Handle::getPndmanHandle()

@@ -17,7 +17,9 @@ void downloadThread(QPndman::Context* context, QMutex* stopMutex)
     stopMutex->unlock();
   }
 
-  while(pending)
+  qDebug() << "downloadThread: cleaning up";
+
+  while(pending > 0)
   {
     pending = context->processDownload();
   }
@@ -71,7 +73,9 @@ int main(int argc, char** argv)
 
   qDebug() << "Waiting for download thread to finish";
   downloadThreadStopMutex.lock();
+  qDebug() << "Stop mutex locked";
   downloadThreadFuture.waitForFinished();
+  qDebug() << "Download thread finished";
 
   device->saveRepositories();
   return 0;

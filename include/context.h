@@ -2,6 +2,7 @@
 #define QT_PNDMAN_H
 
 #include <QObject>
+#include <QMutex>
 #include "pndman.h"
 
 namespace QPndman
@@ -36,7 +37,9 @@ namespace QPndman
     bool loadRepository(pndman_repository* repository, pndman_device* device);
     void checkUpgrades();
     
+    bool performHandle(pndman_package_handle* handle);
     bool commitHandle(pndman_package_handle* handle);
+    void freeHandle(pndman_package_handle* handle);
     
     void setLoggingVerbosity(int level);
     int getLoggingVerbosity() const;
@@ -50,6 +53,7 @@ namespace QPndman
     pndman_repository* localPndmanRepository;
     pndman_repository* pndmanRepositories;
     pndman_device* pndmanDevices;
+    QMutex mutex;
   };
 }
 
