@@ -43,6 +43,8 @@ namespace QPndman
     QString getVersion() const;
     QList<Package*> getPackages() const;
 
+    Context* getContext() const;
+
   public slots:
     virtual void update();
     

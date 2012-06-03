@@ -113,6 +113,11 @@ QList<QPndman::Package*> QPndman::Repository::getPackages() const
   return packages;
 }
 
+QPndman::Context *QPndman::Repository::getContext() const
+{
+  return context;
+}
+
 void QPndman::Repository::update()
 {
   setUrl(pndmanRepository->url);

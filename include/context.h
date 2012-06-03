@@ -40,6 +40,9 @@ namespace QPndman
     bool performHandle(pndman_package_handle* handle);
     bool commitHandle(pndman_package_handle* handle);
     void freeHandle(pndman_package_handle* handle);
+
+    bool performSyncHandle(pndman_sync_handle* handle);
+    void freeSyncHandle(pndman_sync_handle* handle);
     
     void setLoggingVerbosity(int level);
     int getLoggingVerbosity() const;

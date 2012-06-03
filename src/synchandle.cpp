@@ -12,13 +12,13 @@ QPndman::SyncHandle::SyncHandle(Repository* repository, bool fullSync, QObject* 
   handle.repository = repository->getPndmanRepository();
   handle.user_data = this;
   handle.callback = handleCallback;
-  pndman_sync_handle_perform(&handle);
+  repository->getContext()->performSyncHandle(&handle);
   update();
 }
 
 QPndman::SyncHandle::~SyncHandle()
 {
-  pndman_sync_handle_free(&handle);
+  repository->getContext()->freeSyncHandle(&handle);
 }
 
 pndman_sync_handle* QPndman::SyncHandle::getPndmanSyncHandle()

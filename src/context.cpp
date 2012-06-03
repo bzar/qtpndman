@@ -161,6 +161,21 @@ void QPndman::Context::freeHandle(pndman_package_handle *handle)
   mutex.unlock();
 }
 
+bool QPndman::Context::performSyncHandle(pndman_sync_handle *handle)
+{
+  mutex.lock();
+  bool result = pndman_sync_handle_perform(handle) == 0;
+  mutex.unlock();
+  return result;
+}
+
+void QPndman::Context::freeSyncHandle(pndman_sync_handle *handle)
+{
+  mutex.lock();
+  pndman_sync_handle_free(handle);
+  mutex.unlock();
+}
+
 void QPndman::Context::setLoggingVerbosity(int level)
 {
   pndman_set_verbose(level);
