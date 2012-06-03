@@ -105,6 +105,7 @@ void QPndman::Handle::handleCallback(pndman_curl_code code, pndman_package_handl
 void QPndman::Handle::cancel()
 {
   _cancelled = true;
+  context->freeHandle(&handle);
   emit cancelledChanged(true);
   emit cancelled();
 }

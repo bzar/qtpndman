@@ -151,10 +151,7 @@ bool QPndman::Context::performHandle(pndman_package_handle *handle)
 
 bool QPndman::Context::commitHandle(pndman_package_handle *handle)
 {
-  mutex.lock();
-  bool result = pndman_package_handle_commit(handle, localPndmanRepository) == 0;
-  mutex.unlock();
-  return result;
+  return pndman_package_handle_commit(handle, localPndmanRepository) == 0;
 }
 
 void QPndman::Context::freeHandle(pndman_package_handle *handle)

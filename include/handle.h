@@ -12,7 +12,7 @@
 namespace QPndman
 {
   class Device;
-  
+
   class Handle : public QObject
   {
   Q_OBJECT
@@ -37,7 +37,7 @@ namespace QPndman
     pndman_package_handle* getPndmanHandle();
     
     static void handleCallback(pndman_curl_code code, pndman_package_handle* handle);
-    
+
     QString getName() const;
     QString getError() const;
     bool getForce() const;

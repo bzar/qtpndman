@@ -47,7 +47,7 @@ QPndman::InstallHandle* QPndman::Device::install(Package* package, Enum::Install
   if(!handle->execute())
   {
     delete handle;
-    handle = 0;
+    return 0;
   }
   return handle;
 }

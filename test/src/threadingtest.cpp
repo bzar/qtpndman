@@ -13,8 +13,8 @@ void downloadThread(QPndman::Context* context, QMutex* stopMutex)
   while(stopMutex->tryLock())
   {
     pending = context->processDownload();
-    nanosleep(&ts, 0);
     stopMutex->unlock();
+    nanosleep(&ts, 0);
   }
 
   qDebug() << "downloadThread: cleaning up";
@@ -50,10 +50,19 @@ int main(int argc, char** argv)
   // Start two downloads, cancel and restart them so that one is always running
 
   QPndman::InstallHandle* h1 = toInstall->install(device, QPndman::Enum::Menu);
+  if(!h1)
+  {
+    qDebug() << "ERROR: h1 is null!";
+  }
+
   QPndman::InstallHandle* h2 = toInstall2->install(device, QPndman::Enum::Menu);
+  if(!h2)
+  {
+    qDebug() << "ERROR: h2 is null!";
+  }
 
   timespec ts = { 0, 200 * 1000 * 1000 };
-  for(int i = 0; i < 100; ++i)
+  for(int i = 0; i < 100 && h1 && h2; ++i)
   {
     h2->cancel();
     delete h2;
@@ -66,16 +75,25 @@ int main(int argc, char** argv)
     nanosleep(&ts, 0);
   }
 
-  h1->cancel();
-  delete h1;
-  h2->cancel();
-  delete h2;
+  qDebug() << "cancel both dowloads";
+  if(h1)
+  {
+    h1->cancel();
+    delete h1;
+  }
+
+  if(h2)
+  {
+    h2->cancel();
+    delete h2;
+  }
 
   qDebug() << "Waiting for download thread to finish";
   downloadThreadStopMutex.lock();
   qDebug() << "Stop mutex locked";
   downloadThreadFuture.waitForFinished();
   qDebug() << "Download thread finished";
+  downloadThreadStopMutex.unlock();
 
   device->saveRepositories();
   return 0;
