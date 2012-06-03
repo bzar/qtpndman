@@ -19,3 +19,6 @@ target_link_libraries(upgradetest qtpndman)
 
 add_executable(removetest src/removetest.cpp)
 target_link_libraries(removetest qtpndman)
+
+add_executable(threadingtest src/threadingtest.cpp)
+target_link_libraries(threadingtest qtpndman)
