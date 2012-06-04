@@ -12,6 +12,7 @@
 #include "enums.h"
 
 #include "pndman.h"
+#include <QImage>
 
 namespace QPndman
 {
@@ -80,6 +81,8 @@ namespace QPndman
     QList<PreviewPicture*> getPreviewPictures() const;
     QList<Package*> getInstallInstances() const;
     Package* getUpgradeCandidate() const;
+
+    QImage getEmbeddedIcon() const;
 
   protected:
     pndman_package* package;

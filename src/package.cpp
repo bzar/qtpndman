@@ -146,3 +146,18 @@ QPndman::Package* QPndman::Package::getUpgradeCandidate() const
 {
   return upgradeCandidate;
 }
+
+QImage QPndman::Package::getEmbeddedIcon() const
+{
+  int const MAX_ICON_SIZE = 1024 * 1024;
+  QByteArray buf(MAX_ICON_SIZE, '0');
+
+  size_t imageSize = pndman_package_get_embedded_png(package, buf.data(), MAX_ICON_SIZE);
+
+  if(!imageSize)
+  {
+    return QImage();
+  }
+
+  return QImage::fromData(buf);
+}

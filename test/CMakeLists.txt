@@ -22,3 +22,6 @@ target_link_libraries(removetest qtpndman)
 
 add_executable(threadingtest src/threadingtest.cpp)
 target_link_libraries(threadingtest qtpndman)
+
+add_executable(iconextractiontest src/iconextractiontest.cpp)
+target_link_libraries(iconextractiontest qtpndman)
