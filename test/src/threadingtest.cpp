@@ -42,6 +42,14 @@ int main(int argc, char** argv)
   repo->loadFrom(device);
 
   QList<QPndman::Package*> packages = repo->getPackages();
+
+  if(packages.size() == 0)
+  {
+    qDebug() << "ERROR: no packages";
+    downloadThreadStopMutex.lock();
+    return 1;
+  }
+
   QPndman::Package* toInstall = packages.at(qrand() % packages.size());
   QPndman::Package* toInstall2 = packages.at(qrand() % packages.size());
 
