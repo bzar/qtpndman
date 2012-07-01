@@ -59,7 +59,8 @@ namespace QPndman
     
     Q_INVOKABLE InstallHandle* install(Device* device, Enum::InstallLocation location, bool force = false);
     Q_INVOKABLE UpgradeHandle* upgrade(bool force = false);
-    Q_INVOKABLE void addComment(QString const& comment);
+    Q_INVOKABLE bool addComment(QString const& comment);
+    Q_INVOKABLE bool deleteComment(Comment *comment);
     Q_INVOKABLE void reloadComments();
     bool crawl(bool full = false);
 
@@ -122,6 +123,7 @@ namespace QPndman
 
     static void addCommentCallback(pndman_curl_code code, const char *info, void *user_data);
     static void reloadCommentsCallback(pndman_curl_code code, struct pndman_api_comment_packet *packet);
+    static void deleteCommentCallback(pndman_curl_code code, const char *info, void *user_data);
   };
 }
 

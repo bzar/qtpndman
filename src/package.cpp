@@ -51,17 +51,33 @@ QPndman::UpgradeHandle* QPndman::Package::upgrade(bool force)
   return handle;
 }
 
-void QPndman::Package::addComment(const QString &comment)
+bool QPndman::Package::addComment(const QString &comment)
 {
   Repository* repository = qobject_cast<Repository*>(parent());
   if(repository)
   {
-    pndman_api_comment_pnd(this, package, repository->getPndmanRepository(), comment.toUtf8().constData(), addCommentCallback);
+    return pndman_api_comment_pnd(this, package, repository->getPndmanRepository(), comment.toUtf8().constData(), addCommentCallback) == 0;
   }
-  else
+
+  qDebug() << "QPndman::Package parent not a QPndman::Repository!";
+  return false;
+}
+
+bool QPndman::Package::deleteComment(QPndman::Comment* comment)
+{
+  Repository* repository = qobject_cast<Repository*>(parent());
+
+  if(!repository || !comments.contains(comment) ||
+     pndman_api_comment_pnd_delete(this, package, comment->getTimestamp().toTime_t(),
+                                   repository->getPndmanRepository(), deleteCommentCallback) != 0)
   {
-    qDebug() << "QPndman::Package parent not a QPndman::Repository!";
+    return false;
   }
+
+  comments.removeOne(comment);
+  comment->deleteLater();
+  emit commentsChanged();
+  return true;
 }
 
 void QPndman::Package::reloadComments()
@@ -69,10 +85,9 @@ void QPndman::Package::reloadComments()
   Repository* repository = qobject_cast<Repository*>(parent());
   if(repository)
   {
-
     foreach(Comment* comment, comments)
     {
-      delete comment;
+      comment->deleteLater();
     }
 
     comments.clear();
@@ -227,4 +242,9 @@ void QPndman::Package::reloadCommentsCallback(pndman_curl_code code, pndman_api_
     package->comments.append(new Comment(packet, package));
     emit package->commentsChanged();
   }
+}
+
+void QPndman::Package::deleteCommentCallback(pndman_curl_code code, const char *info, void *user_data)
+{
+
 }

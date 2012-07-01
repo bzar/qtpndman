@@ -54,7 +54,12 @@ int main(int argc, char** argv)
   repo->setCredentials(username, key);
 
   qDebug() << "Adding comment for" << pnd->getTitle();
-  pnd->addComment(comment);
+  if(!pnd->addComment(comment))
+  {
+    qDebug() << "ERROR: adding comment failed!";
+    return 1;
+  }
+
   while(context->processDownload() > 0);
 
   qDebug() << "Checking if comment was added...";
@@ -67,7 +72,28 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  qDebug() << "Comment added succesfully";
+  qDebug() << "Comment added successfully";
+
+  qDebug() << "Deleting comment";
+  if(!pnd->deleteComment(pnd->getComments().first()))
+  {
+    qDebug() << "ERROR: deleting comment failed!";
+    return 1;
+  }
+
+  while(context->processDownload() > 0);
+
+  qDebug() << "Checking if comment was deleted...";
+  pnd->reloadComments();
+  while(context->processDownload() > 0);
+
+  if(pnd->getComments().size() != 0 && pnd->getComments().first()->getContent() == comment)
+  {
+    qDebug() << "ERROR: Comment was not deleted!";
+    return 1;
+  }
+
+  qDebug() << "Comment deleted successfully";
 
   return 0;
 }
