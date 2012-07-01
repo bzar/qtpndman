@@ -31,3 +31,6 @@ target_link_libraries(commentpulltest qtpndman)
 
 add_executable(commentaddtest src/commentaddtest.cpp)
 target_link_libraries(commentaddtest qtpndman)
+
+add_executable(ratingtest src/ratingtest.cpp)
+target_link_libraries(ratingtest qtpndman)

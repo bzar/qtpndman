@@ -62,6 +62,9 @@ namespace QPndman
     Q_INVOKABLE bool addComment(QString const& comment);
     Q_INVOKABLE bool deleteComment(Comment *comment);
     Q_INVOKABLE void reloadComments();
+
+    Q_INVOKABLE bool rate(int const rating);
+
     bool crawl(bool full = false);
 
     QString getPath() const;
@@ -94,6 +97,7 @@ namespace QPndman
     void addCommentDone();
     void addCommentFail();
     void commentsChanged();
+    void ratingChanged();
 
   protected:
     pndman_package* package;
@@ -124,6 +128,7 @@ namespace QPndman
     static void addCommentCallback(pndman_curl_code code, const char *info, void *user_data);
     static void reloadCommentsCallback(pndman_curl_code code, struct pndman_api_comment_packet *packet);
     static void deleteCommentCallback(pndman_curl_code code, const char *info, void *user_data);
+    static void rateCallback(pndman_curl_code code, const char *info, void *user_data);
   };
 }
 

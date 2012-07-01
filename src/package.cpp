@@ -101,6 +101,17 @@ void QPndman::Package::reloadComments()
   }
 }
 
+bool QPndman::Package::rate(const int rating)
+{
+  Repository* repository = qobject_cast<Repository*>(parent());
+  if(!repository)
+  {
+    return false;
+  }
+
+  return pndman_api_rate_pnd(this, package, repository->getPndmanRepository(), rating, rateCallback) == 0;
+}
+
 bool QPndman::Package::crawl(bool full)
 {
   return context->crawlPndmanPackage(package, full);
@@ -247,4 +258,15 @@ void QPndman::Package::reloadCommentsCallback(pndman_curl_code code, pndman_api_
 void QPndman::Package::deleteCommentCallback(pndman_curl_code code, const char *info, void *user_data)
 {
 
+}
+
+void QPndman::Package::rateCallback(pndman_curl_code code, const char *info, void *user_data)
+{
+  Q_UNUSED(info)
+
+  if(code == PNDMAN_CURL_DONE)
+  {
+    Package* package = static_cast<Package*>(user_data);
+    emit package->ratingChanged();
+  }
 }
