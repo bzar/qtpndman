@@ -113,6 +113,11 @@ QList<QPndman::Package*> QPndman::Repository::getPackages() const
   return packages;
 }
 
+void QPndman::Repository::setCredentials(const QString &user, const QString &key, const bool store)
+{
+  context->setRepositoryCredentials(pndmanRepository, user, key, store);
+}
+
 QPndman::Context *QPndman::Repository::getContext() const
 {
   return context;

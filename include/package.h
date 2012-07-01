@@ -9,6 +9,7 @@
 #include "application.h"
 #include "translatedstring.h"
 #include "category.h"
+#include "comment.h"
 #include "enums.h"
 
 #include "pndman.h"
@@ -47,6 +48,7 @@ namespace QPndman
     Q_PROPERTY(QList<QPndman::Category*> categories READ getCategories CONSTANT)
     Q_PROPERTY(QList<QPndman::PreviewPicture*> previewPictures READ getPreviewPictures CONSTANT)
     Q_PROPERTY(QList<QPndman::Package*> installInstances READ getInstallInstances CONSTANT)
+    Q_PROPERTY(QList<QPndman::Comment*> comments READ getComments NOTIFY commentsChanged)
     Q_PROPERTY(QPndman::Package* upgradeCandidate READ getUpgradeCandidate CONSTANT)
 
 
@@ -57,6 +59,8 @@ namespace QPndman
     
     Q_INVOKABLE InstallHandle* install(Device* device, Enum::InstallLocation location, bool force = false);
     Q_INVOKABLE UpgradeHandle* upgrade(bool force = false);
+    Q_INVOKABLE void addComment(QString const& comment);
+    Q_INVOKABLE void reloadComments();
     bool crawl(bool full = false);
 
     QString getPath() const;
@@ -80,9 +84,15 @@ namespace QPndman
     QList<Category*> getCategories() const;
     QList<PreviewPicture*> getPreviewPictures() const;
     QList<Package*> getInstallInstances() const;
+    QList<Comment*> getComments() const;
     Package* getUpgradeCandidate() const;
 
     QImage getEmbeddedIcon() const;
+
+  signals:
+    void addCommentDone();
+    void addCommentFail();
+    void commentsChanged();
 
   protected:
     pndman_package* package;
@@ -107,7 +117,11 @@ namespace QPndman
     QList<Category*> categories;
     QList<PreviewPicture*> previewPictures;
     QList<Package*> installInstances;
+    QList<Comment*> comments;
     Package* upgradeCandidate;
+
+    static void addCommentCallback(pndman_curl_code code, const char *info, void *user_data);
+    static void reloadCommentsCallback(pndman_curl_code code, struct pndman_api_comment_packet *packet);
   };
 }
 

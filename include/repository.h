@@ -43,11 +43,13 @@ namespace QPndman
     QString getVersion() const;
     QList<Package*> getPackages() const;
 
+    void setCredentials(QString const& user, QString const& key, bool const store = false);
+
     Context* getContext() const;
 
   public slots:
     virtual void update();
-    
+
   signals:
     void urlChanged(QString newUrl);
     void nameChanged(QString newName);
@@ -55,7 +57,7 @@ namespace QPndman
     void timestampChanged(QDateTime newTimestamp);
     void versionChanged(QString newVersion);
     void packagesChanged(QList<Package*> newPackages);
-    
+
   protected:
     Repository(Context*  c, pndman_repository* p, QObject* parent = 0);
 

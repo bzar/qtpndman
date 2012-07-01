@@ -3,7 +3,9 @@
 #include "device.h"
 #include "util.h"
 #include "context.h"
+#include "repository.h"
 
+#include <QDebug>
 
 QPndman::Package::Package(Context* context, pndman_package* p, QObject* parent, bool initUpgradeCandidate) : QObject(parent), package(p), context(context),
   path(QString::fromUtf8(p->path)), id(QString::fromUtf8(p->id)), icon(QString::fromUtf8(p->icon)), info(QString::fromUtf8(p->info)), md5(QString::fromUtf8(p->md5)),
@@ -47,6 +49,41 @@ QPndman::UpgradeHandle* QPndman::Package::upgrade(bool force)
     handle = 0;
   }
   return handle;
+}
+
+void QPndman::Package::addComment(const QString &comment)
+{
+  Repository* repository = qobject_cast<Repository*>(parent());
+  if(repository)
+  {
+    pndman_api_comment_pnd(this, package, repository->getPndmanRepository(), comment.toUtf8().constData(), addCommentCallback);
+  }
+  else
+  {
+    qDebug() << "QPndman::Package parent not a QPndman::Repository!";
+  }
+}
+
+void QPndman::Package::reloadComments()
+{
+  Repository* repository = qobject_cast<Repository*>(parent());
+  if(repository)
+  {
+
+    foreach(Comment* comment, comments)
+    {
+      delete comment;
+    }
+
+    comments.clear();
+    emit commentsChanged();
+
+    pndman_api_comment_pnd_pull(this, package, repository->getPndmanRepository(), reloadCommentsCallback);
+  }
+  else
+  {
+    qDebug() << "QPndman::Package parent not a QPndman::Repository!";
+  }
 }
 
 bool QPndman::Package::crawl(bool full)
@@ -142,6 +179,11 @@ QList<QPndman::Package*> QPndman::Package::getInstallInstances() const
   return installInstances;
 }
 
+QList<QPndman::Comment *> QPndman::Package::getComments() const
+{
+  return comments;
+}
+
 QPndman::Package* QPndman::Package::getUpgradeCandidate() const
 {
   return upgradeCandidate;
@@ -160,4 +202,29 @@ QImage QPndman::Package::getEmbeddedIcon() const
   }
 
   return QImage::fromData(buf);
+}
+
+void QPndman::Package::addCommentCallback(pndman_curl_code code, const char *info, void *user_data)
+{
+  Q_UNUSED(info)
+
+  Package* package = static_cast<Package*>(user_data);
+  if(code == PNDMAN_CURL_DONE)
+  {
+    emit package->addCommentDone();
+  }
+  else if(code == PNDMAN_CURL_FAIL)
+  {
+    emit package->addCommentFail();
+  }
+}
+
+void QPndman::Package::reloadCommentsCallback(pndman_curl_code code, pndman_api_comment_packet *packet)
+{
+  if(code != PNDMAN_CURL_FAIL)
+  {
+    Package* package = static_cast<Package*>(packet->user_data);
+    package->comments.append(new Comment(packet, package));
+    emit package->commentsChanged();
+  }
 }

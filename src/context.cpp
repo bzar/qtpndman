@@ -62,6 +62,11 @@ void QPndman::Context::checkLocalPndmanRepository()
   pndman_repository_check_local(localPndmanRepository);
 }
 
+void QPndman::Context::setRepositoryCredentials(pndman_repository *repository, const QString &user, const QString &key, bool const store)
+{
+  pndman_repository_set_credentials(repository, user.toUtf8().constData(), key.toUtf8().constData(), store);
+}
+
 
 pndman_device* QPndman::Context::addPndmanDevice(QString const& path)
 {

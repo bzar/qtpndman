@@ -25,3 +25,9 @@ target_link_libraries(threadingtest qtpndman)
 
 add_executable(iconextractiontest src/iconextractiontest.cpp)
 target_link_libraries(iconextractiontest qtpndman)
+
+add_executable(commentpulltest src/commentpulltest.cpp)
+target_link_libraries(commentpulltest qtpndman)
+
+add_executable(commentaddtest src/commentaddtest.cpp)
+target_link_libraries(commentaddtest qtpndman)
