@@ -54,7 +54,7 @@ namespace QPndman
 
   public slots:
     virtual void update();
-    void reloadDownloadHistory();
+    bool reloadDownloadHistory();
 
   signals:
     void urlChanged(QString newUrl);

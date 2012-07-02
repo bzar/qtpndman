@@ -1,5 +1,6 @@
 #include "debugsource.h"
 #include "pndman.h"
+#include <QDebug>
 
 QPndman::DebugSource *QPndman::DebugSource::instance()
 {

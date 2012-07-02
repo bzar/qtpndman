@@ -182,7 +182,7 @@ void QPndman::Repository::update()
   emit packagesChanged(packages);
 }
 
-void QPndman::Repository::reloadDownloadHistory()
+bool QPndman::Repository::reloadDownloadHistory()
 {
   foreach(DownloadHistoryItem* item, downloadHistory)
   {
@@ -191,7 +191,7 @@ void QPndman::Repository::reloadDownloadHistory()
 
   downloadHistory.clear();
   emit downloadHistoryChanged(downloadHistory);
-  pndman_api_download_history(this, pndmanRepository, reloadDownloadHistoryCallback);
+  return pndman_api_download_history(this, pndmanRepository, reloadDownloadHistoryCallback) == 0;
 }
 
 void QPndman::Repository::setUrl(QString const& newUrl)

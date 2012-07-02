@@ -36,7 +36,12 @@ int main(int argc, char** argv)
   repo->setCredentials(username, key);
 
   qDebug() << "Getting download history";
-  repo->reloadDownloadHistory();
+  if(!repo->reloadDownloadHistory())
+  {
+    qDebug() << "Error getting download history";
+    return 1;
+  }
+
   while(context->processDownload() > 0);
 
   qDebug() << "Done.";
