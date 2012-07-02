@@ -80,25 +80,23 @@ bool QPndman::Package::deleteComment(QPndman::Comment* comment)
   return true;
 }
 
-void QPndman::Package::reloadComments()
+bool QPndman::Package::reloadComments()
 {
   Repository* repository = qobject_cast<Repository*>(parent());
-  if(repository)
+  if(!repository)
   {
-    foreach(Comment* comment, comments)
-    {
-      comment->deleteLater();
-    }
-
-    comments.clear();
-    emit commentsChanged();
-
-    pndman_api_comment_pnd_pull(this, package, repository->getPndmanRepository(), reloadCommentsCallback);
+    return false;
   }
-  else
+
+  foreach(Comment* comment, comments)
   {
-    qDebug() << "QPndman::Package parent not a QPndman::Repository!";
+    comment->deleteLater();
   }
+
+  comments.clear();
+  emit commentsChanged();
+
+  return pndman_api_comment_pnd_pull(this, package, repository->getPndmanRepository(), reloadCommentsCallback) == 0;
 }
 
 bool QPndman::Package::rate(const int rating)
@@ -110,6 +108,22 @@ bool QPndman::Package::rate(const int rating)
   }
 
   return pndman_api_rate_pnd(this, package, repository->getPndmanRepository(), rating, rateCallback) == 0;
+}
+
+bool QPndman::Package::reloadArchived()
+{
+  Repository* repository = qobject_cast<Repository*>(parent());
+  if(!repository)
+  {
+    return false;
+  }
+
+  foreach(Package* p, archived)
+  {
+    p->deleteLater();
+  }
+
+  return pndman_api_archived_pnd(this, package, repository->getPndmanRepository(), requestArchivedVersionsCallback) == 0;
 }
 
 bool QPndman::Package::crawl(bool full)
@@ -210,6 +224,11 @@ QList<QPndman::Comment *> QPndman::Package::getComments() const
   return comments;
 }
 
+QList<QPndman::Package *> QPndman::Package::getArchived() const
+{
+  return archived;
+}
+
 QPndman::Package* QPndman::Package::getUpgradeCandidate() const
 {
   return upgradeCandidate;
@@ -268,5 +287,18 @@ void QPndman::Package::rateCallback(pndman_curl_code code, const char *info, voi
   {
     Package* package = static_cast<Package*>(user_data);
     emit package->ratingChanged();
+  }
+}
+
+void QPndman::Package::requestArchivedVersionsCallback(pndman_curl_code code, pndman_api_archived_packet *packet)
+{
+  if(code != PNDMAN_CURL_FAIL)
+  {
+    Package* package = static_cast<Package*>(packet->user_data);
+    for(pndman_package* p = packet->pnd; p; p = p->next_installed)
+    {
+      package->archived << new Package(package->context, p, package->parent(), false);
+    }
+    emit package->archivedChanged(package->archived);
   }
 }

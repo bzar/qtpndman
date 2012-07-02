@@ -37,3 +37,6 @@ target_link_libraries(ratingtest qtpndman)
 
 add_executable(downloadhistorytest src/downloadhistorytest.cpp)
 target_link_libraries(downloadhistorytest qtpndman)
+
+add_executable(archivedtest src/archivedtest.cpp)
+target_link_libraries(archivedtest qtpndman)

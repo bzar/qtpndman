@@ -49,6 +49,7 @@ namespace QPndman
     Q_PROPERTY(QList<QPndman::PreviewPicture*> previewPictures READ getPreviewPictures CONSTANT)
     Q_PROPERTY(QList<QPndman::Package*> installInstances READ getInstallInstances CONSTANT)
     Q_PROPERTY(QList<QPndman::Comment*> comments READ getComments NOTIFY commentsChanged)
+    Q_PROPERTY(QList<QPndman::Package*> archived READ getArchived NOTIFY archivedChanged)
     Q_PROPERTY(QPndman::Package* upgradeCandidate READ getUpgradeCandidate CONSTANT)
 
 
@@ -61,9 +62,10 @@ namespace QPndman
     Q_INVOKABLE UpgradeHandle* upgrade(bool force = false);
     Q_INVOKABLE bool addComment(QString const& comment);
     Q_INVOKABLE bool deleteComment(Comment *comment);
-    Q_INVOKABLE void reloadComments();
+    Q_INVOKABLE bool reloadComments();
 
     Q_INVOKABLE bool rate(int const rating);
+    Q_INVOKABLE bool reloadArchived();
 
     bool crawl(bool full = false);
 
@@ -89,6 +91,7 @@ namespace QPndman
     QList<PreviewPicture*> getPreviewPictures() const;
     QList<Package*> getInstallInstances() const;
     QList<Comment*> getComments() const;
+    QList<Package*> getArchived() const;
     Package* getUpgradeCandidate() const;
 
     QImage getEmbeddedIcon() const;
@@ -98,6 +101,7 @@ namespace QPndman
     void addCommentFail();
     void commentsChanged();
     void ratingChanged();
+    void archivedChanged(QList<Package*> archived);
 
   protected:
     pndman_package* package;
@@ -123,12 +127,14 @@ namespace QPndman
     QList<PreviewPicture*> previewPictures;
     QList<Package*> installInstances;
     QList<Comment*> comments;
+    QList<Package*> archived;
     Package* upgradeCandidate;
 
     static void addCommentCallback(pndman_curl_code code, const char *info, void *user_data);
     static void reloadCommentsCallback(pndman_curl_code code, struct pndman_api_comment_packet *packet);
     static void deleteCommentCallback(pndman_curl_code code, const char *info, void *user_data);
     static void rateCallback(pndman_curl_code code, const char *info, void *user_data);
+    static void requestArchivedVersionsCallback(pndman_curl_code code, struct pndman_api_archived_packet *packet);
   };
 }
 
