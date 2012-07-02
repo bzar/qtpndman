@@ -1,4 +1,5 @@
 #include "repository.h"
+#include "package.h"
 #include "util.h"
 
 #include <QDebug>
@@ -113,6 +114,11 @@ QList<QPndman::Package*> QPndman::Repository::getPackages() const
   return packages;
 }
 
+QList<QPndman::DownloadHistoryItem*> QPndman::Repository::getDownloadHistory() const
+{
+  return downloadHistory;
+}
+
 void QPndman::Repository::setCredentials(const QString &user, const QString &key, const bool store)
 {
   context->setRepositoryCredentials(pndmanRepository, user, key, store);
@@ -176,6 +182,18 @@ void QPndman::Repository::update()
   emit packagesChanged(packages);
 }
 
+void QPndman::Repository::reloadDownloadHistory()
+{
+  foreach(DownloadHistoryItem* item, downloadHistory)
+  {
+    item->deleteLater();
+  }
+
+  downloadHistory.clear();
+  emit downloadHistoryChanged(downloadHistory);
+  pndman_api_download_history(this, pndmanRepository, reloadDownloadHistoryCallback);
+}
+
 void QPndman::Repository::setUrl(QString const& newUrl)
 {
   if(url != newUrl)
@@ -224,4 +242,14 @@ void QPndman::Repository::setPackages(QList<Package*> const& newPackages)
   }
   packages = newPackages;
   emit packagesChanged(packages);
+}
+
+void QPndman::Repository::reloadDownloadHistoryCallback(pndman_curl_code code, pndman_api_history_packet *packet)
+{
+  if(code != PNDMAN_CURL_FAIL)
+  {
+    Repository* repository = static_cast<Repository*>(packet->user_data);
+    repository->downloadHistory.append(new DownloadHistoryItem(packet, repository));
+    emit repository->downloadHistoryChanged(repository->downloadHistory);
+  }
 }

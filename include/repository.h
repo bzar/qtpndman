@@ -8,6 +8,7 @@
 #include "package.h"
 #include "pndman.h"
 #include "synchandle.h"
+#include "downloadhistoryitem.h"
 
 namespace QPndman
 {
@@ -23,8 +24,11 @@ namespace QPndman
     Q_PROPERTY(QDateTime timestamp READ getTimestamp NOTIFY timestampChanged)
     Q_PROPERTY(QString version READ getVersion NOTIFY versionChanged)
     Q_PROPERTY(QList<QPndman::Package*> packages READ getPackages NOTIFY packagesChanged)
+    Q_PROPERTY(QList<QPndman::DownloadHistoryItem*> downloadHistory READ getDownloadHistory NOTIFY downloadHistoryChanged)
 
   public:
+
+
     Repository(Context*  c, QString const& url, QObject* parent = 0);
     ~Repository();
 
@@ -42,6 +46,7 @@ namespace QPndman
     QDateTime getTimestamp() const;
     QString getVersion() const;
     QList<Package*> getPackages() const;
+    QList<DownloadHistoryItem*> getDownloadHistory() const;
 
     void setCredentials(QString const& user, QString const& key, bool const store = false);
 
@@ -49,6 +54,7 @@ namespace QPndman
 
   public slots:
     virtual void update();
+    void reloadDownloadHistory();
 
   signals:
     void urlChanged(QString newUrl);
@@ -57,6 +63,7 @@ namespace QPndman
     void timestampChanged(QDateTime newTimestamp);
     void versionChanged(QString newVersion);
     void packagesChanged(QList<Package*> newPackages);
+    void downloadHistoryChanged(QList<DownloadHistoryItem*> newDownloadHistory);
 
   protected:
     Repository(Context*  c, pndman_repository* p, QObject* parent = 0);
@@ -81,6 +88,9 @@ namespace QPndman
     QDateTime timestamp;
     QString version;
     QList<Package*> packages;
+    QList<DownloadHistoryItem*> downloadHistory;
+
+    static void reloadDownloadHistoryCallback(pndman_curl_code code, struct pndman_api_history_packet *packet);
   };
   
   class LocalRepository : public Repository
