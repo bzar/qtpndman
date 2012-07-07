@@ -55,6 +55,7 @@ namespace QPndman
 
   public:
     Package(Context* context, pndman_package* p, QObject* parent = 0, bool initUpgradeCandidate = true);
+    virtual ~Package();
 
     pndman_package* getPndmanPackage() const;
     

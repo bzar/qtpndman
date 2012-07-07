@@ -30,6 +30,16 @@ QPndman::Package::Package(Context* context, pndman_package* p, QObject* parent, 
   }
 }
 
+QPndman::Package::~Package()
+{
+  foreach(Comment* comment, comments)
+  {
+    comment->deleteLater();
+  }
+
+  comments.clear();
+}
+
 pndman_package* QPndman::Package::getPndmanPackage() const
 {
   return package;
@@ -269,7 +279,7 @@ void QPndman::Package::reloadCommentsCallback(pndman_curl_code code, pndman_api_
   if(code != PNDMAN_CURL_FAIL)
   {
     Package* package = static_cast<Package*>(packet->user_data);
-    package->comments.append(new Comment(packet, package));
+    package->comments.append(new Comment(packet));
     emit package->commentsChanged();
   }
 }
