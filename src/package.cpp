@@ -281,6 +281,11 @@ void QPndman::Package::reloadCommentsCallback(pndman_curl_code code, pndman_api_
     Package* package = static_cast<Package*>(packet->user_data);
     package->comments.append(new Comment(packet));
     emit package->commentsChanged();
+
+    if(code == PNDMAN_CURL_DONE)
+    {
+      emit package->reloadCommentsDone();
+    }
   }
 }
 

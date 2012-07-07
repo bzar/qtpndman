@@ -101,6 +101,7 @@ namespace QPndman
     void addCommentDone();
     void addCommentFail();
     void commentsChanged();
+    void reloadCommentsDone();
     void ratingChanged();
     void archivedChanged(QList<Package*> archived);
 
