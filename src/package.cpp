@@ -293,6 +293,7 @@ void QPndman::Package::rateCallback(pndman_curl_code code, pndman_api_rate_packe
     package->ownRating = packet->rating;
     emit package->ratingChanged();
     emit package->ownRatingChanged();
+    emit package->rateDone();
   }
 }
 
