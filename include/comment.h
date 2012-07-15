@@ -15,7 +15,7 @@ namespace QPndman
     Q_PROPERTY(QString username READ getUsername CONSTANT)
     Q_PROPERTY(QString content READ getContent CONSTANT)
     Q_PROPERTY(QDateTime timestamp READ getTimestamp CONSTANT)
-    Q_PROPERTY(Version* commentedVersion READ getCommentedVersion CONSTANT)
+    Q_PROPERTY(QPndman::Version* commentedVersion READ getCommentedVersion CONSTANT)
   public:
     Comment(pndman_api_comment_packet const* p, QObject* parent = 0);
 

@@ -3,14 +3,12 @@
 #include "device.h"
 #include "util.h"
 #include "context.h"
-#include "repository.h"
-
 #include <QDebug>
 
 QPndman::Package::Package(Context* context, pndman_package* p, QObject* parent, bool initUpgradeCandidate) : QObject(parent), package(p), context(context),
   path(QString::fromUtf8(p->path)), id(QString::fromUtf8(p->id)), icon(QString::fromUtf8(p->icon)), info(QString::fromUtf8(p->info)), md5(QString::fromUtf8(p->md5)),
   url(QString::fromUtf8(p->url)), vendor(QString::fromUtf8(p->vendor)), mount(QString::fromUtf8(p->mount)),
-  size(p->size), modified(QDateTime::fromTime_t(p->modified_time)), rating(p->rating),
+  size(p->size), modified(QDateTime::fromTime_t(p->modified_time)), rating(p->rating), ownRating(0),
   author(new Author(&p->author, this)),
   version(new Version(&p->version, this)),
   applications(makeQListPtr<pndman_application const, Application>(p->app, this)),
@@ -63,41 +61,30 @@ QPndman::UpgradeHandle* QPndman::Package::upgrade(bool force)
 
 bool QPndman::Package::addComment(const QString &comment)
 {
-  Repository* repository = qobject_cast<Repository*>(parent());
-  if(repository)
-  {
-    return pndman_api_comment_pnd(this, package, repository->getPndmanRepository(), comment.toUtf8().constData(), addCommentCallback) == 0;
-  }
-
-  qDebug() << "QPndman::Package parent not a QPndman::Repository!";
-  return false;
+  return pndman_api_comment_pnd(this, package, comment.toUtf8().constData(), addCommentCallback) == 0;
 }
 
 bool QPndman::Package::deleteComment(QPndman::Comment* comment)
 {
-  Repository* repository = qobject_cast<Repository*>(parent());
-
-  if(!repository || !comments.contains(comment) ||
-     pndman_api_comment_pnd_delete(this, package, comment->getTimestamp().toTime_t(),
-                                   repository->getPndmanRepository(), deleteCommentCallback) != 0)
+  if(!comments.contains(comment))
   {
     return false;
   }
 
-  comments.removeOne(comment);
-  comment->deleteLater();
-  emit commentsChanged();
-  return true;
+  bool success = pndman_api_comment_pnd_delete(this, package, comment->getTimestamp().toTime_t(), deleteCommentCallback) == 0;
+
+  if(success)
+  {
+    comments.removeOne(comment);
+    comment->deleteLater();
+    emit commentsChanged();
+  }
+
+  return success;
 }
 
 bool QPndman::Package::reloadComments()
 {
-  Repository* repository = qobject_cast<Repository*>(parent());
-  if(!repository)
-  {
-    return false;
-  }
-
   foreach(Comment* comment, comments)
   {
     comment->deleteLater();
@@ -106,34 +93,27 @@ bool QPndman::Package::reloadComments()
   comments.clear();
   emit commentsChanged();
 
-  return pndman_api_comment_pnd_pull(this, package, repository->getPndmanRepository(), reloadCommentsCallback) == 0;
+  return pndman_api_comment_pnd_pull(this, package, reloadCommentsCallback) == 0;
+}
+
+bool QPndman::Package::reloadOwnRating()
+{
+  return pndman_api_get_own_rate_pnd(this, package, reloadOwnRatingCallback) == 0;
 }
 
 bool QPndman::Package::rate(const int rating)
 {
-  Repository* repository = qobject_cast<Repository*>(parent());
-  if(!repository)
-  {
-    return false;
-  }
-
-  return pndman_api_rate_pnd(this, package, repository->getPndmanRepository(), rating, rateCallback) == 0;
+  return pndman_api_rate_pnd(this, package, rating, rateCallback) == 0;
 }
 
 bool QPndman::Package::reloadArchived()
 {
-  Repository* repository = qobject_cast<Repository*>(parent());
-  if(!repository)
-  {
-    return false;
-  }
-
   foreach(Package* p, archived)
   {
     p->deleteLater();
   }
 
-  return pndman_api_archived_pnd(this, package, repository->getPndmanRepository(), requestArchivedVersionsCallback) == 0;
+  return pndman_api_archived_pnd(this, package, requestArchivedVersionsCallback) == 0;
 }
 
 bool QPndman::Package::crawl(bool full)
@@ -185,6 +165,12 @@ int QPndman::Package::getRating() const
 {
   return rating;
 }
+
+int QPndman::Package::getOwnRating() const
+{
+  return ownRating;
+}
+
 QPndman::Author* QPndman::Package::getAuthor() const
 {
   return author;
@@ -279,8 +265,12 @@ void QPndman::Package::reloadCommentsCallback(pndman_curl_code code, pndman_api_
   if(code != PNDMAN_CURL_FAIL)
   {
     Package* package = static_cast<Package*>(packet->user_data);
-    package->comments.append(new Comment(packet));
-    emit package->commentsChanged();
+
+    if(packet->pnd)
+    {
+      package->comments.append(new Comment(packet));
+      emit package->commentsChanged();
+    }
 
     if(code == PNDMAN_CURL_DONE)
     {
@@ -294,14 +284,25 @@ void QPndman::Package::deleteCommentCallback(pndman_curl_code code, const char *
 
 }
 
-void QPndman::Package::rateCallback(pndman_curl_code code, const char *info, void *user_data)
+void QPndman::Package::rateCallback(pndman_curl_code code, pndman_api_rate_packet *packet)
 {
-  Q_UNUSED(info)
-
-  if(code == PNDMAN_CURL_DONE)
+  if(code != PNDMAN_CURL_FAIL)
   {
-    Package* package = static_cast<Package*>(user_data);
+    Package* package = static_cast<Package*>(packet->user_data);
+    package->rating = packet->total_rating;
+    package->ownRating = packet->rating;
     emit package->ratingChanged();
+    emit package->ownRatingChanged();
+  }
+}
+
+void QPndman::Package::reloadOwnRatingCallback(pndman_curl_code code, pndman_api_rate_packet *packet)
+{
+  if(code != PNDMAN_CURL_FAIL)
+  {
+    Package* package = static_cast<Package*>(packet->user_data);
+    package->ownRating = packet->rating;
+    emit package->ownRatingChanged();
   }
 }
 

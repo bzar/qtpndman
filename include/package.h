@@ -37,7 +37,8 @@ namespace QPndman
     Q_PROPERTY(QString mount READ getMount CONSTANT)
     Q_PROPERTY(qint64 size READ getSize CONSTANT)
     Q_PROPERTY(QDateTime modified READ getModified CONSTANT)
-    Q_PROPERTY(int rating READ getRating CONSTANT)
+    Q_PROPERTY(int rating READ getRating NOTIFY ratingChanged)
+    Q_PROPERTY(int ownRating READ getOwnRating NOTIFY ownRatingChanged)
     Q_PROPERTY(QPndman::Author* author READ getAuthor CONSTANT)
     Q_PROPERTY(QPndman::Version* version READ getVersion CONSTANT)
     Q_PROPERTY(QList<QPndman::Application*> applications READ getApplications CONSTANT)
@@ -64,6 +65,7 @@ namespace QPndman
     Q_INVOKABLE bool addComment(QString const& comment);
     Q_INVOKABLE bool deleteComment(Comment *comment);
     Q_INVOKABLE bool reloadComments();
+    Q_INVOKABLE bool reloadOwnRating();
 
     Q_INVOKABLE bool rate(int const rating);
     Q_INVOKABLE bool reloadArchived();
@@ -81,6 +83,7 @@ namespace QPndman
     qint64 getSize() const;
     QDateTime getModified() const;
     int getRating() const;
+    int getOwnRating() const;
     Author* getAuthor() const;
     Version* getVersion() const;
     QList<Application*> getApplications() const;
@@ -103,6 +106,7 @@ namespace QPndman
     void commentsChanged();
     void reloadCommentsDone();
     void ratingChanged();
+    void ownRatingChanged();
     void archivedChanged(QList<Package*> archived);
 
   protected:
@@ -120,6 +124,7 @@ namespace QPndman
     qint64 size;
     QDateTime modified;
     int rating;
+    int ownRating;
     Author* author;
     Version* version;
     QList<Application*> applications;
@@ -133,10 +138,11 @@ namespace QPndman
     Package* upgradeCandidate;
 
     static void addCommentCallback(pndman_curl_code code, const char *info, void *user_data);
-    static void reloadCommentsCallback(pndman_curl_code code, struct pndman_api_comment_packet *packet);
+    static void reloadCommentsCallback(pndman_curl_code code, pndman_api_comment_packet *packet);
     static void deleteCommentCallback(pndman_curl_code code, const char *info, void *user_data);
-    static void rateCallback(pndman_curl_code code, const char *info, void *user_data);
-    static void requestArchivedVersionsCallback(pndman_curl_code code, struct pndman_api_archived_packet *packet);
+    static void rateCallback(pndman_curl_code code, pndman_api_rate_packet *packet);
+    static void reloadOwnRatingCallback(pndman_curl_code code, struct pndman_api_rate_packet *packet);
+    static void requestArchivedVersionsCallback(pndman_curl_code code, pndman_api_archived_packet *packet);
   };
 }
 

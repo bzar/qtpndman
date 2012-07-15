@@ -62,7 +62,18 @@ int main(int argc, char** argv)
   qDebug() << "Setting credentials";
   repo->setCredentials(username, key);
 
-  qDebug() << "Rating" << pnd->getTitle();
+  qDebug() << "Getting current rating for" << pnd->getTitle();
+  if(!pnd->reloadOwnRating())
+  {
+    qDebug() << "ERROR: getting current rating failed!";
+    return 1;
+  }
+
+  while(context->processDownload() > 0);
+
+  qDebug() << "Current rating is:" << pnd->getOwnRating() ;
+
+  qDebug() << "Changing rating to" << rating;
   if(!pnd->rate(rating))
   {
     qDebug() << "ERROR: rating failed!";
@@ -71,7 +82,22 @@ int main(int argc, char** argv)
 
   while(context->processDownload() > 0);
 
-  qDebug() << "Rating done";
+  qDebug() << "Getting current rating again for" << pnd->getTitle();
+  if(!pnd->reloadOwnRating())
+  {
+    qDebug() << "ERROR: getting current rating failed!";
+    return 1;
+  }
+
+  while(context->processDownload() > 0);
+
+  if(pnd->getOwnRating() != rating)
+  {
+    qDebug() << "ERROR: New rating does not match the one set!" << pnd->getOwnRating() << "!=" << rating;
+    return 1;
+  }
+
+  qDebug() << "Rating done, new total rating:" << pnd->getRating() ;
 
   return 0;
 }
