@@ -8,9 +8,13 @@ int main(int argc, char** argv)
 
   pndman_set_verbose(PNDMAN_LEVEL_CRAP);
 
+  QString searchTerm = argc == 2 ? argv[1] : "";
+
   QPndman::Context* context = new QPndman::Context(&application);
   QPndman::Device* device = new QPndman::Device(context, "/tmp");
-  
+  QList<QPndman::Device*> devices = QPndman::Device::detectDevices(context);
+  devices << device;
+
   QPndman::Repository* repo = new QPndman::Repository(context, "http://repo.openpandora.org/client/masterlist");
   if(!repo->loadFrom(device))
   {
@@ -26,7 +30,10 @@ int main(int argc, char** argv)
   }
 
   qDebug() << "Crawling";
-  device->crawl();
+  foreach(QPndman::Device* d, devices)
+  {
+    d->crawl();
+  }
   qDebug() << "Checking for removed packages";
   context->checkLocalPndmanRepository();
   qDebug() << "Checking for upgrades";
@@ -40,14 +47,17 @@ int main(int argc, char** argv)
 
   foreach(QPndman::Package* package, local->getPackages())
   {
-    if(package->getUpgradeCandidate() != 0)
+    if(package->getPath().contains(searchTerm))
     {
-      toUpgrade = package;
-      break;
-    }
-    else
-    {
-      qDebug() << "No upgrade for" << package->getId();
+      if(package->getUpgradeCandidate() != 0)
+      {
+        toUpgrade = package;
+        break;
+      }
+      else
+      {
+        qDebug() << "No upgrade for" << package->getId();
+      }
     }
   }
   
