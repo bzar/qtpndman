@@ -6,6 +6,7 @@
 QPndman::Context::Context(QObject* parent) : QObject(parent),
   localPndmanRepository(0), pndmanRepositories(0), pndmanDevices(0), mutex()
 {
+  setColor(0);
   setLoggingVerbosity(1);
   localPndmanRepository = pndman_repository_init();
   pndmanRepositories = localPndmanRepository;
@@ -75,7 +76,7 @@ pndman_device* QPndman::Context::addPndmanDevice(QString const& path)
   {
     pndmanDevices = device;
   }
-  
+
   return device;
 }
 
@@ -179,6 +180,11 @@ void QPndman::Context::freeSyncHandle(pndman_sync_handle *handle)
   mutex.lock();
   pndman_sync_handle_free(handle);
   mutex.unlock();
+}
+
+void QPndman::Context::setColor(int color)
+{
+  pndman_set_color(color);
 }
 
 void QPndman::Context::setLoggingVerbosity(int level)
