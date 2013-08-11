@@ -1,24 +1,21 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.8)
 
 project(qtpndman)
 
-find_package(Qt4 REQUIRED)
-
-include(${QT_USE_FILE})
-add_definitions(${QT_DEFINITIONS})
-
-set(CMAKE_CXX_FLAGS "-g -Wall")
-#set(CMAKE_CXX_FLAGS "-Wall")
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+find_package(Qt5Gui REQUIRED)
+find_package(Qt5Core REQUIRED)
 
 file (GLOB_RECURSE HEADERS include/*.h)
-QT4_WRAP_CPP(SRC_MOC ${HEADERS})
 
 include_directories(include lib/libpndman/src/include)
 
 add_subdirectory(lib)
 
 file (GLOB_RECURSE SRCS src/*.cpp)
-add_library(qtpndman ${SRCS} ${SRC_MOC} ${HEADERS})
-target_link_libraries(qtpndman ${QT_LIBRARIES} pndman)
+add_library(qtpndman ${SRCS} ${HEADERS})
+target_link_libraries(qtpndman pndman)
+qt5_use_modules(qtpndman Core Gui)
 
 add_subdirectory(test)
