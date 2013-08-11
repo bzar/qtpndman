@@ -33,6 +33,7 @@ namespace QPndman
     int crawlPndmanDevice(pndman_device* device, bool full = false);
     int crawlAllPndmanDevices(bool full = false);
     bool crawlPndmanPackage(pndman_package* package, bool full = false);
+    bool crawlPndmanPackageById(QString const& packageId, bool full = false);
 
     bool saveRepositories(pndman_device* device);
     bool loadRepository(pndman_repository* repository, pndman_device* device);

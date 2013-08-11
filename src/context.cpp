@@ -137,6 +137,30 @@ bool QPndman::Context::crawlPndmanPackage(pndman_package *package, bool full)
   return success;
 }
 
+bool QPndman::Context::crawlPndmanPackageById(const QString& packageId, bool full)
+{
+  qDebug() << "Crawling for " << packageId <<  " in local repository";
+  pndman_package* package;
+  for(package = localPndmanRepository->pnd; package != 0; package = package->next)
+  {
+    if(packageId == package->id)
+    {
+      qDebug() << "   Found it!";
+      break;
+    }
+  }
+
+  if(package == 0)
+  {
+    qDebug() << "   Not found!";
+    return false;
+  }
+
+  bool success = pndman_package_crawl_single_package(full ? 1 : 0, package) == 0;
+  emit crawlDone(package);
+  return success;
+}
+
 bool QPndman::Context::saveRepositories(pndman_device* device)
 {
   return pndman_repository_commit_all(pndmanRepositories, device) == 0;

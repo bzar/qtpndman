@@ -131,6 +131,7 @@ QPndman::Context *QPndman::Repository::getContext() const
 
 void QPndman::Repository::update()
 {
+  qDebug() << "QPndman::Repository::update";
   setUrl(pndmanRepository->url);
   setName(pndmanRepository->name);
   setUpdates(pndmanRepository->updates);
