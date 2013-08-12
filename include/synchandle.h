@@ -47,7 +47,7 @@ namespace QPndman
 
   private:
     void setError(QString const& newError);
-    void setDone(bool const& done);
+    void setDone(bool const& newDone);
     void setBytesDownloaded(qint64 const value);
     void setBytesToDownload(qint64 const value);
 

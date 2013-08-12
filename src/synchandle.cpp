@@ -66,17 +66,17 @@ void QPndman::SyncHandle::update()
 
 void QPndman::SyncHandle::setError(QString const& newError)
 {
-  if(error != error)
+  if(error != newError)
   {
-    error = error;
+    error = newError;
     emit errorChanged(error);
   }
 }
-void QPndman::SyncHandle::setDone(bool const& done)
+void QPndman::SyncHandle::setDone(bool const& newDone)
 {
-  if(_done != done)
+  if(_done != newDone)
   {
-    _done = done;
+    _done = newDone;
     emit doneChanged(_done);
     if(_done)
     {
