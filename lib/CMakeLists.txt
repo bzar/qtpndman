@@ -1,1 +1,11 @@
-ADD_SUBDIRECTORY(libpndman)
+if (NOT PNDMAN_LIBRARY)
+    message("Building libpndman with qtpndman")
+    SET(LIBPNDMAN_BUILD_STATIC ON CACHE STRING "Build libpndman as static library")
+    SET(LIBPNDMAN_BUILD_MILKYHELPER OFF CACHE STRING "Build libpndman without milkyhelper")
+    ADD_SUBDIRECTORY(libpndman)
+    list(APPEND QTPNDMAN_INCL ${libpndman_SOURCE_DIR}/include)
+    list(APPEND QTPNDMAN_LINK pndman)
+endif ()
+
+SET(QTPNDMAN_STATIC_INCL ${QTPNDMAN_INCL} CACHE STRING "(internal) qtpndman static includes")
+SET(QTPNDMAN_STATIC_LINK ${QTPNDMAN_LINK} CACHE STRING "(internal) qtpndman static linkage")
