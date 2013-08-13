@@ -296,14 +296,18 @@ void QPndman::Package::deleteCommentCallback(pndman_curl_code code, const char *
 
 void QPndman::Package::rateCallback(pndman_curl_code code, pndman_api_rate_packet *packet)
 {
-  if(code != PNDMAN_CURL_FAIL)
+  Package* package = static_cast<Package*>(packet->user_data);
+  if(code == PNDMAN_CURL_DONE)
   {
-    Package* package = static_cast<Package*>(packet->user_data);
     package->rating = packet->total_rating;
     package->ownRating = packet->rating;
     emit package->ratingChanged();
     emit package->ownRatingChanged();
     emit package->rateDone();
+  }
+  else if(code == PNDMAN_CURL_FAIL)
+  {
+    emit package->rateFail();
   }
 }
 
