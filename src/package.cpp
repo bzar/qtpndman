@@ -71,16 +71,10 @@ bool QPndman::Package::deleteComment(QPndman::Comment* comment)
     return false;
   }
 
-  bool success = pndman_api_comment_pnd_delete(this, package, comment->getTimestamp().toTime_t(), deleteCommentCallback) == 0;
-
-  if(success)
-  {
-    comments.removeOne(comment);
-    comment->deleteLater();
-    emit commentsChanged();
-  }
-
-  return success;
+  PackageComment* pc = new PackageComment;
+  pc->package = this;
+  pc->comment = comment;
+  return pndman_api_comment_pnd_delete(pc, package, comment->getTimestamp().toTime_t(), deleteCommentCallback) == 0;
 }
 
 bool QPndman::Package::reloadComments()
@@ -281,7 +275,23 @@ void QPndman::Package::reloadCommentsCallback(pndman_curl_code code, pndman_api_
 
 void QPndman::Package::deleteCommentCallback(pndman_curl_code code, const char *info, void *user_data)
 {
+  Q_UNUSED(info)
 
+  PackageComment* pc = static_cast<PackageComment*>(user_data);
+
+  if(code == PNDMAN_CURL_DONE)
+  {
+    pc->package->comments.removeOne(pc->comment);
+    pc->comment->deleteLater();
+    emit pc->package->deleteCommentDone();
+    emit pc->package->commentsChanged();
+    delete pc;
+  }
+  else if(code == PNDMAN_CURL_FAIL)
+  {
+    emit pc->package->deleteCommentFail();
+    delete pc;
+  }
 }
 
 void QPndman::Package::rateCallback(pndman_curl_code code, pndman_api_rate_packet *packet)

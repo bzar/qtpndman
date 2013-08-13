@@ -103,6 +103,8 @@ namespace QPndman
   signals:
     void addCommentDone();
     void addCommentFail();
+    void deleteCommentDone();
+    void deleteCommentFail();
     void commentsChanged();
     void reloadCommentsDone();
     void ratingChanged();
@@ -144,6 +146,13 @@ namespace QPndman
     static void rateCallback(pndman_curl_code code, pndman_api_rate_packet *packet);
     static void reloadOwnRatingCallback(pndman_curl_code code, struct pndman_api_rate_packet *packet);
     static void requestArchivedVersionsCallback(pndman_curl_code code, pndman_api_archived_packet *packet);
+
+  private:
+    struct PackageComment
+    {
+      Package* package;
+      Comment* comment;
+    };
   };
 }
 
