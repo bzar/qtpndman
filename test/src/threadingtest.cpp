@@ -4,7 +4,7 @@
 #include <QMutex>
 #include <QFuture>
 #include <QThread>
-#include <QtCore/QtConcurrentRun>
+#include <QtConcurrent/QtConcurrent>
 
 void downloadThread(QPndman::Context* context, QMutex* stopMutex)
 {

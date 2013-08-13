@@ -1,14 +1,13 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.8)
 
 project(qtpndman)
 
 option(QTPNDMAN_NO_SYSTEM_LIBS "Force build depencies from git" OFF)
 
-find_package(Qt4 REQUIRED)
-
-include(${QT_USE_FILE})
-add_definitions(${QT_DEFINITIONS})
-ADD_DEFINITIONS(-fPIC)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+find_package(Qt5Gui REQUIRED)
+find_package(Qt5Core REQUIRED)
 
 if (NOT QTPNDMAN_NO_SYSTEM_LIBS)
     find_library(PNDMAN_LIBRARY pndman)
@@ -17,9 +16,6 @@ endif ()
 if (PNDMAN_LIBRARY)
     list(APPEND QTPNDMAN_LINK ${PNDMAN_LIBRARY})
 endif ()
-
-file (GLOB_RECURSE HEADERS include/*.h)
-QT4_WRAP_CPP(SRC_MOC ${HEADERS})
 
 # Export qtpndman library dependencies
 SET(QTPNDMAN_LIBRARIES ${QTPNDMAN_LINK} CACHE STRING "Dependencies of qtpndman")
@@ -30,7 +26,8 @@ add_subdirectory(lib)
 include_directories(include ${QTPNDMAN_STATIC_INCL})
 
 file (GLOB_RECURSE SRCS src/*.cpp)
-add_library(qtpndman ${SRCS} ${SRC_MOC} ${HEADERS})
-target_link_libraries(qtpndman ${QT_LIBRARIES} ${QTPNDMAN_LIBRARIES} ${QTPNDMAN_STATIC_LINK} ${LIBPNDMAN_LIBRARIES})
+add_library(qtpndman ${SRCS} ${HEADERS})
+target_link_libraries(qtpndman ${QTPNDMAN_LIBRARIES} ${QTPNDMAN_STATIC_LINK} ${LIBPNDMAN_LIBRARIES})
+qt5_use_modules(qtpndman Core Gui)
 
 add_subdirectory(test)
