@@ -10,9 +10,6 @@ include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
 ADD_DEFINITIONS(-fPIC)
 
-set(CMAKE_CXX_FLAGS "-g -Wall")
-#set(CMAKE_CXX_FLAGS "-Wall")
-
 if (NOT QTPNDMAN_NO_SYSTEM_LIBS)
     find_library(PNDMAN_LIBRARY pndman)
 endif ()
