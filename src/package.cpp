@@ -3,7 +3,6 @@
 #include "device.h"
 #include "util.h"
 #include "context.h"
-#include <QDebug>
 
 QPndman::Package::Package(Context* context, pndman_package* p, QObject* parent, bool initUpgradeCandidate) : QObject(parent), package(p), context(context),
   path(QString::fromUtf8(p->path)), id(QString::fromUtf8(p->id)), icon(QString::fromUtf8(p->icon)), info(QString::fromUtf8(p->info)), md5(QString::fromUtf8(p->md5)),
@@ -61,7 +60,7 @@ QPndman::UpgradeHandle* QPndman::Package::upgrade(bool force)
 
 bool QPndman::Package::addComment(const QString &comment)
 {
-  return pndman_api_comment_pnd(this, package, comment.toUtf8().constData(), addCommentCallback) == 0;
+  return context->addComment(this, comment);
 }
 
 bool QPndman::Package::deleteComment(QPndman::Comment* comment)
@@ -71,10 +70,7 @@ bool QPndman::Package::deleteComment(QPndman::Comment* comment)
     return false;
   }
 
-  PackageComment* pc = new PackageComment;
-  pc->package = this;
-  pc->comment = comment;
-  return pndman_api_comment_pnd_delete(pc, package, comment->getTimestamp().toTime_t(), deleteCommentCallback) == 0;
+  return context->deleteComment(this, comment);
 }
 
 bool QPndman::Package::reloadComments()
@@ -87,17 +83,17 @@ bool QPndman::Package::reloadComments()
   comments.clear();
   emit commentsChanged();
 
-  return pndman_api_comment_pnd_pull(this, package, reloadCommentsCallback) == 0;
+  return context->reloadComments(this);
 }
 
 bool QPndman::Package::reloadOwnRating()
 {
-  return pndman_api_get_own_rate_pnd(this, package, reloadOwnRatingCallback) == 0;
+  return context->reloadOwnRating(this);
 }
 
 bool QPndman::Package::rate(const int rating)
 {
-  return pndman_api_rate_pnd(this, package, rating, rateCallback) == 0;
+  return context->rate(this, rating);
 }
 
 bool QPndman::Package::reloadArchived()
@@ -239,86 +235,78 @@ QImage QPndman::Package::getEmbeddedIcon() const
   return QImage::fromData(buf);
 }
 
-void QPndman::Package::addCommentCallback(pndman_curl_code code, const char *info, void *user_data)
+void QPndman::Package::handleCommentAdded()
 {
-  Q_UNUSED(info)
-
-  Package* package = static_cast<Package*>(user_data);
-  if(code == PNDMAN_CURL_DONE)
-  {
-    emit package->addCommentDone();
-  }
-  else if(code == PNDMAN_CURL_FAIL)
-  {
-    emit package->addCommentFail();
-  }
+  emit addCommentDone();
 }
 
-void QPndman::Package::reloadCommentsCallback(pndman_curl_code code, pndman_api_comment_packet *packet)
+void QPndman::Package::handleCommentAddedFail()
 {
-  if(code != PNDMAN_CURL_FAIL)
+  emit addCommentFail();
+}
+
+void QPndman::Package::handleCommentDeleted(QDateTime timestamp)
+{
+  Comment* comment = 0;
+  foreach(Comment* c, comments)
   {
-    Package* package = static_cast<Package*>(packet->user_data);
-
-    if(packet->pnd)
+    if(c->getTimestamp() == timestamp)
     {
-      package->comments.append(new Comment(packet));
-      emit package->commentsChanged();
-    }
-
-    if(code == PNDMAN_CURL_DONE)
-    {
-      emit package->reloadCommentsDone();
+      comment = c;
     }
   }
+  if(comment)
+  {
+    comments.removeOne(comment);
+    comment->deleteLater();
+    emit commentsChanged();
+  }
+  emit deleteCommentDone();
 }
 
-void QPndman::Package::deleteCommentCallback(pndman_curl_code code, const char *info, void *user_data)
+void QPndman::Package::handleCommentDeletedFail()
 {
-  Q_UNUSED(info)
-
-  PackageComment* pc = static_cast<PackageComment*>(user_data);
-
-  if(code == PNDMAN_CURL_DONE)
-  {
-    pc->package->comments.removeOne(pc->comment);
-    pc->comment->deleteLater();
-    emit pc->package->deleteCommentDone();
-    emit pc->package->commentsChanged();
-    delete pc;
-  }
-  else if(code == PNDMAN_CURL_FAIL)
-  {
-    emit pc->package->deleteCommentFail();
-    delete pc;
-  }
+  emit deleteCommentFail();
 }
 
-void QPndman::Package::rateCallback(pndman_curl_code code, pndman_api_rate_packet *packet)
+void QPndman::Package::handleNewComment(QString username, QString content, QDateTime timestamp,
+                                        QString majorVersion, QString minorVersion, QString release, QString build,
+                                        int type)
 {
-  Package* package = static_cast<Package*>(packet->user_data);
-  if(code == PNDMAN_CURL_DONE)
-  {
-    package->rating = packet->total_rating;
-    package->ownRating = packet->rating;
-    emit package->ratingChanged();
-    emit package->ownRatingChanged();
-    emit package->rateDone();
-  }
-  else if(code == PNDMAN_CURL_FAIL)
-  {
-    emit package->rateFail();
-  }
+  Comment* comment = new Comment(username, content, timestamp, new Version(majorVersion, minorVersion, release, build, Version::decodeVersionType(type)));
+  comments.append(comment);
+  emit commentsChanged();
 }
 
-void QPndman::Package::reloadOwnRatingCallback(pndman_curl_code code, pndman_api_rate_packet *packet)
+void QPndman::Package::handleCommentsReloaded()
 {
-  if(code != PNDMAN_CURL_FAIL)
-  {
-    Package* package = static_cast<Package*>(packet->user_data);
-    package->ownRating = packet->rating;
-    emit package->ownRatingChanged();
-  }
+  emit reloadCommentsDone();
+}
+
+void QPndman::Package::handleCommentReloadFail()
+{
+  emit reloadCommentsFail();
+}
+
+void QPndman::Package::handleRating(int newOwnRating, int newRating)
+{
+  rating = newRating;
+  ownRating = newOwnRating;
+  emit ratingChanged();
+  emit ownRatingChanged();
+  emit rateDone();
+
+}
+
+void QPndman::Package::handleRatingFail()
+{
+  emit rateFail();
+}
+
+void QPndman::Package::handleOwnRatingReloaded(int newOwnRating)
+{
+  ownRating = newOwnRating;
+  emit ownRatingChanged();
 }
 
 void QPndman::Package::requestArchivedVersionsCallback(pndman_curl_code code, pndman_api_archived_packet *packet)

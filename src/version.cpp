@@ -1,5 +1,11 @@
 #include "version.h"
 
+QPndman::Version::Version(const QString majorVersion, const QString minorVersion, const QString release, const QString build, const QPndman::Version::Type type, QObject* parent) :
+  QObject(parent),
+  _major(majorVersion), _minor(minorVersion), release(release), build(build), type(type)
+{
+}
+
 QPndman::Version::Version(pndman_version const* p, QObject* parent) : QObject(parent),
   _major(QString::fromUtf8(p->major)), _minor(QString::fromUtf8(p->minor)),
   release(QString::fromUtf8(p->release)), build(QString::fromUtf8(p->build)),
@@ -85,5 +91,37 @@ bool QPndman::Version::operator <=(const QPndman::Version &other) const
 bool QPndman::Version::operator >=(const QPndman::Version &other) const
 {
   return !operator<(other);
+}
+
+int QPndman::Version::encodeVersionType(const pndman_version_type type)
+{
+  if(type == PND_VERSION_RELEASE)
+  {
+    return 0;
+  }
+  else if(type == PND_VERSION_BETA)
+  {
+    return 1;
+  }
+  else if(type == PND_VERSION_ALPHA)
+  {
+    return 2;
+  }
+}
+
+QPndman::Version::Type QPndman::Version::decodeVersionType(const int type)
+{
+  if(type == 0)
+  {
+    return ReleaseVersion;
+  }
+  else if(type == 1)
+  {
+    return BetaVersion;
+  }
+  else
+  {
+    return AlphaVersion;
+  }
 }
 

@@ -107,11 +107,26 @@ namespace QPndman
     void deleteCommentFail();
     void commentsChanged();
     void reloadCommentsDone();
+    void reloadCommentsFail();
     void ratingChanged();
     void rateDone();
     void rateFail();
     void ownRatingChanged();
     void archivedChanged(QList<Package*> archived);
+
+  public slots:
+    void handleCommentAdded();
+    void handleCommentAddedFail();
+    void handleCommentDeleted(QDateTime timestamp);
+    void handleCommentDeletedFail();
+    void handleNewComment(QString username, QString content, QDateTime timestamp,
+                          QString majorVersion, QString minorVersion, QString release, QString build,
+                          int type);
+    void handleCommentsReloaded();
+    void handleCommentReloadFail();
+    void handleRating(int newOwnRating, int newRating);
+    void handleRatingFail();
+    void handleOwnRatingReloaded(int newOwnRating);
 
   protected:
     pndman_package* package;
@@ -141,19 +156,9 @@ namespace QPndman
     QList<Package*> archived;
     Package* upgradeCandidate;
 
-    static void addCommentCallback(pndman_curl_code code, const char *info, void *user_data);
-    static void reloadCommentsCallback(pndman_curl_code code, pndman_api_comment_packet *packet);
-    static void deleteCommentCallback(pndman_curl_code code, const char *info, void *user_data);
-    static void rateCallback(pndman_curl_code code, pndman_api_rate_packet *packet);
-    static void reloadOwnRatingCallback(pndman_curl_code code, struct pndman_api_rate_packet *packet);
     static void requestArchivedVersionsCallback(pndman_curl_code code, pndman_api_archived_packet *packet);
 
-  private:
-    struct PackageComment
-    {
-      Package* package;
-      Comment* comment;
-    };
+    friend class Context;
   };
 }
 

@@ -1,5 +1,15 @@
 #include "comment.h"
 
+QPndman::Comment::Comment(const QString username, const QString content, const QDateTime timestamp, QPndman::Version* const version, QObject* parent) :
+  QObject(parent),
+  username(username),
+  content(content),
+  timestamp(timestamp),
+  commentedVersion(version)
+{
+  version->setParent(this);
+}
+
 QPndman::Comment::Comment(pndman_api_comment_packet const* p, QObject* parent) :
   QObject(parent),
   username(QString::fromUtf8(p->username)),

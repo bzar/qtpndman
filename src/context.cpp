@@ -1,7 +1,8 @@
 #include "context.h"
 #include "util.h"
+#include "package.h"
+#include "comment.h"
 
-#include <QDebug>
 
 QPndman::Context::Context(QObject* parent) : QObject(parent),
   localPndmanRepository(0), pndmanRepositories(0), pndmanDevices(0), mutex()
@@ -139,20 +140,17 @@ bool QPndman::Context::crawlPndmanPackage(pndman_package *package, bool full)
 
 bool QPndman::Context::crawlPndmanPackageById(const QString& packageId, bool full)
 {
-  qDebug() << "Crawling for " << packageId <<  " in local repository";
   pndman_package* package;
   for(package = localPndmanRepository->pnd; package != 0; package = package->next)
   {
     if(packageId == package->id)
     {
-      qDebug() << "   Found it!";
       break;
     }
   }
 
   if(package == 0)
   {
-    qDebug() << "   Not found!";
     return false;
   }
 
@@ -206,6 +204,49 @@ void QPndman::Context::freeSyncHandle(pndman_sync_handle *handle)
   mutex.unlock();
 }
 
+bool QPndman::Context::addComment(Package* package, const QString &comment)
+{
+  mutex.lock();
+  bool result = pndman_api_comment_pnd(package, package->getPndmanPackage(), comment.toUtf8().constData(), addCommentCallback) == 0;
+  mutex.unlock();
+  return result;
+}
+
+bool QPndman::Context::deleteComment(Package* package, QPndman::Comment* comment)
+{
+  PackageComment* pc = new PackageComment;
+  pc->package = package;
+  pc->comment = comment;
+  mutex.lock();
+  bool result = pndman_api_comment_pnd_delete(pc, package->getPndmanPackage(), comment->getTimestamp().toTime_t(), deleteCommentCallback) == 0;
+  mutex.unlock();
+  return result;
+}
+
+bool QPndman::Context::reloadComments(Package* package)
+{
+  mutex.lock();
+  bool result = pndman_api_comment_pnd_pull(package, package->getPndmanPackage(), reloadCommentsCallback) == 0;
+  mutex.unlock();
+  return result;
+}
+
+bool QPndman::Context::reloadOwnRating(Package* package)
+{
+  mutex.lock();
+  bool result = pndman_api_get_own_rate_pnd(package, package->getPndmanPackage(), reloadOwnRatingCallback) == 0;
+  mutex.unlock();
+  return result;
+}
+
+bool QPndman::Context::rate(Package* package, const int rating)
+{
+  mutex.lock();
+  bool result = pndman_api_rate_pnd(package, package->getPndmanPackage(), rating, rateCallback) == 0;
+  mutex.unlock();
+  return result;
+}
+
 void QPndman::Context::setColor(int color)
 {
   pndman_set_color(color);
@@ -234,3 +275,91 @@ void QPndman::Context::checkUpgrades()
   pndman_repository_check_updates(pndmanRepositories);
 }
 
+void QPndman::Context::addCommentCallback(pndman_curl_code code, const char *info, void *user_data)
+{
+  Q_UNUSED(info)
+
+  Package* package = static_cast<Package*>(user_data);
+
+  if(code == PNDMAN_CURL_DONE)
+  {
+    QMetaObject::invokeMethod(package, "handleCommentAdded", Qt::QueuedConnection);
+  }
+  else if(code == PNDMAN_CURL_FAIL)
+  {
+    QMetaObject::invokeMethod(package, "handleCommentAddedFail", Qt::QueuedConnection);
+  }
+}
+
+void QPndman::Context::reloadCommentsCallback(pndman_curl_code code, pndman_api_comment_packet *packet)
+{
+  Package* package = static_cast<Package*>(packet->user_data);
+  if(code != PNDMAN_CURL_FAIL)
+  {
+    if(packet->pnd)
+    {
+      QMetaObject::invokeMethod(package, "handleNewComment", Qt::QueuedConnection,
+                                Q_ARG(QString, QString::fromUtf8(packet->username)),
+                                Q_ARG(QString, QString::fromUtf8(packet->comment)),
+                                Q_ARG(QDateTime, QDateTime::fromTime_t(packet->date)),
+                                Q_ARG(QString, QString::fromUtf8(packet->version->major)),
+                                Q_ARG(QString, QString::fromUtf8(packet->version->minor)),
+                                Q_ARG(QString, QString::fromUtf8(packet->version->release)),
+                                Q_ARG(QString, QString::fromUtf8(packet->version->build)),
+                                Q_ARG(int, Version::encodeVersionType(packet->version->type)));
+    }
+
+    if(code == PNDMAN_CURL_DONE)
+    {
+      QMetaObject::invokeMethod(package, "handleCommentsReloaded", Qt::QueuedConnection);
+    }
+  }
+  else
+  {
+    QMetaObject::invokeMethod(package, "handleCommentReloadFail", Qt::QueuedConnection);
+  }
+}
+
+void QPndman::Context::deleteCommentCallback(pndman_curl_code code, const char *info, void *user_data)
+{
+  Q_UNUSED(info)
+
+  PackageComment* pc = static_cast<PackageComment*>(user_data);
+
+  if(code == PNDMAN_CURL_DONE)
+  {
+    QMetaObject::invokeMethod(pc->package, "handleCommentDeleted", Qt::QueuedConnection,
+                              Q_ARG(QDateTime, pc->comment->getTimestamp()));
+    delete pc;
+  }
+  else if(code == PNDMAN_CURL_FAIL)
+  {
+    QMetaObject::invokeMethod(pc->package, "handleCommentDeletedFail", Qt::QueuedConnection);
+    delete pc;
+  }
+}
+
+void QPndman::Context::rateCallback(pndman_curl_code code, pndman_api_rate_packet *packet)
+{
+  Package* package = static_cast<Package*>(packet->user_data);
+  if(code == PNDMAN_CURL_DONE)
+  {
+    QMetaObject::invokeMethod(package, "handleRating", Qt::QueuedConnection,
+                              Q_ARG(int, packet->rating),
+                              Q_ARG(int, packet->total_rating));
+  }
+  else if(code == PNDMAN_CURL_FAIL)
+  {
+    QMetaObject::invokeMethod(package, "handleRatingFail", Qt::QueuedConnection);
+  }
+}
+
+void QPndman::Context::reloadOwnRatingCallback(pndman_curl_code code, pndman_api_rate_packet *packet)
+{
+  if(code != PNDMAN_CURL_FAIL)
+  {
+    Package* package = static_cast<Package*>(packet->user_data);
+    QMetaObject::invokeMethod(package, "handleOwnRatingReloaded", Qt::QueuedConnection,
+                              Q_ARG(int, packet->rating));
+  }
+}

@@ -19,7 +19,7 @@ namespace QPndman
 
   public:
     enum Type { AlphaVersion, BetaVersion, ReleaseVersion };
-
+    Version(QString const majorVersion, QString const minorVersion, QString const release, QString const build, Type const type, QObject* parent = 0);
     Version(pndman_version const* p, QObject* parent = 0);
 
     Q_INVOKABLE QString toString() const;
@@ -37,6 +37,8 @@ namespace QPndman
     bool operator<=(Version const& other) const;
     bool operator>=(Version const& other) const;
 
+    static int encodeVersionType(pndman_version_type const type);
+    static Type decodeVersionType(int const type);
   private:
     QString _major;
     QString _minor;

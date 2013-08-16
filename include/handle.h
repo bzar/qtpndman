@@ -46,6 +46,7 @@ namespace QPndman
     Enum::Operation getOperation() const;
     bool getDone() const;
     bool getCancelled() const;
+    bool getExecuted() const;
     qint64 getBytesDownloaded() const;
     qint64 getBytesToDownload() const;
 
@@ -87,6 +88,7 @@ namespace QPndman
     Enum::Operation operation;
     bool _done;
     bool _cancelled;
+    bool _executed;
     qint64 bytesDownloaded;
     qint64 bytesToDownload;
   };

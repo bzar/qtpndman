@@ -7,6 +7,9 @@
 
 namespace QPndman
 {
+  class Package;
+  class Comment;
+
   class Context : public QObject
   {
     Q_OBJECT
@@ -46,6 +49,12 @@ namespace QPndman
     bool performSyncHandle(pndman_sync_handle* handle);
     void freeSyncHandle(pndman_sync_handle* handle);
 
+    bool addComment(Package* package, QString const& comment);
+    bool deleteComment(Package* package, Comment *comment);
+    bool reloadComments(Package* package);
+    bool reloadOwnRating(Package* package);
+    bool rate(Package* package, int const rating);
+
     void setColor(int color);
 
     void setLoggingVerbosity(int level);
@@ -57,6 +66,18 @@ namespace QPndman
     void crawlDone(pndman_package *package = 0);
 
   private:
+    struct PackageComment
+    {
+      Package* package;
+      Comment* comment;
+    };
+
+    static void addCommentCallback(pndman_curl_code code, const char *info, void *user_data);
+    static void reloadCommentsCallback(pndman_curl_code code, pndman_api_comment_packet *packet);
+    static void deleteCommentCallback(pndman_curl_code code, const char *info, void *user_data);
+    static void rateCallback(pndman_curl_code code, pndman_api_rate_packet *packet);
+    static void reloadOwnRatingCallback(pndman_curl_code code, struct pndman_api_rate_packet *packet);
+
     pndman_repository* localPndmanRepository;
     pndman_repository* pndmanRepositories;
     pndman_device* pndmanDevices;

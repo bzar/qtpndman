@@ -14,6 +14,7 @@ bool QPndman::InstallHandle::execute()
 {
   if(context->performHandle(&handle))
   {
+    _executed = true;
     emit executed();
     return true;
   }
@@ -34,6 +35,7 @@ bool QPndman::UpgradeHandle::execute()
 {
   if(context->performHandle(&handle))
   {
+    _executed = true;
     emit executed();
     return true;
   }
@@ -57,6 +59,7 @@ bool QPndman::RemoveHandle::execute()
     return false;
   }
   
+  _executed = true;
   emit executed();
   _done = true;
   emit done();
@@ -68,7 +71,7 @@ QPndman::Handle::Handle(Context*  context, Enum::Operation operation, Package* p
   context(context), handle(),
   name("."), _error(""), force(force), package(package),
   device(device), operation(operation), _done(false),
-  _cancelled(false), bytesDownloaded(0), bytesToDownload(0)
+  _cancelled(false), _executed(false), bytesDownloaded(0), bytesToDownload(0)
 {
   pndman_package_handle_init(name.toLocal8Bit().data(), &handle);
   handle.device = device ? device->getPndmanDevice() : 0;
@@ -153,6 +156,11 @@ bool QPndman::Handle::getDone() const
 bool QPndman::Handle::getCancelled() const
 {
   return _cancelled;
+}
+
+bool QPndman::Handle::getExecuted() const
+{
+  return _executed;
 }
 
 qint64 QPndman::Handle::getBytesDownloaded() const
