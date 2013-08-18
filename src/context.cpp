@@ -265,7 +265,7 @@ int QPndman::Context::getLoggingVerbosity() const
 int QPndman::Context::processDownload()
 {
   mutex.lock();
-  int pending = pndman_curl_process(0,1000);
+  int pending = pndman_curl_process(0,10000);
   mutex.unlock();
   return pending;
 }
