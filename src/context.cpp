@@ -294,7 +294,7 @@ void QPndman::Context::addCommentCallback(pndman_curl_code code, const char *inf
 void QPndman::Context::reloadCommentsCallback(pndman_curl_code code, pndman_api_comment_packet *packet)
 {
   Package* package = static_cast<Package*>(packet->user_data);
-  if(code != PNDMAN_CURL_FAIL)
+  if(code == PNDMAN_CURL_DONE)
   {
     if(packet->pnd)
     {
@@ -309,12 +309,12 @@ void QPndman::Context::reloadCommentsCallback(pndman_curl_code code, pndman_api_
                                 Q_ARG(int, Version::encodeVersionType(packet->version->type)));
     }
 
-    if(code == PNDMAN_CURL_DONE)
+    if(packet->is_last)
     {
       QMetaObject::invokeMethod(package, "handleCommentsReloaded", Qt::QueuedConnection);
     }
   }
-  else
+  else if(code == PNDMAN_CURL_FAIL)
   {
     QMetaObject::invokeMethod(package, "handleCommentReloadFail", Qt::QueuedConnection);
   }
