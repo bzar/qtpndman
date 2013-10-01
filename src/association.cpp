@@ -1,7 +1,9 @@
 #include "association.h"
 
 QPndman::Association::Association(pndman_association const* p, QObject* parent) : QObject(parent),
-  name(QString::fromUtf8(p->name)), fileType(QString::fromUtf8(p->filetype)), exec(QString::fromUtf8(p->exec))
+  name(!p->name ? "" : QString::fromUtf8(p->name)),
+  fileType(!p->filetype ? "" : QString::fromUtf8(p->filetype)),
+  exec(!p->exec ? "" : QString::fromUtf8(p->exec))
 {
 }
 

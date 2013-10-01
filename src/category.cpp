@@ -1,7 +1,8 @@
 #include "category.h"
 
-QPndman::Category::Category(pndman_category const* p, QObject* parent) :
-  QObject(parent), main(QString::fromUtf8(p->main)), sub(QString::fromUtf8(p->sub))
+QPndman::Category::Category(pndman_category const* p, QObject* parent) : QObject(parent),
+  main(!p->main ? "" : QString::fromUtf8(p->main)),
+  sub(!p->sub ? "" : QString::fromUtf8(p->sub))
 {
 }
 

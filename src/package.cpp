@@ -5,8 +5,14 @@
 #include "context.h"
 
 QPndman::Package::Package(Context* context, pndman_package* p, QObject* parent, bool initUpgradeCandidate) : QObject(parent), package(p), context(context),
-  path(QString::fromUtf8(p->path)), id(QString::fromUtf8(p->id)), icon(QString::fromUtf8(p->icon)), info(QString::fromUtf8(p->info)), md5(QString::fromUtf8(p->md5)),
-  url(QString::fromUtf8(p->url)), vendor(QString::fromUtf8(p->vendor)), mount(QString::fromUtf8(p->mount)),
+  path(!p->path ? "" : QString::fromUtf8(p->path)),
+  id(!p->id ? "" : QString::fromUtf8(p->id)),
+  icon(!p->icon ? "" : QString::fromUtf8(p->icon)),
+  info(!p->info ? "" : QString::fromUtf8(p->info)),
+  md5(!p->md5 ? "" : QString::fromUtf8(p->md5)),
+  url(!p->url ? "" : QString::fromUtf8(p->url)),
+  vendor(!p->vendor ? "" : QString::fromUtf8(p->vendor)),
+  mount(!p->mount ? "" : QString::fromUtf8(p->mount)),
   size(p->size), modified(QDateTime::fromTime_t(p->modified_time)), rating(p->rating), ownRating(0),
   author(new Author(&p->author, this)),
   version(new Version(&p->version, this)),

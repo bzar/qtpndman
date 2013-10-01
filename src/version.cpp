@@ -7,8 +7,10 @@ QPndman::Version::Version(const QString majorVersion, const QString minorVersion
 }
 
 QPndman::Version::Version(pndman_version const* p, QObject* parent) : QObject(parent),
-  _major(QString::fromUtf8(p->major)), _minor(QString::fromUtf8(p->minor)),
-  release(QString::fromUtf8(p->release)), build(QString::fromUtf8(p->build)),
+  _major(!p->major ? "" : QString::fromUtf8(p->major)),
+  _minor(!p->minor ? "" : QString::fromUtf8(p->minor)),
+  release(!p->release ? "" : QString::fromUtf8(p->release)),
+  build(!p->build ? "" : QString::fromUtf8(p->build)),
   type(Version::ReleaseVersion)
 {
   if(p->type == PND_VERSION_BETA)       type = Version::BetaVersion;

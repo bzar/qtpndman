@@ -1,7 +1,8 @@
 #include "translatedstring.h"
 
 QPndman::TranslatedString::TranslatedString(pndman_translated const* p, QObject* parent) : QObject(parent),
-language(QString::fromUtf8(p->lang)), content(QString::fromUtf8(p->string))
+  language(!p->lang ? "" : QString::fromUtf8(p->lang)),
+  content(!p->string ? "" : QString::fromUtf8(p->string))
 {
   
 }

@@ -2,7 +2,7 @@
 
 QPndman::DownloadHistoryItem::DownloadHistoryItem(pndman_api_history_packet const* p, QObject* parent) :
   QObject(parent),
-  id(QString::fromUtf8(p->id)),
+  id(!p->id ? "" : QString::fromUtf8(p->id)),
   timestamp(QDateTime::fromTime_t(p->download_date)),
   downloadedVersion(new Version(p->version, this))
 {

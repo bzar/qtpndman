@@ -15,5 +15,8 @@ QPndman::DebugSource::DebugSource(QObject *parent) : QObject(parent)
 
 void QPndman::DebugSource::debugCallback(const char *file, int line, const char *function, int verbose_level, const char *str)
 {
-  emit instance()->message(QString::fromUtf8(file), QString::fromUtf8(function), line, verbose_level, QString::fromUtf8(str));
+  emit instance()->message(!file ? "" : QString::fromUtf8(file),
+                           !function ? "" : QString::fromUtf8(function),
+                           line, verbose_level,
+                           !str ? "" : QString::fromUtf8(str));
 }

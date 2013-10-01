@@ -1,8 +1,10 @@
 #include "executioninfo.h"
 
 QPndman::ExecutionInfo::ExecutionInfo(pndman_exec const* p, QObject* parent) : QObject(parent),
-  background(p->background), startDir(QString::fromUtf8(p->startdir)), standalone(p->standalone),
-  command(QString::fromUtf8(p->command)), arguments(QString::fromUtf8(p->arguments)), x11(ExecutionInfo::ExecReq)
+  background(p->background),
+  startDir(!p->startdir ? "" : QString::fromUtf8(p->startdir)), standalone(p->standalone),
+  command(!p->command ? "" : QString::fromUtf8(p->command)),
+  arguments(!p->arguments ? "" : QString::fromUtf8(p->arguments)), x11(ExecutionInfo::ExecReq)
 {
   
 }

@@ -1,7 +1,8 @@
 #include "author.h"
 
-QPndman::Author::Author(pndman_author const* p, QObject* parent) :
-  QObject(parent), name(QString::fromUtf8(p->name)), website(QString::fromUtf8(p->website))
+QPndman::Author::Author(pndman_author const* p, QObject* parent) : QObject(parent),
+  name(!p->name ? "" : QString::fromUtf8(p->name)),
+  website(!p->website ? "" : QString::fromUtf8(p->website))
 {
   
 }

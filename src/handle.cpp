@@ -20,7 +20,7 @@ bool QPndman::InstallHandle::execute()
   }
   else
   {
-    setError(handle.error);
+    setError(handle.error ? handle.error : "");
     return false;
   }
 }
@@ -41,7 +41,7 @@ bool QPndman::UpgradeHandle::execute()
   }
   else
   {
-    setError(handle.error);
+    setError(handle.error ? handle.error : "");
     return false;
   }
 }
@@ -55,7 +55,7 @@ bool QPndman::RemoveHandle::execute()
 {
   if(!context->commitHandle(&handle))
   {
-    setError(handle.error);
+    setError(handle.error ? handle.error : "");
     return false;
   }
   
@@ -117,7 +117,7 @@ void QPndman::Handle::update()
 {
   if(!_cancelled)
   {
-    setError(handle.error);
+    setError(handle.error ? handle.error : "");
     setDone(handle.progress.done);
     setBytesDownloaded(static_cast<qint64>(handle.progress.download));
     setBytesToDownload(static_cast<qint64>(handle.progress.total_to_download));
@@ -194,7 +194,7 @@ void QPndman::Handle::setDone(bool const& done)
       }
       else
       {
-        setError(handle.error);
+        setError(handle.error ? handle.error : "");
       }
     }
     emit doneChanged(_done);

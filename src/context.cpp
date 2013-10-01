@@ -299,13 +299,13 @@ void QPndman::Context::reloadCommentsCallback(pndman_curl_code code, pndman_api_
     if(packet->pnd)
     {
       QMetaObject::invokeMethod(package, "handleNewComment", Qt::QueuedConnection,
-                                Q_ARG(QString, QString::fromUtf8(packet->username)),
-                                Q_ARG(QString, QString::fromUtf8(packet->comment)),
+                                Q_ARG(QString, !packet->username ? "" : QString::fromUtf8(packet->username)),
+                                Q_ARG(QString, !packet->comment ? "" : QString::fromUtf8(packet->comment)),
                                 Q_ARG(QDateTime, QDateTime::fromTime_t(packet->date)),
-                                Q_ARG(QString, QString::fromUtf8(packet->version->major)),
-                                Q_ARG(QString, QString::fromUtf8(packet->version->minor)),
-                                Q_ARG(QString, QString::fromUtf8(packet->version->release)),
-                                Q_ARG(QString, QString::fromUtf8(packet->version->build)),
+                                Q_ARG(QString, !packet->version->major ? "" : QString::fromUtf8(packet->version->major)),
+                                Q_ARG(QString, !packet->version->minor ? "" : QString::fromUtf8(packet->version->minor)),
+                                Q_ARG(QString, !packet->version->release ? "" : QString::fromUtf8(packet->version->release)),
+                                Q_ARG(QString, !packet->version->build ? "" : QString::fromUtf8(packet->version->build)),
                                 Q_ARG(int, Version::encodeVersionType(packet->version->type)));
     }
 

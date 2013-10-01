@@ -143,6 +143,9 @@ void QPndman::Repository::update()
 
   for(pndman_package* x = pndmanRepository->pnd; x != 0; x = x->next)
   {
+    if(!x->id)
+      continue;
+
     bool newPackage = true;
     QString packageId = QString::fromUtf8(x->id);
     ids.insert(packageId);
