@@ -123,6 +123,7 @@ QString QPndman::Device::getAppdata() const
 
 void QPndman::Device::update()
 {
+  pndman_device_update(pndmanDevice);
   setFree(pndmanDevice->free);
   setAvailable(pndmanDevice->available);
 }
