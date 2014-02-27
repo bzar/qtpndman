@@ -45,12 +45,12 @@ bool QPndman::SyncHandle::getDone() const
   return _done;
 }
 
-qint64 QPndman::SyncHandle::getBytesDownloaded() const
+quint64 QPndman::SyncHandle::getBytesDownloaded() const
 {
   return bytesDownloaded;
 }
 
-qint64 QPndman::SyncHandle::getBytesToDownload() const
+quint64 QPndman::SyncHandle::getBytesToDownload() const
 {
   return bytesToDownload;
 }
@@ -59,8 +59,8 @@ void QPndman::SyncHandle::update()
 {
   setError(handle.error);
   setDone(handle.progress.done);
-  setBytesDownloaded(static_cast<qint64>(handle.progress.download));
-  setBytesToDownload(static_cast<qint64>(handle.progress.total_to_download));
+  setBytesDownloaded(static_cast<quint64>(handle.progress.download));
+  setBytesToDownload(static_cast<quint64>(handle.progress.total_to_download));
 }
 
 
@@ -85,7 +85,7 @@ void QPndman::SyncHandle::setDone(bool const& newDone)
   }
 }
 
-void QPndman::SyncHandle::setBytesDownloaded(qint64 const value)
+void QPndman::SyncHandle::setBytesDownloaded(quint64 const value)
 {
   if(value != bytesDownloaded)
   {
@@ -104,7 +104,7 @@ void QPndman::SyncHandle::setBytesDownloaded(qint64 const value)
   }
 }
 
-void QPndman::SyncHandle::setBytesToDownload(qint64 const value)
+void QPndman::SyncHandle::setBytesToDownload(quint64 const value)
 {
   if(value != bytesToDownload)
   {

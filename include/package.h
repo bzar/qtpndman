@@ -35,7 +35,7 @@ namespace QPndman
     Q_PROPERTY(QString url READ getUrl CONSTANT)
     Q_PROPERTY(QString vendor READ getVendor CONSTANT)
     Q_PROPERTY(QString mount READ getMount CONSTANT)
-    Q_PROPERTY(qint64 size READ getSize CONSTANT)
+    Q_PROPERTY(quint64 size READ getSize CONSTANT)
     Q_PROPERTY(QDateTime modified READ getModified CONSTANT)
     Q_PROPERTY(int rating READ getRating NOTIFY ratingChanged)
     Q_PROPERTY(int ownRating READ getOwnRating NOTIFY ownRatingChanged)
@@ -80,7 +80,7 @@ namespace QPndman
     QString getUrl() const;
     QString getVendor() const;
     QString getMount() const;
-    qint64 getSize() const;
+    quint64 getSize() const;
     QDateTime getModified() const;
     int getRating() const;
     int getOwnRating() const;
@@ -140,7 +140,7 @@ namespace QPndman
     QString url;
     QString vendor;
     QString mount;
-    qint64 size;
+    quint64 size;
     QDateTime modified;
     int rating;
     int ownRating;

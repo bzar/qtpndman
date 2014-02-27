@@ -149,7 +149,7 @@ QString QPndman::Package::getMount() const
 {
   return mount;
 }
-qint64 QPndman::Package::getSize() const
+quint64 QPndman::Package::getSize() const
 {
   return size;
 }

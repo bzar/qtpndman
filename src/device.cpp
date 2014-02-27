@@ -104,15 +104,15 @@ QString QPndman::Device::getMount() const
 {
   return mount;
 }
-qint64 QPndman::Device::getSize() const
+quint64 QPndman::Device::getSize() const
 {
   return size;
 }
-qint64 QPndman::Device::getFree() const
+quint64 QPndman::Device::getFree() const
 {
   return free;
 }
-qint64 QPndman::Device::getAvailable() const
+quint64 QPndman::Device::getAvailable() const
 {
   return available;
 }
@@ -128,7 +128,7 @@ void QPndman::Device::update()
   setAvailable(pndmanDevice->available);
 }
 
-void QPndman::Device::setFree(qint64 const& newFree)
+void QPndman::Device::setFree(quint64 const& newFree)
 {
   if(free != newFree)
   {
@@ -136,7 +136,7 @@ void QPndman::Device::setFree(qint64 const& newFree)
     emit freeChanged(free);
   }
 }
-void QPndman::Device::setAvailable(qint64 const& newAvailable)
+void QPndman::Device::setAvailable(quint64 const& newAvailable)
 {
   if(available != newAvailable)
   {

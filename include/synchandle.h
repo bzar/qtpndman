@@ -15,8 +15,8 @@ namespace QPndman
     Q_PROPERTY(QString error READ getError NOTIFY errorChanged)
     Q_PROPERTY(QPndman::Repository* repository READ getRepository CONSTANT)
     Q_PROPERTY(bool done READ getDone NOTIFY doneChanged)
-    Q_PROPERTY(qint64 bytesDownloaded READ getBytesDownloaded NOTIFY bytesDownloadedChanged)
-    Q_PROPERTY(qint64 bytesToDownload READ getBytesToDownload NOTIFY bytesToDownloadChanged)
+    Q_PROPERTY(quint64 bytesDownloaded READ getBytesDownloaded NOTIFY bytesDownloadedChanged)
+    Q_PROPERTY(quint64 bytesToDownload READ getBytesToDownload NOTIFY bytesToDownloadChanged)
 
   public:
     SyncHandle(Repository* repository, bool fullSync = false, QObject* parent = 0);
@@ -29,8 +29,8 @@ namespace QPndman
     QString getError() const;
     Repository* getRepository() const;
     bool getDone() const;
-    qint64 getBytesDownloaded() const;
-    qint64 getBytesToDownload() const;
+    quint64 getBytesDownloaded() const;
+    quint64 getBytesToDownload() const;
 
   public slots:
     void update();
@@ -39,8 +39,8 @@ namespace QPndman
     void errorChanged(QString newError);
     void doneChanged(bool newDone);
     void done();
-    void bytesDownloadedChanged(qint64 newBytesDownloaded);
-    void bytesToDownloadChanged(qint64 newBytesToDownload);
+    void bytesDownloadedChanged(quint64 newBytesDownloaded);
+    void bytesToDownloadChanged(quint64 newBytesToDownload);
     
     void downloadStarted();
     void downloadFinished();
@@ -48,15 +48,15 @@ namespace QPndman
   private:
     void setError(QString const& newError);
     void setDone(bool const& newDone);
-    void setBytesDownloaded(qint64 const value);
-    void setBytesToDownload(qint64 const value);
+    void setBytesDownloaded(quint64 const value);
+    void setBytesToDownload(quint64 const value);
 
     pndman_sync_handle handle;
     QString error;
     Repository* repository;
     bool _done;
-    qint64 bytesDownloaded;
-    qint64 bytesToDownload;
+    quint64 bytesDownloaded;
+    quint64 bytesToDownload;
   };
 }
 

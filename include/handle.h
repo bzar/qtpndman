@@ -27,8 +27,8 @@ namespace QPndman
     Q_PROPERTY(QPndman::Enum::Operation operation READ getOperation CONSTANT)
     Q_PROPERTY(bool done READ getDone NOTIFY doneChanged)
     Q_PROPERTY(bool cancelled READ getCancelled NOTIFY cancelledChanged)
-    Q_PROPERTY(qint64 bytesDownloaded READ getBytesDownloaded NOTIFY bytesDownloadedChanged)
-    Q_PROPERTY(qint64 bytesToDownload READ getBytesToDownload NOTIFY bytesToDownloadChanged)
+    Q_PROPERTY(quint64 bytesDownloaded READ getBytesDownloaded NOTIFY bytesDownloadedChanged)
+    Q_PROPERTY(quint64 bytesToDownload READ getBytesToDownload NOTIFY bytesToDownloadChanged)
 
   
   public:
@@ -47,8 +47,8 @@ namespace QPndman
     bool getDone() const;
     bool getCancelled() const;
     bool getExecuted() const;
-    qint64 getBytesDownloaded() const;
-    qint64 getBytesToDownload() const;
+    quint64 getBytesDownloaded() const;
+    quint64 getBytesToDownload() const;
 
   public slots:
     virtual bool execute() = 0;
@@ -59,8 +59,8 @@ namespace QPndman
     void errorChanged(QString newError);
     void doneChanged(bool newDone);
     void cancelledChanged(bool newCancelled);
-    void bytesDownloadedChanged(qint64 newBytesDownloaded);
-    void bytesToDownloadChanged(qint64 newBytesToDownload);
+    void bytesDownloadedChanged(quint64 newBytesDownloaded);
+    void bytesToDownloadChanged(quint64 newBytesToDownload);
 
     void downloadStarted();
     void downloadFinished();
@@ -75,8 +75,8 @@ namespace QPndman
 
     void setError(QString const& error);
     void setDone(bool const& done);
-    void setBytesDownloaded(qint64 const value);
-    void setBytesToDownload(qint64 const value);
+    void setBytesDownloaded(quint64 const value);
+    void setBytesToDownload(quint64 const value);
     
     Context* context;
     pndman_package_handle handle;
@@ -89,8 +89,8 @@ namespace QPndman
     bool _done;
     bool _cancelled;
     bool _executed;
-    qint64 bytesDownloaded;
-    qint64 bytesToDownload;
+    quint64 bytesDownloaded;
+    quint64 bytesToDownload;
   };
   
   class InstallHandle : public Handle
